@@ -6,177 +6,319 @@
 <title>YaContesto — Recepcionista con IA para el WhatsApp de tu clínica dental</title>
 <meta name="description" content="Instalamos un asistente con inteligencia artificial en el WhatsApp de tu consultorio: contesta al instante 24/7, responde precios y dudas, y agenda las citas en tu calendario. Listo en 7 días, con garantía.">
 <meta property="og:title" content="YaContesto — Tu WhatsApp contesta solo, 24/7">
-<meta property="og:description" content="Asistente con IA para clínicas dentales: contesta al instante, resuelve dudas y agenda citas en tu calendario. Instalación completa en 7 días.">
+<meta property="og:description" content="Asistente con IA para clínicas dentales: contesta al instante, resuelve dudas y agenda citas verificando tu calendario. Instalación completa en 7 días, con garantía de 14 días.">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="es_MX">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2310B981'/><text y='72' x='50' font-size='58' font-weight='bold' text-anchor='middle' fill='white' font-family='sans-serif'>Ya</text></svg>">
+<meta name="theme-color" content="#075E54">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23075E54'/><text y='70' x='50' font-size='54' font-weight='bold' text-anchor='middle' fill='white' font-family='sans-serif'>Ya</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Service",
+  "name": "YaContesto",
+  "serviceType": "Recepcionista virtual con IA para WhatsApp",
+  "areaServed": "MX",
+  "provider": { "@type": "Person", "name": "Diego Benítez", "email": "diego@yacontesto.com" },
+  "description": "Asistente con inteligencia artificial para el WhatsApp de clínicas dentales: responde al instante, resuelve dudas y agenda citas verificando el calendario."
+}
+</script>
 <style>
-  *, *::before, *::after { box-sizing: border-box; }
+  /* ── Sistema ─────────────────────────────────────────────
+     Tinta con sesgo verde, papel blanco, neutro menta clínico.
+     Acento de marca: verde selva (WhatsApp clásico, adulto).
+     El verde brillante de chat vive SOLO dentro del teléfono. */
   :root {
-    --verde: #059669;
-    --verde-osc: #047857;
-    --verde-claro: #ecfdf5;
-    --tinta: #0f172a;
-    --gris: #475569;
-    --gris-claro: #e2e8f0;
-    --fondo: #ffffff;
-    --radio: 16px;
-    --sombra: 0 4px 24px rgba(15, 23, 42, .08);
+    --tinta: #172823;
+    --tinta-suave: #46615A;
+    --papel: #FFFFFF;
+    --menta: #F1F6F4;
+    --linea: #DCE7E2;
+    --selva: #075E54;
+    --selva-osc: #054C44;
+    --resalte: #C9F0DE;
+    --chat-fondo: #0B141A;
+    --chat-panel: #1F2C34;
+    --chat-entrante: #202C33;
+    --chat-saliente: #005C4B;
+    --chat-texto: #E9EDEF;
+    --chat-meta: #8696A0;
+    --ancho: 1120px;
+    --radio: 10px;
   }
+  *, *::before, *::after { box-sizing: border-box; }
   html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
   body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    color: var(--tinta);
-    background: var(--fondo);
-    line-height: 1.6;
-    font-size: 17px;
+    font-family: "Instrument Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 17px; line-height: 1.6;
+    color: var(--tinta); background: var(--papel);
   }
-  img { max-width: 100%; }
-  .contenedor { width: min(1080px, 100% - 2.5rem); margin-inline: auto; }
-  .estrecho { width: min(720px, 100% - 2.5rem); margin-inline: auto; }
+  ::selection { background: var(--resalte); color: var(--tinta); }
+  :focus-visible { outline: 2px solid var(--selva); outline-offset: 3px; border-radius: 4px; }
+  img, svg { display: block; max-width: 100%; }
+  .contenedor { width: min(var(--ancho), 100% - 3rem); margin-inline: auto; }
+  .estrecho { width: min(760px, 100% - 3rem); margin-inline: auto; }
 
-  /* --- Barra --- */
-  header {
-    position: sticky; top: 0; z-index: 20;
-    background: rgba(255,255,255,.92);
-    backdrop-filter: blur(8px);
-    border-bottom: 1px solid var(--gris-claro);
+  h1, h2, .display {
+    font-family: "Bricolage Grotesque", "Instrument Sans", sans-serif;
+    font-weight: 600; letter-spacing: -0.015em; line-height: 1.06;
+    text-wrap: balance; margin: 0;
   }
-  .barra { display: flex; align-items: center; justify-content: space-between; padding: .75rem 0; }
-  .marca { display: flex; align-items: center; gap: .55rem; font-weight: 800; font-size: 1.15rem; letter-spacing: -.02em; }
-  .marca-icono {
-    width: 34px; height: 34px; border-radius: 9px;
-    background: linear-gradient(160deg, #10b981, var(--verde-osc));
-    color: #fff; display: grid; place-items: center; font-size: .95rem; font-weight: 800;
+  .ceja {
+    font-size: .78rem; font-weight: 600; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--selva); margin: 0 0 1.1rem;
   }
+  p { margin: 0; }
 
-  /* --- Botones --- */
+  /* ── Botones: rectos, sin brillos ── */
   .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
-    background: var(--verde); color: #fff; text-decoration: none;
-    padding: .85rem 1.5rem; border-radius: 999px; font-weight: 700; font-size: 1rem;
-    box-shadow: 0 6px 18px rgba(5, 150, 105, .28);
-    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
-    text-align: center;
+    display: inline-flex; align-items: center; gap: .55rem;
+    background: var(--selva); color: #fff; text-decoration: none;
+    font-weight: 600; font-size: 1rem; line-height: 1;
+    padding: .95rem 1.4rem; border-radius: var(--radio);
+    transition: background .15s ease;
   }
-  .btn:hover { background: var(--verde-osc); transform: translateY(-1px); box-shadow: 0 8px 22px rgba(5,150,105,.34); }
-  .btn-chico { padding: .6rem 1.1rem; font-size: .92rem; }
-  .btn-linea { background: #fff; color: var(--verde-osc); border: 2px solid var(--verde); box-shadow: none; }
-  .btn-linea:hover { background: var(--verde-claro); color: var(--verde-osc); }
-
-  /* --- Portada --- */
-  .portada { padding: 4rem 0 3rem; background: linear-gradient(180deg, var(--verde-claro), #fff 70%); }
-  .portada-grid { display: grid; gap: 3rem; align-items: center; }
-  @media (min-width: 900px) { .portada-grid { grid-template-columns: 1.05fr .95fr; } }
-  .etiqueta {
-    display: inline-block; background: #fff; border: 1px solid #a7f3d0; color: var(--verde-osc);
-    padding: .35rem .85rem; border-radius: 999px; font-size: .82rem; font-weight: 700; margin-bottom: 1.1rem;
+  .btn:hover { background: var(--selva-osc); }
+  .btn svg { width: 18px; height: 18px; }
+  .enlace {
+    display: inline-flex; align-items: center; gap: .4rem;
+    color: var(--selva); font-weight: 600; text-decoration: none;
+    border-bottom: 2px solid var(--resalte); padding-bottom: 2px;
   }
-  h1 { font-size: clamp(2rem, 5.5vw, 3.1rem); line-height: 1.12; letter-spacing: -.03em; margin: 0 0 1rem; font-weight: 800; }
-  h1 .resalte { color: var(--verde-osc); }
-  .entrada { font-size: 1.13rem; color: var(--gris); margin: 0 0 1.8rem; }
-  .acciones { display: flex; flex-wrap: wrap; gap: .8rem; }
-  .nota-portada { margin-top: 1.1rem; font-size: .92rem; color: var(--gris); }
+  .enlace:hover { border-bottom-color: var(--selva); }
 
-  /* --- Chat --- */
+  /* ── Encabezado ── */
+  header {
+    position: sticky; top: 0; z-index: 40;
+    background: rgba(255,255,255,.94); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--linea);
+  }
+  .barra { display: flex; align-items: center; justify-content: space-between; padding: .8rem 0; }
+  .marca { display: flex; align-items: center; gap: .6rem; text-decoration: none; color: var(--tinta); }
+  .marca-glifo {
+    width: 32px; height: 32px; border-radius: 8px; background: var(--selva);
+    color: #fff; display: grid; place-items: center;
+    font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; font-size: .85rem;
+  }
+  .marca-nombre { font-family: "Bricolage Grotesque", sans-serif; font-weight: 700; font-size: 1.12rem; }
+  .barra .btn { padding: .6rem 1rem; font-size: .92rem; }
+
+  /* ── Portada ── */
+  .portada { padding: 4.5rem 0 4rem; border-bottom: 1px solid var(--linea); }
+  .portada-grid { display: grid; gap: 3.5rem; align-items: center; }
+  @media (min-width: 940px) { .portada-grid { grid-template-columns: 1.04fr .96fr; gap: 4rem; } }
+  h1 { font-size: clamp(2.3rem, 5.2vw, 3.4rem); }
+  .marcador {
+    background: linear-gradient(transparent 58%, var(--resalte) 0);
+    padding-inline: .08em; margin-inline: -.08em;
+  }
+  .entrada { font-size: 1.14rem; color: var(--tinta-suave); margin: 1.4rem 0 2rem; max-width: 34rem; }
+  .entrada strong { color: var(--tinta); }
+  .acciones { display: flex; flex-wrap: wrap; align-items: center; gap: 1.4rem; }
+  .meta-portada {
+    display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; margin-top: 1.8rem;
+    padding-top: 1.4rem; border-top: 1px solid var(--linea);
+    font-size: .88rem; color: var(--tinta-suave);
+  }
+  .meta-portada span { display: inline-flex; align-items: center; gap: .45rem; }
+  .meta-portada svg { width: 15px; height: 15px; color: var(--selva); flex-shrink: 0; }
+
+  /* ── Teléfono (única zona con el verde brillante de WhatsApp) ── */
   .telefono {
-    background: #0b141a; border-radius: 26px; padding: .7rem .6rem 1rem;
-    box-shadow: 0 18px 50px rgba(15,23,42,.28); max-width: 400px; margin-inline: auto; width: 100%;
+    width: min(392px, 100%); margin-inline: auto;
+    background: var(--chat-fondo); border-radius: 30px;
+    border: 1px solid #2A3942; box-shadow: 0 24px 60px -18px rgba(23,40,35,.35);
+    overflow: hidden;
+    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
   }
-  .telefono-barra {
-    display: flex; align-items: center; gap: .6rem; padding: .35rem .7rem .7rem; color: #e9edef;
+  .estado-barra {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: .55rem 1.1rem .35rem; color: var(--chat-texto); font-size: .74rem; font-weight: 600;
   }
-  .telefono-avatar {
-    width: 34px; height: 34px; border-radius: 50%; background: var(--verde); display: grid; place-items: center;
-    font-size: .8rem; font-weight: 800; color: #fff; flex-shrink: 0;
+  .estado-iconos { display: flex; gap: .35rem; align-items: center; }
+  .estado-iconos svg { width: 14px; height: 14px; }
+  .chat-encabezado {
+    display: flex; align-items: center; gap: .65rem;
+    background: var(--chat-panel); padding: .55rem .8rem;
   }
-  .telefono-nombre { font-weight: 700; font-size: .93rem; line-height: 1.2; }
-  .telefono-estado { font-size: .74rem; color: #8696a0; }
-  .chat { background: #0b141a; padding: .3rem .25rem; display: flex; flex-direction: column; gap: .45rem; }
+  .chat-atras { color: var(--chat-texto); flex-shrink: 0; }
+  .chat-atras svg { width: 20px; height: 20px; }
+  .chat-avatar {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    background: #25D366; color: #063A2F; font-weight: 700; font-size: .8rem;
+    display: grid; place-items: center;
+  }
+  .chat-quien { flex: 1; min-width: 0; }
+  .chat-nombre { color: var(--chat-texto); font-weight: 600; font-size: .92rem; line-height: 1.2; }
+  .chat-estado { color: var(--chat-meta); font-size: .74rem; }
+  .chat-acciones { display: flex; gap: 1rem; color: var(--chat-texto); }
+  .chat-acciones svg { width: 19px; height: 19px; }
+  .chat { padding: .7rem .55rem .9rem; display: flex; flex-direction: column; gap: .38rem; }
+  .chat-dia {
+    align-self: center; background: var(--chat-panel); color: var(--chat-meta);
+    font-size: .68rem; font-weight: 600; letter-spacing: .05em;
+    padding: .28rem .7rem; border-radius: 8px; margin-bottom: .3rem;
+  }
   .burbuja {
-    max-width: 85%; padding: .5rem .7rem; border-radius: 12px; font-size: .875rem; line-height: 1.45;
-    position: relative; white-space: pre-line;
+    max-width: 86%; padding: .48rem .62rem .3rem; border-radius: 9px;
+    font-size: .865rem; line-height: 1.42; color: var(--chat-texto);
+    white-space: pre-line; overflow-wrap: break-word;
   }
-  .de-ellos { background: #202c33; color: #e9edef; align-self: flex-start; border-top-left-radius: 3px; }
-  .de-nosotros { background: #005c4b; color: #e9edef; align-self: flex-end; border-top-right-radius: 3px; }
-  .hora { font-size: .65rem; color: #8696a0; display: block; text-align: right; margin-top: .15rem; }
-  .pie-chat { text-align: center; font-size: .8rem; color: var(--gris); margin-top: 1rem; }
+  .entrante { background: var(--chat-entrante); align-self: flex-start; border-top-left-radius: 2px; }
+  .saliente { background: var(--chat-saliente); align-self: flex-end; border-top-right-radius: 2px; }
+  .burbuja-meta {
+    display: flex; justify-content: flex-end; align-items: center; gap: .25rem;
+    font-size: .64rem; color: var(--chat-meta); margin-top: .12rem;
+  }
+  .palomas { width: 15px; height: 10px; color: #53BDEB; }
+  .pie-chat { text-align: center; font-size: .85rem; color: var(--tinta-suave); margin-top: 1rem; }
 
-  /* --- Secciones --- */
-  section { padding: 4rem 0; }
-  .seccion-alt { background: #f8fafc; border-block: 1px solid var(--gris-claro); }
-  h2 { font-size: clamp(1.55rem, 3.7vw, 2.15rem); letter-spacing: -.025em; line-height: 1.2; margin: 0 0 .8rem; font-weight: 800; }
-  .sub-seccion { color: var(--gris); font-size: 1.05rem; margin: 0 auto 2.5rem; max-width: 620px; }
-  .centro { text-align: center; }
+  @media (prefers-reduced-motion: no-preference) {
+    .burbuja { opacity: 0; transform: translateY(8px); animation: aparecer .45s ease forwards; }
+    .chat .burbuja:nth-of-type(1) { animation-delay: .2s }
+    .chat .burbuja:nth-of-type(2) { animation-delay: .7s }
+    .chat .burbuja:nth-of-type(3) { animation-delay: 1.3s }
+    .chat .burbuja:nth-of-type(4) { animation-delay: 1.9s }
+    .chat .burbuja:nth-of-type(5) { animation-delay: 2.6s }
+    .chat .burbuja:nth-of-type(6) { animation-delay: 3.2s }
+    .chat .burbuja:nth-of-type(7) { animation-delay: 3.8s }
+    .chat .burbuja:nth-of-type(8) { animation-delay: 4.4s }
+    @keyframes aparecer { to { opacity: 1; transform: none; } }
+  }
 
-  .datos { display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
-  .dato { background: #fff; border: 1px solid var(--gris-claro); border-radius: var(--radio); padding: 1.6rem 1.3rem; text-align: center; }
-  .dato-num { font-size: 2.3rem; font-weight: 800; color: var(--verde-osc); letter-spacing: -.03em; line-height: 1; }
-  .dato-txt { color: var(--gris); font-size: .95rem; margin-top: .6rem; }
-  .fuentes { font-size: .8rem; color: #94a3b8; text-align: center; margin-top: 1.5rem; }
+  /* ── Franja de datos ── */
+  .datos { padding: 3.4rem 0; border-bottom: 1px solid var(--linea); }
+  .datos-fila { display: grid; gap: 2rem; }
+  @media (min-width: 760px) {
+    .datos-fila { grid-template-columns: repeat(3, 1fr); gap: 0; }
+    .datos-fila > div { padding-inline: 2.2rem; border-left: 1px solid var(--linea); }
+    .datos-fila > div:first-child { padding-left: 0; border-left: 0; }
+  }
+  .dato-num {
+    font-family: "Bricolage Grotesque", sans-serif; font-weight: 700;
+    font-size: 2.9rem; line-height: 1; letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .dato-num sup { font-size: 1rem; font-weight: 600; color: var(--selva); }
+  .dato-txt { color: var(--tinta-suave); font-size: .95rem; margin-top: .55rem; max-width: 26ch; }
+  .fuentes { font-size: .8rem; color: var(--tinta-suave); margin-top: 2rem; opacity: .85; }
 
-  .tarjetas { display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
-  .tarjeta { background: #fff; border: 1px solid var(--gris-claro); border-radius: var(--radio); padding: 1.5rem; box-shadow: var(--sombra); }
-  .tarjeta h3 { margin: .2rem 0 .5rem; font-size: 1.08rem; }
-  .tarjeta p { margin: 0; color: var(--gris); font-size: .95rem; }
-  .icono { font-size: 1.7rem; line-height: 1; }
+  /* ── Secciones ── */
+  section { padding: 5rem 0; }
+  .seccion-menta { background: var(--menta); border-block: 1px solid var(--linea); }
+  h2 { font-size: clamp(1.7rem, 3.6vw, 2.35rem); }
+  .cabecera-seccion { display: grid; gap: 1rem; margin-bottom: 3rem; max-width: 900px; }
+  @media (min-width: 860px) {
+    .cabecera-seccion.doble { grid-template-columns: 1.1fr .9fr; align-items: end; gap: 3rem; max-width: none; }
+  }
+  .cabecera-seccion p { color: var(--tinta-suave); font-size: 1.05rem; }
 
-  .pasos { display: grid; gap: 1.6rem; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); counter-reset: paso; }
-  .paso { position: relative; padding-left: 3.3rem; }
+  /* Funciones: registro a dos columnas, sin tarjetas */
+  .funciones { display: grid; gap: 0 3.5rem; }
+  @media (min-width: 760px) { .funciones { grid-template-columns: 1fr 1fr; } }
+  .funcion {
+    display: grid; grid-template-columns: 44px 1fr; gap: 1.1rem;
+    padding: 1.5rem 0; border-top: 1px solid var(--linea);
+  }
+  .funcion-icono {
+    width: 44px; height: 44px; border-radius: var(--radio);
+    background: #fff; border: 1px solid var(--linea); color: var(--selva);
+    display: grid; place-items: center;
+  }
+  .seccion-menta .funcion-icono { background: #fff; }
+  .funcion-icono svg { width: 21px; height: 21px; }
+  .funcion h3 { margin: 0 0 .3rem; font-size: 1.05rem; font-weight: 600; }
+  .funcion p { color: var(--tinta-suave); font-size: .95rem; }
+
+  /* Pasos: proceso real, numerado */
+  .pasos { display: grid; gap: 2.5rem; counter-reset: paso; }
+  @media (min-width: 760px) { .pasos { grid-template-columns: repeat(3, 1fr); gap: 3rem; } }
+  .paso { border-top: 2px solid var(--tinta); padding-top: 1.1rem; }
   .paso::before {
-    counter-increment: paso; content: counter(paso);
-    position: absolute; left: 0; top: 0;
-    width: 2.4rem; height: 2.4rem; border-radius: 50%;
-    background: var(--verde); color: #fff; display: grid; place-items: center; font-weight: 800;
+    counter-increment: paso; content: "Paso " counter(paso);
+    font-size: .78rem; font-weight: 600; letter-spacing: .14em; text-transform: uppercase;
+    color: var(--selva);
   }
-  .paso h3 { margin: .35rem 0 .4rem; font-size: 1.05rem; }
-  .paso p { margin: 0; color: var(--gris); font-size: .95rem; }
+  .paso h3 { margin: .5rem 0 .4rem; font-size: 1.12rem; }
+  .paso p { color: var(--tinta-suave); font-size: .95rem; }
+  .paso .tiempo { display: inline-block; margin-top: .7rem; font-size: .82rem; color: var(--tinta-suave); border: 1px solid var(--linea); border-radius: 6px; padding: .15rem .55rem; background: #fff; }
 
-  .lista { list-style: none; padding: 0; margin: 0; display: grid; gap: .85rem; }
-  .lista li { display: flex; gap: .7rem; align-items: flex-start; }
-  .palomita { color: var(--verde); font-weight: 800; flex-shrink: 0; }
-
-  /* --- Precio --- */
-  .precio-caja {
-    background: #fff; border: 2px solid var(--verde); border-radius: 22px; padding: 2.2rem 1.8rem;
-    max-width: 520px; margin-inline: auto; box-shadow: 0 12px 40px rgba(5,150,105,.14); text-align: center;
+  /* ── Precio ── */
+  .precio-grid { display: grid; gap: 2.5rem; align-items: start; }
+  @media (min-width: 900px) { .precio-grid { grid-template-columns: .95fr 1.05fr; gap: 4rem; } }
+  .precio-caja { background: #fff; border: 1px solid var(--tinta); border-radius: 14px; overflow: hidden; }
+  .precio-cinta {
+    background: var(--tinta); color: #fff; font-size: .8rem; font-weight: 600;
+    letter-spacing: .1em; text-transform: uppercase; padding: .55rem 1.4rem;
+    display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap;
   }
-  .precio-tag { display: inline-block; background: var(--verde); color: #fff; font-size: .8rem; font-weight: 700; padding: .3rem .9rem; border-radius: 999px; margin-bottom: 1.2rem; }
-  .precio-num { font-size: 2.7rem; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
-  .precio-antes { color: #94a3b8; text-decoration: line-through; font-size: 1.05rem; margin-left: .5rem; font-weight: 600; }
-  .precio-detalle { color: var(--gris); font-size: .95rem; margin: .5rem 0 1.6rem; }
-  .precio-linea { border-top: 1px solid var(--gris-claro); margin: 1.6rem 0; }
+  .precio-cinta em { font-style: normal; color: var(--resalte); }
+  .precio-cuerpo { padding: 1.8rem 1.6rem; }
+  .precio-linea { display: flex; align-items: baseline; gap: .7rem; flex-wrap: wrap; }
+  .precio-num {
+    font-family: "Bricolage Grotesque", sans-serif; font-weight: 700;
+    font-size: 2.6rem; letter-spacing: -.02em; line-height: 1; font-variant-numeric: tabular-nums;
+  }
+  .precio-antes { color: var(--tinta-suave); text-decoration: line-through; font-size: 1rem; }
+  .precio-desc { color: var(--tinta-suave); font-size: .92rem; margin-top: .3rem; }
+  .precio-sep { border: 0; border-top: 1px solid var(--linea); margin: 1.4rem 0; }
+  .incluye { list-style: none; margin: 0; padding: 0; display: grid; gap: .65rem; }
+  .incluye li { display: flex; gap: .6rem; align-items: flex-start; font-size: .95rem; }
+  .incluye svg { width: 17px; height: 17px; color: var(--selva); flex-shrink: 0; margin-top: .22rem; }
+  .precio-caja .btn { width: 100%; justify-content: center; margin-top: 1.6rem; }
 
-  .garantia { background: var(--verde-claro); border: 1px solid #a7f3d0; border-radius: var(--radio); padding: 1.6rem; text-align: center; max-width: 620px; margin: 2.5rem auto 0; }
-  .garantia strong { color: var(--verde-osc); }
+  .garantia {
+    display: grid; grid-template-columns: 46px 1fr; gap: 1.1rem; align-items: start;
+    border: 1px solid var(--linea); border-left: 3px solid var(--selva);
+    border-radius: 0 var(--radio) var(--radio) 0; padding: 1.4rem 1.5rem; background: var(--menta);
+  }
+  .garantia svg { width: 30px; height: 30px; color: var(--selva); margin-top: .1rem; }
+  .garantia h3 { margin: 0 0 .3rem; font-size: 1.05rem; }
+  .garantia p { color: var(--tinta-suave); font-size: .95rem; }
+  .precio-nota { margin-top: 1.6rem; color: var(--tinta-suave); font-size: .95rem; }
+  .precio-nota strong { color: var(--tinta); }
 
-  /* --- FAQ --- */
-  details { border-bottom: 1px solid var(--gris-claro); padding: 1.1rem 0; }
-  summary { cursor: pointer; font-weight: 700; list-style: none; display: flex; justify-content: space-between; gap: 1rem; align-items: center; }
+  /* ── FAQ ── */
+  details { border-bottom: 1px solid var(--linea); }
+  details:first-of-type { border-top: 1px solid var(--linea); }
+  summary {
+    cursor: pointer; list-style: none; font-weight: 600; font-size: 1.02rem;
+    padding: 1.2rem 2.2rem 1.2rem 0; position: relative;
+  }
   summary::-webkit-details-marker { display: none; }
-  summary::after { content: "+"; color: var(--verde); font-size: 1.5rem; font-weight: 400; line-height: 1; flex-shrink: 0; }
-  details[open] summary::after { content: "−"; }
-  details p { color: var(--gris); margin: .8rem 0 0; font-size: .97rem; }
+  summary::after {
+    content: ""; position: absolute; right: .2rem; top: 50%;
+    width: 11px; height: 11px; translate: 0 -50%;
+    border-right: 2px solid var(--tinta); border-bottom: 2px solid var(--tinta);
+    rotate: 45deg; transition: rotate .18s ease;
+  }
+  details[open] summary::after { rotate: 225deg; }
+  details > p { color: var(--tinta-suave); font-size: .97rem; padding: 0 0 1.3rem; max-width: 62ch; }
 
-  /* --- Cierre --- */
-  .cierre { background: linear-gradient(160deg, var(--verde-osc), #065f46); color: #fff; text-align: center; }
-  .cierre h2 { color: #fff; }
-  .cierre p { color: #d1fae5; max-width: 560px; margin: 0 auto 2rem; }
-  .cierre .btn { background: #fff; color: var(--verde-osc); box-shadow: 0 8px 26px rgba(0,0,0,.22); }
-  .cierre .btn:hover { background: #ecfdf5; color: var(--verde-osc); }
+  /* ── Cierre ── */
+  .cierre { background: var(--selva-osc); color: #fff; }
+  .cierre .ceja { color: var(--resalte); }
+  .cierre h2 { color: #fff; max-width: 21ch; }
+  .cierre p { color: #C5DAD4; max-width: 52ch; margin: 1.2rem 0 2rem; font-size: 1.05rem; }
+  .cierre .btn { background: #fff; color: var(--selva-osc); }
+  .cierre .btn:hover { background: var(--resalte); }
 
-  footer { padding: 2.5rem 0; text-align: center; color: var(--gris); font-size: .9rem; }
-  footer a { color: var(--verde-osc); }
+  footer { padding: 2.6rem 0; font-size: .9rem; color: var(--tinta-suave); }
+  .pie { display: flex; flex-wrap: wrap; gap: 1rem 2rem; justify-content: space-between; align-items: baseline; }
+  footer a { color: var(--selva); }
+  .pie-legal { font-size: .8rem; opacity: .8; margin-top: .6rem; }
 
-  /* Botón flotante en móvil */
+  /* Barra flotante móvil */
   .flotante { display: none; }
   @media (max-width: 640px) {
     .flotante {
-      display: flex; position: fixed; bottom: 1rem; left: 1rem; right: 1rem; z-index: 30;
-      box-shadow: 0 8px 28px rgba(5,150,105,.4);
+      display: flex; position: fixed; inset: auto 1rem 1rem; z-index: 50;
+      justify-content: center; box-shadow: 0 10px 30px -8px rgba(5,76,68,.5);
     }
-    body { padding-bottom: 4.5rem; }
+    body { padding-bottom: 4.6rem; }
     .barra .btn { display: none; }
   }
 </style>
@@ -185,263 +327,322 @@
 
 <header>
   <div class="contenedor barra">
-    <div class="marca"><span class="marca-icono">Ya</span> YaContesto</div>
-    <a class="btn btn-chico" href="https://wa.me/5217774933883?text=Hola%2C%20vi%20su%20p%C3%A1gina%20y%20quiero%20la%20demo%20del%20asistente%20para%20mi%20cl%C3%ADnica" target="_blank" rel="noopener">Pedir demo</a>
+    <a class="marca" href="#">
+      <span class="marca-glifo">Ya</span>
+      <span class="marca-nombre">YaContesto</span>
+    </a>
+    <a class="btn" href="https://wa.me/5217774933883?text=Hola%2C%20vi%20su%20p%C3%A1gina%20y%20quiero%20ver%20la%20demo%20del%20asistente" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L4 21l1.9-4.6A8.5 8.5 0 1 1 21 11.5Z"/></svg>
+      Pedir demo
+    </a>
   </div>
 </header>
 
-<!-- PORTADA -->
+<!-- ══ PORTADA ══ -->
 <section class="portada">
   <div class="contenedor portada-grid">
     <div>
-      <span class="etiqueta">Para clínicas dentales en México</span>
-      <h1>Tu WhatsApp contesta solo. <span class="resalte">Aunque sean las 11 de la noche.</span></h1>
+      <p class="ceja">Para clínicas dentales en México</p>
+      <h1>Tu WhatsApp contesta solo. <span class="marcador">Aunque sean las 11 de la noche.</span></h1>
       <p class="entrada">
         Instalamos un asistente con inteligencia artificial en el WhatsApp de tu consultorio:
-        responde al instante, resuelve dudas y precios, y <strong>agenda la cita directo en tu calendario</strong>.
-        Tú no mueves nada — nosotros lo dejamos funcionando en 7 días.
+        responde al instante, resuelve dudas y precios, y <strong>agenda la cita directo en tu
+        calendario</strong>. Tú no mueves nada — lo dejamos funcionando en 7 días.
       </p>
       <div class="acciones">
-        <a class="btn" href="https://wa.me/5217774933883?text=Hola%2C%20vi%20su%20p%C3%A1gina%20y%20quiero%20la%20demo%20del%20asistente%20para%20mi%20cl%C3%ADnica" target="_blank" rel="noopener">Quiero verlo funcionando</a>
-        <a class="btn btn-linea" href="#precio">Ver precios</a>
+        <a class="btn" href="https://wa.me/5217774933883?text=Hola%2C%20vi%20su%20p%C3%A1gina%20y%20quiero%20ver%20la%20demo%20del%20asistente" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L4 21l1.9-4.6A8.5 8.5 0 1 1 21 11.5Z"/></svg>
+          Verlo funcionando
+        </a>
+        <a class="enlace" href="#precio">Ver precios ↓</a>
       </div>
-      <p class="nota-portada">Instalación completa · Garantía de 14 días · Sin plazos forzosos</p>
+      <div class="meta-portada">
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Instalación completa</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Garantía de 14 días</span>
+        <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Sin plazos forzosos</span>
+      </div>
     </div>
 
-    <!-- Conversación real -->
+    <!-- Conversación real con el asistente -->
     <div>
-      <div class="telefono">
-        <div class="telefono-barra">
-          <div class="telefono-avatar">CD</div>
-          <div>
-            <div class="telefono-nombre">Clínica Dental</div>
-            <div class="telefono-estado">en línea</div>
-          </div>
+      <div class="telefono" role="img" aria-label="Conversación de WhatsApp donde el asistente responde precios y agenda una cita">
+        <div class="estado-barra">
+          <span>10:47</span>
+          <span class="estado-iconos">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M2 16h3v5H2zM7.5 12h3v9h-3zM13 8h3v13h-3zM18.5 4h3v17h-3z"/></svg>
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 20.5 3 11.7A12.6 12.6 0 0 1 12 8a12.6 12.6 0 0 1 9 3.7Z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2.5" y="8" width="17" height="9" rx="2.2"/><path d="M21.5 11.5v2" stroke-linecap="round"/><rect x="4.2" y="9.7" width="10" height="5.6" rx="1" fill="currentColor" stroke="none"/></svg>
+          </span>
+        </div>
+        <div class="chat-encabezado">
+          <span class="chat-atras"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m14 6-6 6 6 6"/></svg></span>
+          <span class="chat-avatar">CD</span>
+          <span class="chat-quien">
+            <span class="chat-nombre">Clínica Dental</span>
+            <span class="chat-estado">en línea</span>
+          </span>
+          <span class="chat-acciones">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="7" width="13" height="10" rx="2"/><path d="m15.5 11 5.5-3v8l-5.5-3"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7 12.8 12.8 0 0 0 .7 2.8 2 2 0 0 1-.5 2.1L8 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4 12.8 12.8 0 0 0 2.8.7 2 2 0 0 1 1.8 2Z"/></svg>
+          </span>
         </div>
         <div class="chat">
-          <div class="burbuja de-nosotros">Hola, buen día<span class="hora">10:47 p.m.</span></div>
-          <div class="burbuja de-ellos">¡Buenas noches! 👋 ¿En qué te puedo ayudar? 😊<span class="hora">10:47 p.m.</span></div>
-          <div class="burbuja de-nosotros">Quería agendar una cita, ¿qué servicios ofrecen?<span class="hora">10:48 p.m.</span></div>
-          <div class="burbuja de-ellos">¡Claro! Esto es lo que ofrecemos:
+          <span class="chat-dia">HOY</span>
+          <div class="burbuja saliente">Hola, buenas noches<span class="burbuja-meta">10:47 p.m. <svg class="palomas" viewBox="0 0 17 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m1 7 3 3 5.5-6.5"/><path d="m7 7 3 3 5.5-6.5"/></svg></span></div>
+          <div class="burbuja entrante">¡Buenas noches! 👋 ¿En qué te puedo ayudar? 😊<span class="burbuja-meta">10:47 p.m.</span></div>
+          <div class="burbuja saliente">Quería agendar una cita, ¿qué servicios ofrecen?<span class="burbuja-meta">10:48 p.m. <svg class="palomas" viewBox="0 0 17 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m1 7 3 3 5.5-6.5"/><path d="m7 7 3 3 5.5-6.5"/></svg></span></div>
+          <div class="burbuja entrante">¡Claro! Esto es lo que ofrecemos:
 
-✅ Consulta y diagnóstico — Gratis la primera vez
-✅ Limpieza dental — $600 MXN
-✅ Blanqueamiento — $2,500 MXN
-✅ Resina / empaste — desde $800 MXN
-✅ Ortodoncia — desde $8,000 MXN
+• Consulta y diagnóstico — gratis la primera vez
+• Limpieza dental — $600
+• Blanqueamiento — $2,500
+• Resina / empaste — desde $800
+• Ortodoncia — desde $8,000
 
-¿Cuál te interesa? Después te agendo la cita 🦷<span class="hora">10:48 p.m.</span></div>
-          <div class="burbuja de-nosotros">Blanqueamiento. ¿Mañana a las 10?<span class="hora">10:49 p.m.</span></div>
-          <div class="burbuja de-ellos">Mañana a las 10:00 ya está apartada, pero tengo libre <strong>10:30</strong> u <strong>11:00</strong>. ¿Cuál te viene mejor? 😊<span class="hora">10:49 p.m.</span></div>
-          <div class="burbuja de-nosotros">10:30 está bien<span class="hora">10:50 p.m.</span></div>
-          <div class="burbuja de-ellos">¡Listo! ✅ Tu cita está confirmada:
+¿Cuál te interesa? Después te agendo la cita 🦷<span class="burbuja-meta">10:48 p.m.</span></div>
+          <div class="burbuja saliente">Blanqueamiento. ¿Mañana a las 10?<span class="burbuja-meta">10:49 p.m. <svg class="palomas" viewBox="0 0 17 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m1 7 3 3 5.5-6.5"/><path d="m7 7 3 3 5.5-6.5"/></svg></span></div>
+          <div class="burbuja entrante">Mañana a las 10:00 ya está apartada, pero tengo libre 10:30 u 11:00. ¿Cuál te viene mejor? 😊<span class="burbuja-meta">10:49 p.m.</span></div>
+          <div class="burbuja saliente">10:30 está bien<span class="burbuja-meta">10:50 p.m. <svg class="palomas" viewBox="0 0 17 12" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m1 7 3 3 5.5-6.5"/><path d="m7 7 3 3 5.5-6.5"/></svg></span></div>
+          <div class="burbuja entrante">¡Listo! ✅ Tu cita quedó confirmada:
 
-📅 Martes 28 de julio
-🕥 10:30 a.m.
+📅 Martes 28 de julio, 10:30 a.m.
 ✨ Blanqueamiento dental
 📍 Av. Morelos 123, Centro
 
-¡Te esperamos! 🙂<span class="hora">10:50 p.m.</span></div>
+¡Te esperamos! 🙂<span class="burbuja-meta">10:50 p.m.</span></div>
         </div>
       </div>
-      <p class="pie-chat">Conversación real con el asistente. Un paciente agendó a las 10:50 de la noche.</p>
+      <p class="pie-chat">Conversación real con el asistente. El paciente agendó a las 10:50 de la noche — la cita quedó verificada contra la agenda y creada en el calendario.</p>
     </div>
   </div>
 </section>
 
-<!-- DATOS -->
-<section class="seccion-alt">
+<!-- ══ DATOS ══ -->
+<section class="datos">
   <div class="contenedor">
-    <div class="centro">
-      <h2>El paciente ya te escribió. La pregunta es si alguien le contestó.</h2>
-      <p class="sub-seccion">Las personas buscan dentista de noche, en fin de semana y desde el celular. Si nadie responde en minutos, escriben a la siguiente clínica.</p>
-    </div>
-    <div class="datos">
-      <div class="dato">
-        <div class="dato-num">93%</div>
-        <div class="dato-txt">de los mexicanos con internet usa WhatsApp — es la app más usada del país</div>
+    <div class="datos-fila">
+      <div>
+        <div class="dato-num">93<sup>%¹</sup></div>
+        <p class="dato-txt">de los mexicanos con internet usa WhatsApp. Es donde tus pacientes ya están.</p>
       </div>
-      <div class="dato">
-        <div class="dato-num">69%</div>
-        <div class="dato-txt">prefiere escribirle a un negocio por mensaje antes que llamar por teléfono</div>
+      <div>
+        <div class="dato-num">69<sup>%²</sup></div>
+        <p class="dato-txt">prefiere escribirle a un negocio por mensaje antes que llamar por teléfono.</p>
       </div>
-      <div class="dato">
-        <div class="dato-num">24/7</div>
-        <div class="dato-txt">tu asistente contesta noches, domingos y días festivos, sin sueldo ni descansos</div>
+      <div>
+        <div class="dato-num">3<sup>min</sup></div>
+        <p class="dato-txt">o menos tarda tu asistente en resolver una duda y proponer horarios de cita.</p>
       </div>
     </div>
-    <p class="fuentes">Fuentes: iLifebelt 2025 (uso de WhatsApp en México) · Estudio Meta/BCG con Kantar, 2025 (preferencia por mensajería).</p>
+    <p class="fuentes">¹ iLifebelt, uso de mensajería en México, 2025 &nbsp;·&nbsp; ² Estudio Meta/BCG con Kantar sobre mensajería de negocios, 2025.</p>
   </div>
 </section>
 
-<!-- QUÉ HACE -->
+<!-- ══ QUÉ HACE ══ -->
 <section>
   <div class="contenedor">
-    <div class="centro">
-      <h2>Qué hace por tu clínica</h2>
-      <p class="sub-seccion">No es un menú de opciones ni un "escribe 1 para citas". Es un asistente que entiende lo que el paciente escribe y resuelve.</p>
+    <div class="cabecera-seccion doble">
+      <div>
+        <p class="ceja">Qué hace por tu clínica</p>
+        <h2>No es un menú de "marca 1 para citas". Entiende lo que el paciente escribe.</h2>
+      </div>
+      <p>Responde como lo haría tu mejor recepcionista en su mejor día — con tu información, tu tono y tu agenda real. Y cuando el caso necesita a un humano, te lo pasa.</p>
     </div>
-    <div class="tarjetas">
-      <div class="tarjeta">
-        <div class="icono">⚡</div>
-        <h3>Contesta en segundos, siempre</h3>
-        <p>Responde precios, horarios, ubicación, formas de pago y dudas frecuentes — con la información que tú apruebas. Nunca inventa datos.</p>
+
+    <div class="funciones">
+      <div class="funcion">
+        <span class="funcion-icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 4.5 13H11l-1 9 8.5-12H12l1-8Z"/></svg></span>
+        <div>
+          <h3>Contesta en segundos, a cualquier hora</h3>
+          <p>Precios, horarios, ubicación, formas de pago y dudas frecuentes — solo con la información que tú apruebas. Tiene prohibido inventar.</p>
+        </div>
       </div>
-      <div class="tarjeta">
-        <div class="icono">📅</div>
-        <h3>Agenda en tu calendario</h3>
-        <p>Revisa tus horarios ocupados de verdad, ofrece las horas libres y crea la cita en tu Google Calendar. Sin citas empalmadas.</p>
+      <div class="funcion">
+        <span class="funcion-icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M8 3v4M16 3v4M3 10h18M9 15l2 2 4-4"/></svg></span>
+        <div>
+          <h3>Agenda verificando tu calendario</h3>
+          <p>Revisa tus horarios ocupados de verdad, ofrece solo las horas libres y crea la cita en tu Google Calendar. Sin citas empalmadas.</p>
+        </div>
       </div>
-      <div class="tarjeta">
-        <div class="icono">🔁</div>
-        <h3>Reagenda y cancela</h3>
-        <p>El paciente puede mover o cancelar su cita por mensaje. Tu agenda se actualiza sola y tú te enteras al instante.</p>
+      <div class="funcion">
+        <span class="funcion-icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 0 1 15.5-6.2L21 8M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-15.5 6.2L3 16M3 21v-5h5"/></svg></span>
+        <div>
+          <h3>Reagenda y cancela sin llamadas</h3>
+          <p>El paciente mueve o cancela su cita por mensaje; tu agenda se actualiza sola y tú te enteras al momento.</p>
+        </div>
       </div>
-      <div class="tarjeta">
-        <div class="icono">🔔</div>
-        <h3>Recuerda las citas</h3>
-        <p>Envía recordatorios automáticos antes de la cita para reducir los pacientes que no se presentan.</p>
+      <div class="funcion">
+        <span class="funcion-icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></svg></span>
+        <div>
+          <h3>Recuerda las citas por ti</h3>
+          <p>Manda recordatorios automáticos antes de cada cita, para que los "se me olvidó" dejen de costarte sillón vacío.</p>
+        </div>
       </div>
-      <div class="tarjeta">
-        <div class="icono">🙋</div>
-        <h3>Te pasa el control</h3>
-        <p>Si el paciente pide hablar con una persona, o el caso es delicado, el asistente se hace a un lado y te avisa. Tú tomas el chat.</p>
+      <div class="funcion">
+        <span class="funcion-icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1.5-3.4 4-5 7-5s5.5 1.6 7 5"/></svg></span>
+        <div>
+          <h3>Sabe cuándo pasarte el chat</h3>
+          <p>Si el paciente pide hablar con una persona o el tema es delicado, el asistente se hace a un lado y te avisa. Tú retomas la conversación.</p>
+        </div>
       </div>
-      <div class="tarjeta">
-        <div class="icono">📊</div>
-        <h3>Te reporta cada semana</h3>
-        <p>Cuántos pacientes escribieron, cuántas citas se agendaron y cuántos mensajes llegaron fuera de tu horario.</p>
+      <div class="funcion">
+        <span class="funcion-icono"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-6M20 20H4"/></svg></span>
+        <div>
+          <h3>Te reporta cada semana</h3>
+          <p>Cuántos pacientes escribieron, cuántas citas se agendaron y cuántos mensajes llegaron fuera de tu horario. Lo que antes se perdía, ahora se ve.</p>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- CÓMO FUNCIONA -->
-<section class="seccion-alt">
+<!-- ══ PROCESO ══ -->
+<section class="seccion-menta">
   <div class="contenedor">
-    <div class="centro">
-      <h2>Listo en 7 días. Tú solo contestas una vez.</h2>
-      <p class="sub-seccion">No necesitas saber de tecnología ni contratar a nadie. Nosotros lo instalamos completo.</p>
+    <div class="cabecera-seccion">
+      <p class="ceja">Cómo se instala</p>
+      <h2>Listo en 7 días. Tu parte dura 15 minutos.</h2>
     </div>
     <div class="pasos">
       <div class="paso">
         <h3>Nos cuentas de tu clínica</h3>
-        <p>15 minutos por WhatsApp: tus servicios, precios, horarios y las dudas que más te preguntan.</p>
+        <p>Una conversación por WhatsApp: tus servicios, precios, horarios y las preguntas que más te hacen los pacientes.</p>
+        <span class="tiempo">15 min, una sola vez</span>
       </div>
       <div class="paso">
-        <h3>Lo instalamos y lo probamos</h3>
-        <p>Configuramos el asistente con tu información y tu calendario. Lo probamos juntos hasta que hable como tu clínica.</p>
+        <h3>Lo configuramos y lo pruebas</h3>
+        <p>Cargamos tu información, conectamos tu calendario y lo afinamos contigo hasta que suene a tu clínica.</p>
+        <span class="tiempo">Días 2 a 6 — trabajamos nosotros</span>
       </div>
       <div class="paso">
         <h3>Empieza a contestar</h3>
-        <p>Tu asistente entra en operación. Cualquier ajuste durante el primer mes es ilimitado y sin costo.</p>
+        <p>Tu asistente entra en operación. Durante el primer mes, todos los ajustes que quieras van incluidos.</p>
+        <span class="tiempo">Día 7 — en vivo</span>
       </div>
     </div>
   </div>
 </section>
 
-<!-- PRECIO -->
+<!-- ══ PRECIO ══ -->
 <section id="precio">
   <div class="contenedor">
-    <div class="centro">
-      <h2>Precio claro, sin letras chiquitas</h2>
-      <p class="sub-seccion">Estamos abriendo con las primeras 4 clínicas a precio de lanzamiento, a cambio de que nos dejen contar su caso.</p>
-    </div>
-
-    <div class="precio-caja">
-      <span class="precio-tag">Precio de lanzamiento · quedan 4 lugares</span>
+    <div class="precio-grid">
       <div>
-        <span class="precio-num">$2,900</span>
-        <span class="precio-antes">$5,900</span>
+        <p class="ceja">Precio</p>
+        <h2>Claro y sin letras chiquitas.</h2>
+        <p class="precio-nota">
+          Estamos abriendo con <strong>4 clínicas fundadoras</strong> a precio de lanzamiento,
+          a cambio de poder contar su caso con resultados reales. Al llenarse los lugares,
+          vuelve el precio de lista.
+        </p>
+        <div style="margin-top:2rem">
+          <div class="garantia">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.8-3.2 8.3-7 10-3.8-1.7-7-5.2-7-10V6Z"/><path d="m9 12 2 2 4-4"/></svg>
+            <div>
+              <h3>Garantía de 14 días</h3>
+              <p>Si en dos semanas el asistente no está atendiendo a tus pacientes como esperabas, te devolvemos el total. Sin trámite y sin rodeos.</p>
+            </div>
+          </div>
+        </div>
       </div>
-      <p class="precio-detalle">Instalación completa, una sola vez</p>
 
-      <div class="precio-linea"></div>
-
-      <div>
-        <span class="precio-num">$990</span>
-        <span class="precio-antes">$1,490</span>
+      <div class="precio-caja">
+        <div class="precio-cinta"><span>Lanzamiento</span> <em>Quedan 4 lugares</em></div>
+        <div class="precio-cuerpo">
+          <div class="precio-linea">
+            <span class="precio-num">$2,900</span>
+            <span class="precio-antes">$5,900</span>
+          </div>
+          <p class="precio-desc">Instalación completa · pago único</p>
+          <hr class="precio-sep">
+          <div class="precio-linea">
+            <span class="precio-num">$990</span>
+            <span class="precio-antes">$1,490</span>
+          </div>
+          <p class="precio-desc">Mensuales · cancela cuando quieras</p>
+          <hr class="precio-sep">
+          <ul class="incluye">
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Instalación y configuración completa</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Conexión con tu Google Calendar</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Ajustes ilimitados el primer mes</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Soporte directo por WhatsApp</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Reporte semanal de pacientes y citas</li>
+            <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg> Sin plazos forzosos ni penalizaciones</li>
+          </ul>
+          <a class="btn" href="https://wa.me/5217774933883?text=Hola%2C%20me%20interesa%20el%20precio%20de%20lanzamiento%20para%20mi%20cl%C3%ADnica" target="_blank" rel="noopener">Apartar mi lugar</a>
+        </div>
       </div>
-      <p class="precio-detalle">Al mes · cancela cuando quieras</p>
-
-      <div class="precio-linea"></div>
-
-      <ul class="lista" style="text-align:left">
-        <li><span class="palomita">✓</span> Instalación y configuración completa</li>
-        <li><span class="palomita">✓</span> Conexión con tu Google Calendar</li>
-        <li><span class="palomita">✓</span> Ajustes ilimitados el primer mes</li>
-        <li><span class="palomita">✓</span> Soporte directo por WhatsApp</li>
-        <li><span class="palomita">✓</span> Reporte semanal de pacientes y citas</li>
-        <li><span class="palomita">✓</span> Sin plazos forzosos ni penalización</li>
-      </ul>
-
-      <p style="margin:1.8rem 0 0"><a class="btn" href="https://wa.me/5217774933883?text=Hola%2C%20me%20interesa%20el%20precio%20de%20lanzamiento%20para%20mi%20cl%C3%ADnica" target="_blank" rel="noopener">Apartar mi lugar</a></p>
-    </div>
-
-    <div class="garantia">
-      <strong>Garantía de 14 días.</strong> Si en dos semanas el asistente no te está atendiendo pacientes como esperabas,
-      te devolvemos tu dinero completo. Sin discusiones y sin preguntas incómodas.
     </div>
   </div>
 </section>
 
-<!-- FAQ -->
-<section class="seccion-alt">
+<!-- ══ FAQ ══ -->
+<section class="seccion-menta">
   <div class="estrecho">
-    <div class="centro">
-      <h2>Preguntas que siempre nos hacen</h2>
+    <div class="cabecera-seccion">
+      <p class="ceja">Dudas frecuentes</p>
+      <h2>Lo que todo dentista nos pregunta</h2>
     </div>
 
     <details>
-      <summary>Ya tengo recepcionista, ¿para qué lo quiero?</summary>
-      <p>El asistente no la reemplaza: la cubre cuando ella no puede. Contesta de noche, en domingo, en su hora de comida y cuando llegan tres mensajes al mismo tiempo. Además le deja todo anotado: quién escribió, qué quería y qué se agendó.</p>
+      <summary>Ya tengo recepcionista. ¿Para qué lo quiero?</summary>
+      <p>No la reemplaza: la cubre cuando ella no puede. De noche, en domingo, en su hora de comida y cuando entran tres chats al mismo tiempo. Además le deja todo anotado — quién escribió, qué quería, qué se agendó.</p>
     </details>
 
     <details>
       <summary>¿Y si le contesta mal a un paciente?</summary>
-      <p>Solo responde con la información que usted aprueba: sus precios, sus horarios, sus servicios. Tiene prohibido inventar datos y no da consejos médicos ni diagnósticos. Cuando no sabe algo, lo dice y le avisa a una persona del equipo. Y siempre tiene la garantía de 14 días de respaldo.</p>
+      <p>Solo responde con la información que tú apruebas: tus precios, tus horarios, tus políticas. Tiene prohibido inventar datos y no da diagnósticos ni consejos médicos. Cuando no sabe algo, lo dice, y le pasa el chat a una persona de tu equipo. Y detrás de todo está la garantía de 14 días.</p>
     </details>
 
     <details>
       <summary>¿Tengo que cambiar mi número de WhatsApp?</summary>
-      <p>No. Puede quedarse con su número de siempre, o podemos arrancar con un número dedicado a citas que usted anuncia en su perfil, tarjetas y Google Maps. Se lo explicamos con calma y usted decide.</p>
+      <p>No. Puedes quedarte con tu número de siempre, o arrancar con un número dedicado a citas que anuncias en tu perfil, tus tarjetas y Google Maps. Te explicamos las dos opciones y tú decides.</p>
     </details>
 
     <details>
-      <summary>¿Necesito instalar algo o aprender a usar un programa?</summary>
-      <p>Nada. Nosotros lo dejamos funcionando. Usted sigue viendo sus citas en su Google Calendar de siempre, desde su celular.</p>
+      <summary>¿Necesito instalar algo o aprender un sistema?</summary>
+      <p>Nada. Nosotros lo dejamos funcionando y tú sigues viendo tus citas en tu Google Calendar de siempre, desde tu celular.</p>
     </details>
 
     <details>
-      <summary>¿Cuánto tarda en estar listo?</summary>
-      <p>Siete días desde que nos comparte la información de su clínica. La mayoría queda antes.</p>
+      <summary>¿En cuánto tiempo queda listo?</summary>
+      <p>Siete días desde que nos compartes la información de tu clínica. La mayoría queda antes.</p>
     </details>
 
     <details>
-      <summary>¿Y si quiero cancelar?</summary>
-      <p>Lo cancela cuando quiera, sin penalización. Le exportamos toda la información de sus pacientes y citas para que se la lleve.</p>
+      <summary>¿Y si después quiero cancelar?</summary>
+      <p>Cancelas cuando quieras, sin penalización. Te exportamos la información de tus pacientes y citas para que te la lleves completa.</p>
     </details>
   </div>
 </section>
 
-<!-- CIERRE -->
+<!-- ══ CIERRE ══ -->
 <section class="cierre">
-  <div class="estrecho">
+  <div class="contenedor">
+    <p class="ceja">Da el primer paso</p>
     <h2>¿Cuántas citas se te fueron este mes por no contestar a tiempo?</h2>
-    <p>Escríbenos y te enseñamos el asistente funcionando en vivo, con los servicios y precios de tu clínica. Sin compromiso y sin presentaciones aburridas.</p>
-    <a class="btn" href="https://wa.me/5217774933883?text=Hola%2C%20quiero%20ver%20la%20demo%20del%20asistente%20para%20mi%20cl%C3%ADnica" target="_blank" rel="noopener">Ver la demo por WhatsApp</a>
+    <p>Escríbenos y te enseñamos el asistente funcionando en vivo, con los servicios y precios de tu clínica. Sin compromiso y sin juntas eternas.</p>
+    <a class="btn" href="https://wa.me/5217774933883?text=Hola%2C%20quiero%20ver%20la%20demo%20del%20asistente%20para%20mi%20cl%C3%ADnica" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L4 21l1.9-4.6A8.5 8.5 0 1 1 21 11.5Z"/></svg>
+      Ver la demo por WhatsApp
+    </a>
   </div>
 </section>
 
 <footer>
   <div class="contenedor">
-    <p><strong>YaContesto</strong> — Asistentes con IA para el WhatsApp de tu negocio<br>
-    Cuernavaca, Morelos, México · <a href="mailto:diego@yacontesto.com">diego@yacontesto.com</a></p>
-    <p style="font-size:.82rem;color:#94a3b8">No estamos afiliados a WhatsApp ni a Meta Platforms, Inc.</p>
+    <div class="pie">
+      <p><strong>YaContesto</strong> — asistentes con IA para el WhatsApp de tu negocio</p>
+      <p>Cuernavaca, Morelos · <a href="mailto:diego@yacontesto.com">diego@yacontesto.com</a></p>
+    </div>
+    <p class="pie-legal">YaContesto es un servicio independiente. No estamos afiliados a WhatsApp ni a Meta Platforms, Inc.</p>
   </div>
 </footer>
 
-<a class="btn flotante" href="https://wa.me/5217774933883?text=Hola%2C%20quiero%20la%20demo%20del%20asistente%20para%20mi%20cl%C3%ADnica" target="_blank" rel="noopener">Pedir demo por WhatsApp</a>
+<a class="btn flotante" href="https://wa.me/5217774933883?text=Hola%2C%20quiero%20ver%20la%20demo%20del%20asistente%20para%20mi%20cl%C3%ADnica" target="_blank" rel="noopener">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L4 21l1.9-4.6A8.5 8.5 0 1 1 21 11.5Z"/></svg>
+  Pedir demo por WhatsApp
+</a>
 
 </body>
 </html>
