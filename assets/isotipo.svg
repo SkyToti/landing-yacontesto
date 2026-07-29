@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <!-- YaContesto · isotipo: globo de chat con palomita ("resuelto") -->
+  <path d="M15 5H33A11 11 0 0 1 44 16V25A11 11 0 0 1 33 36H15A11 11 0 0 1 4 25V16A11 11 0 0 1 15 5Z" fill="#075E54"/>
+  <path d="M9.5 32 9.5 43.5 20.5 35.5Z" fill="#075E54" stroke="#075E54" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M12.5 23.5 19.5 30.5 35.5 14.5" fill="none" stroke="#fff" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
