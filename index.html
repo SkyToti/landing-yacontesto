@@ -1,0 +1,447 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>YaContesto — Recepcionista con IA para el WhatsApp de tu clínica dental</title>
+<meta name="description" content="Instalamos un asistente con inteligencia artificial en el WhatsApp de tu consultorio: contesta al instante 24/7, responde precios y dudas, y agenda las citas en tu calendario. Listo en 7 días, con garantía.">
+<meta property="og:title" content="YaContesto — Tu WhatsApp contesta solo, 24/7">
+<meta property="og:description" content="Asistente con IA para clínicas dentales: contesta al instante, resuelve dudas y agenda citas en tu calendario. Instalación completa en 7 días.">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_MX">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%2310B981'/><text y='72' x='50' font-size='58' font-weight='bold' text-anchor='middle' fill='white' font-family='sans-serif'>Ya</text></svg>">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --verde: #059669;
+    --verde-osc: #047857;
+    --verde-claro: #ecfdf5;
+    --tinta: #0f172a;
+    --gris: #475569;
+    --gris-claro: #e2e8f0;
+    --fondo: #ffffff;
+    --radio: 16px;
+    --sombra: 0 4px 24px rgba(15, 23, 42, .08);
+  }
+  html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: var(--tinta);
+    background: var(--fondo);
+    line-height: 1.6;
+    font-size: 17px;
+  }
+  img { max-width: 100%; }
+  .contenedor { width: min(1080px, 100% - 2.5rem); margin-inline: auto; }
+  .estrecho { width: min(720px, 100% - 2.5rem); margin-inline: auto; }
+
+  /* --- Barra --- */
+  header {
+    position: sticky; top: 0; z-index: 20;
+    background: rgba(255,255,255,.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--gris-claro);
+  }
+  .barra { display: flex; align-items: center; justify-content: space-between; padding: .75rem 0; }
+  .marca { display: flex; align-items: center; gap: .55rem; font-weight: 800; font-size: 1.15rem; letter-spacing: -.02em; }
+  .marca-icono {
+    width: 34px; height: 34px; border-radius: 9px;
+    background: linear-gradient(160deg, #10b981, var(--verde-osc));
+    color: #fff; display: grid; place-items: center; font-size: .95rem; font-weight: 800;
+  }
+
+  /* --- Botones --- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+    background: var(--verde); color: #fff; text-decoration: none;
+    padding: .85rem 1.5rem; border-radius: 999px; font-weight: 700; font-size: 1rem;
+    box-shadow: 0 6px 18px rgba(5, 150, 105, .28);
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+    text-align: center;
+  }
+  .btn:hover { background: var(--verde-osc); transform: translateY(-1px); box-shadow: 0 8px 22px rgba(5,150,105,.34); }
+  .btn-chico { padding: .6rem 1.1rem; font-size: .92rem; }
+  .btn-linea { background: #fff; color: var(--verde-osc); border: 2px solid var(--verde); box-shadow: none; }
+  .btn-linea:hover { background: var(--verde-claro); color: var(--verde-osc); }
+
+  /* --- Portada --- */
+  .portada { padding: 4rem 0 3rem; background: linear-gradient(180deg, var(--verde-claro), #fff 70%); }
+  .portada-grid { display: grid; gap: 3rem; align-items: center; }
+  @media (min-width: 900px) { .portada-grid { grid-template-columns: 1.05fr .95fr; } }
+  .etiqueta {
+    display: inline-block; background: #fff; border: 1px solid #a7f3d0; color: var(--verde-osc);
+    padding: .35rem .85rem; border-radius: 999px; font-size: .82rem; font-weight: 700; margin-bottom: 1.1rem;
+  }
+  h1 { font-size: clamp(2rem, 5.5vw, 3.1rem); line-height: 1.12; letter-spacing: -.03em; margin: 0 0 1rem; font-weight: 800; }
+  h1 .resalte { color: var(--verde-osc); }
+  .entrada { font-size: 1.13rem; color: var(--gris); margin: 0 0 1.8rem; }
+  .acciones { display: flex; flex-wrap: wrap; gap: .8rem; }
+  .nota-portada { margin-top: 1.1rem; font-size: .92rem; color: var(--gris); }
+
+  /* --- Chat --- */
+  .telefono {
+    background: #0b141a; border-radius: 26px; padding: .7rem .6rem 1rem;
+    box-shadow: 0 18px 50px rgba(15,23,42,.28); max-width: 400px; margin-inline: auto; width: 100%;
+  }
+  .telefono-barra {
+    display: flex; align-items: center; gap: .6rem; padding: .35rem .7rem .7rem; color: #e9edef;
+  }
+  .telefono-avatar {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--verde); display: grid; place-items: center;
+    font-size: .8rem; font-weight: 800; color: #fff; flex-shrink: 0;
+  }
+  .telefono-nombre { font-weight: 700; font-size: .93rem; line-height: 1.2; }
+  .telefono-estado { font-size: .74rem; color: #8696a0; }
+  .chat { background: #0b141a; padding: .3rem .25rem; display: flex; flex-direction: column; gap: .45rem; }
+  .burbuja {
+    max-width: 85%; padding: .5rem .7rem; border-radius: 12px; font-size: .875rem; line-height: 1.45;
+    position: relative; white-space: pre-line;
+  }
+  .de-ellos { background: #202c33; color: #e9edef; align-self: flex-start; border-top-left-radius: 3px; }
+  .de-nosotros { background: #005c4b; color: #e9edef; align-self: flex-end; border-top-right-radius: 3px; }
+  .hora { font-size: .65rem; color: #8696a0; display: block; text-align: right; margin-top: .15rem; }
+  .pie-chat { text-align: center; font-size: .8rem; color: var(--gris); margin-top: 1rem; }
+
+  /* --- Secciones --- */
+  section { padding: 4rem 0; }
+  .seccion-alt { background: #f8fafc; border-block: 1px solid var(--gris-claro); }
+  h2 { font-size: clamp(1.55rem, 3.7vw, 2.15rem); letter-spacing: -.025em; line-height: 1.2; margin: 0 0 .8rem; font-weight: 800; }
+  .sub-seccion { color: var(--gris); font-size: 1.05rem; margin: 0 auto 2.5rem; max-width: 620px; }
+  .centro { text-align: center; }
+
+  .datos { display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); }
+  .dato { background: #fff; border: 1px solid var(--gris-claro); border-radius: var(--radio); padding: 1.6rem 1.3rem; text-align: center; }
+  .dato-num { font-size: 2.3rem; font-weight: 800; color: var(--verde-osc); letter-spacing: -.03em; line-height: 1; }
+  .dato-txt { color: var(--gris); font-size: .95rem; margin-top: .6rem; }
+  .fuentes { font-size: .8rem; color: #94a3b8; text-align: center; margin-top: 1.5rem; }
+
+  .tarjetas { display: grid; gap: 1.2rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+  .tarjeta { background: #fff; border: 1px solid var(--gris-claro); border-radius: var(--radio); padding: 1.5rem; box-shadow: var(--sombra); }
+  .tarjeta h3 { margin: .2rem 0 .5rem; font-size: 1.08rem; }
+  .tarjeta p { margin: 0; color: var(--gris); font-size: .95rem; }
+  .icono { font-size: 1.7rem; line-height: 1; }
+
+  .pasos { display: grid; gap: 1.6rem; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); counter-reset: paso; }
+  .paso { position: relative; padding-left: 3.3rem; }
+  .paso::before {
+    counter-increment: paso; content: counter(paso);
+    position: absolute; left: 0; top: 0;
+    width: 2.4rem; height: 2.4rem; border-radius: 50%;
+    background: var(--verde); color: #fff; display: grid; place-items: center; font-weight: 800;
+  }
+  .paso h3 { margin: .35rem 0 .4rem; font-size: 1.05rem; }
+  .paso p { margin: 0; color: var(--gris); font-size: .95rem; }
+
+  .lista { list-style: none; padding: 0; margin: 0; display: grid; gap: .85rem; }
+  .lista li { display: flex; gap: .7rem; align-items: flex-start; }
+  .palomita { color: var(--verde); font-weight: 800; flex-shrink: 0; }
+
+  /* --- Precio --- */
+  .precio-caja {
+    background: #fff; border: 2px solid var(--verde); border-radius: 22px; padding: 2.2rem 1.8rem;
+    max-width: 520px; margin-inline: auto; box-shadow: 0 12px 40px rgba(5,150,105,.14); text-align: center;
+  }
+  .precio-tag { display: inline-block; background: var(--verde); color: #fff; font-size: .8rem; font-weight: 700; padding: .3rem .9rem; border-radius: 999px; margin-bottom: 1.2rem; }
+  .precio-num { font-size: 2.7rem; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+  .precio-antes { color: #94a3b8; text-decoration: line-through; font-size: 1.05rem; margin-left: .5rem; font-weight: 600; }
+  .precio-detalle { color: var(--gris); font-size: .95rem; margin: .5rem 0 1.6rem; }
+  .precio-linea { border-top: 1px solid var(--gris-claro); margin: 1.6rem 0; }
+
+  .garantia { background: var(--verde-claro); border: 1px solid #a7f3d0; border-radius: var(--radio); padding: 1.6rem; text-align: center; max-width: 620px; margin: 2.5rem auto 0; }
+  .garantia strong { color: var(--verde-osc); }
+
+  /* --- FAQ --- */
+  details { border-bottom: 1px solid var(--gris-claro); padding: 1.1rem 0; }
+  summary { cursor: pointer; font-weight: 700; list-style: none; display: flex; justify-content: space-between; gap: 1rem; align-items: center; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; color: var(--verde); font-size: 1.5rem; font-weight: 400; line-height: 1; flex-shrink: 0; }
+  details[open] summary::after { content: "−"; }
+  details p { color: var(--gris); margin: .8rem 0 0; font-size: .97rem; }
+
+  /* --- Cierre --- */
+  .cierre { background: linear-gradient(160deg, var(--verde-osc), #065f46); color: #fff; text-align: center; }
+  .cierre h2 { color: #fff; }
+  .cierre p { color: #d1fae5; max-width: 560px; margin: 0 auto 2rem; }
+  .cierre .btn { background: #fff; color: var(--verde-osc); box-shadow: 0 8px 26px rgba(0,0,0,.22); }
+  .cierre .btn:hover { background: #ecfdf5; color: var(--verde-osc); }
+
+  footer { padding: 2.5rem 0; text-align: center; color: var(--gris); font-size: .9rem; }
+  footer a { color: var(--verde-osc); }
+
+  /* Botón flotante en móvil */
+  .flotante { display: none; }
+  @media (max-width: 640px) {
+    .flotante {
+      display: flex; position: fixed; bottom: 1rem; left: 1rem; right: 1rem; z-index: 30;
+      box-shadow: 0 8px 28px rgba(5,150,105,.4);
+    }
+    body { padding-bottom: 4.5rem; }
+    .barra .btn { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="contenedor barra">
+    <div class="marca"><span class="marca-icono">Ya</span> YaContesto</div>
+    <a class="btn btn-chico" href="https://wa.me/5217774933883?text=Hola%2C%20vi%20su%20p%C3%A1gina%20y%20quiero%20la%20demo%20del%20asistente%20para%20mi%20cl%C3%ADnica" target="_blank" rel="noopener">Pedir demo</a>
+  </div>
+</header>
+
+<!-- PORTADA -->
+<section class="portada">
+  <div class="contenedor portada-grid">
+    <div>
+      <span class="etiqueta">Para clínicas dentales en México</span>
+      <h1>Tu WhatsApp contesta solo. <span class="resalte">Aunque sean las 11 de la noche.</span></h1>
+      <p class="entrada">
+        Instalamos un asistente con inteligencia artificial en el WhatsApp de tu consultorio:
+        responde al instante, resuelve dudas y precios, y <strong>agenda la cita directo en tu calendario</strong>.
+        Tú no mueves nada — nosotros lo dejamos funcionando en 7 días.
+      </p>
+      <div class="acciones">
+        <a class="btn" href="https://wa.me/5217774933883?text=Hola%2C%20vi%20su%20p%C3%A1gina%20y%20quiero%20la%20demo%20del%20asistente%20para%20mi%20cl%C3%ADnica" target="_blank" rel="noopener">Quiero verlo funcionando</a>
+        <a class="btn btn-linea" href="#precio">Ver precios</a>
+      </div>
+      <p class="nota-portada">Instalación completa · Garantía de 14 días · Sin plazos forzosos</p>
+    </div>
+
+    <!-- Conversación real -->
+    <div>
+      <div class="telefono">
+        <div class="telefono-barra">
+          <div class="telefono-avatar">CD</div>
+          <div>
+            <div class="telefono-nombre">Clínica Dental</div>
+            <div class="telefono-estado">en línea</div>
+          </div>
+        </div>
+        <div class="chat">
+          <div class="burbuja de-nosotros">Hola, buen día<span class="hora">10:47 p.m.</span></div>
+          <div class="burbuja de-ellos">¡Buenas noches! 👋 ¿En qué te puedo ayudar? 😊<span class="hora">10:47 p.m.</span></div>
+          <div class="burbuja de-nosotros">Quería agendar una cita, ¿qué servicios ofrecen?<span class="hora">10:48 p.m.</span></div>
+          <div class="burbuja de-ellos">¡Claro! Esto es lo que ofrecemos:
+
+✅ Consulta y diagnóstico — Gratis la primera vez
+✅ Limpieza dental — $600 MXN
+✅ Blanqueamiento — $2,500 MXN
+✅ Resina / empaste — desde $800 MXN
+✅ Ortodoncia — desde $8,000 MXN
+
+¿Cuál te interesa? Después te agendo la cita 🦷<span class="hora">10:48 p.m.</span></div>
+          <div class="burbuja de-nosotros">Blanqueamiento. ¿Mañana a las 10?<span class="hora">10:49 p.m.</span></div>
+          <div class="burbuja de-ellos">Mañana a las 10:00 ya está apartada, pero tengo libre <strong>10:30</strong> u <strong>11:00</strong>. ¿Cuál te viene mejor? 😊<span class="hora">10:49 p.m.</span></div>
+          <div class="burbuja de-nosotros">10:30 está bien<span class="hora">10:50 p.m.</span></div>
+          <div class="burbuja de-ellos">¡Listo! ✅ Tu cita está confirmada:
+
+📅 Martes 28 de julio
+🕥 10:30 a.m.
+✨ Blanqueamiento dental
+📍 Av. Morelos 123, Centro
+
+¡Te esperamos! 🙂<span class="hora">10:50 p.m.</span></div>
+        </div>
+      </div>
+      <p class="pie-chat">Conversación real con el asistente. Un paciente agendó a las 10:50 de la noche.</p>
+    </div>
+  </div>
+</section>
+
+<!-- DATOS -->
+<section class="seccion-alt">
+  <div class="contenedor">
+    <div class="centro">
+      <h2>El paciente ya te escribió. La pregunta es si alguien le contestó.</h2>
+      <p class="sub-seccion">Las personas buscan dentista de noche, en fin de semana y desde el celular. Si nadie responde en minutos, escriben a la siguiente clínica.</p>
+    </div>
+    <div class="datos">
+      <div class="dato">
+        <div class="dato-num">93%</div>
+        <div class="dato-txt">de los mexicanos con internet usa WhatsApp — es la app más usada del país</div>
+      </div>
+      <div class="dato">
+        <div class="dato-num">69%</div>
+        <div class="dato-txt">prefiere escribirle a un negocio por mensaje antes que llamar por teléfono</div>
+      </div>
+      <div class="dato">
+        <div class="dato-num">24/7</div>
+        <div class="dato-txt">tu asistente contesta noches, domingos y días festivos, sin sueldo ni descansos</div>
+      </div>
+    </div>
+    <p class="fuentes">Fuentes: iLifebelt 2025 (uso de WhatsApp en México) · Estudio Meta/BCG con Kantar, 2025 (preferencia por mensajería).</p>
+  </div>
+</section>
+
+<!-- QUÉ HACE -->
+<section>
+  <div class="contenedor">
+    <div class="centro">
+      <h2>Qué hace por tu clínica</h2>
+      <p class="sub-seccion">No es un menú de opciones ni un "escribe 1 para citas". Es un asistente que entiende lo que el paciente escribe y resuelve.</p>
+    </div>
+    <div class="tarjetas">
+      <div class="tarjeta">
+        <div class="icono">⚡</div>
+        <h3>Contesta en segundos, siempre</h3>
+        <p>Responde precios, horarios, ubicación, formas de pago y dudas frecuentes — con la información que tú apruebas. Nunca inventa datos.</p>
+      </div>
+      <div class="tarjeta">
+        <div class="icono">📅</div>
+        <h3>Agenda en tu calendario</h3>
+        <p>Revisa tus horarios ocupados de verdad, ofrece las horas libres y crea la cita en tu Google Calendar. Sin citas empalmadas.</p>
+      </div>
+      <div class="tarjeta">
+        <div class="icono">🔁</div>
+        <h3>Reagenda y cancela</h3>
+        <p>El paciente puede mover o cancelar su cita por mensaje. Tu agenda se actualiza sola y tú te enteras al instante.</p>
+      </div>
+      <div class="tarjeta">
+        <div class="icono">🔔</div>
+        <h3>Recuerda las citas</h3>
+        <p>Envía recordatorios automáticos antes de la cita para reducir los pacientes que no se presentan.</p>
+      </div>
+      <div class="tarjeta">
+        <div class="icono">🙋</div>
+        <h3>Te pasa el control</h3>
+        <p>Si el paciente pide hablar con una persona, o el caso es delicado, el asistente se hace a un lado y te avisa. Tú tomas el chat.</p>
+      </div>
+      <div class="tarjeta">
+        <div class="icono">📊</div>
+        <h3>Te reporta cada semana</h3>
+        <p>Cuántos pacientes escribieron, cuántas citas se agendaron y cuántos mensajes llegaron fuera de tu horario.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CÓMO FUNCIONA -->
+<section class="seccion-alt">
+  <div class="contenedor">
+    <div class="centro">
+      <h2>Listo en 7 días. Tú solo contestas una vez.</h2>
+      <p class="sub-seccion">No necesitas saber de tecnología ni contratar a nadie. Nosotros lo instalamos completo.</p>
+    </div>
+    <div class="pasos">
+      <div class="paso">
+        <h3>Nos cuentas de tu clínica</h3>
+        <p>15 minutos por WhatsApp: tus servicios, precios, horarios y las dudas que más te preguntan.</p>
+      </div>
+      <div class="paso">
+        <h3>Lo instalamos y lo probamos</h3>
+        <p>Configuramos el asistente con tu información y tu calendario. Lo probamos juntos hasta que hable como tu clínica.</p>
+      </div>
+      <div class="paso">
+        <h3>Empieza a contestar</h3>
+        <p>Tu asistente entra en operación. Cualquier ajuste durante el primer mes es ilimitado y sin costo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRECIO -->
+<section id="precio">
+  <div class="contenedor">
+    <div class="centro">
+      <h2>Precio claro, sin letras chiquitas</h2>
+      <p class="sub-seccion">Estamos abriendo con las primeras 4 clínicas a precio de lanzamiento, a cambio de que nos dejen contar su caso.</p>
+    </div>
+
+    <div class="precio-caja">
+      <span class="precio-tag">Precio de lanzamiento · quedan 4 lugares</span>
+      <div>
+        <span class="precio-num">$2,900</span>
+        <span class="precio-antes">$5,900</span>
+      </div>
+      <p class="precio-detalle">Instalación completa, una sola vez</p>
+
+      <div class="precio-linea"></div>
+
+      <div>
+        <span class="precio-num">$990</span>
+        <span class="precio-antes">$1,490</span>
+      </div>
+      <p class="precio-detalle">Al mes · cancela cuando quieras</p>
+
+      <div class="precio-linea"></div>
+
+      <ul class="lista" style="text-align:left">
+        <li><span class="palomita">✓</span> Instalación y configuración completa</li>
+        <li><span class="palomita">✓</span> Conexión con tu Google Calendar</li>
+        <li><span class="palomita">✓</span> Ajustes ilimitados el primer mes</li>
+        <li><span class="palomita">✓</span> Soporte directo por WhatsApp</li>
+        <li><span class="palomita">✓</span> Reporte semanal de pacientes y citas</li>
+        <li><span class="palomita">✓</span> Sin plazos forzosos ni penalización</li>
+      </ul>
+
+      <p style="margin:1.8rem 0 0"><a class="btn" href="https://wa.me/5217774933883?text=Hola%2C%20me%20interesa%20el%20precio%20de%20lanzamiento%20para%20mi%20cl%C3%ADnica" target="_blank" rel="noopener">Apartar mi lugar</a></p>
+    </div>
+
+    <div class="garantia">
+      <strong>Garantía de 14 días.</strong> Si en dos semanas el asistente no te está atendiendo pacientes como esperabas,
+      te devolvemos tu dinero completo. Sin discusiones y sin preguntas incómodas.
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="seccion-alt">
+  <div class="estrecho">
+    <div class="centro">
+      <h2>Preguntas que siempre nos hacen</h2>
+    </div>
+
+    <details>
+      <summary>Ya tengo recepcionista, ¿para qué lo quiero?</summary>
+      <p>El asistente no la reemplaza: la cubre cuando ella no puede. Contesta de noche, en domingo, en su hora de comida y cuando llegan tres mensajes al mismo tiempo. Además le deja todo anotado: quién escribió, qué quería y qué se agendó.</p>
+    </details>
+
+    <details>
+      <summary>¿Y si le contesta mal a un paciente?</summary>
+      <p>Solo responde con la información que usted aprueba: sus precios, sus horarios, sus servicios. Tiene prohibido inventar datos y no da consejos médicos ni diagnósticos. Cuando no sabe algo, lo dice y le avisa a una persona del equipo. Y siempre tiene la garantía de 14 días de respaldo.</p>
+    </details>
+
+    <details>
+      <summary>¿Tengo que cambiar mi número de WhatsApp?</summary>
+      <p>No. Puede quedarse con su número de siempre, o podemos arrancar con un número dedicado a citas que usted anuncia en su perfil, tarjetas y Google Maps. Se lo explicamos con calma y usted decide.</p>
+    </details>
+
+    <details>
+      <summary>¿Necesito instalar algo o aprender a usar un programa?</summary>
+      <p>Nada. Nosotros lo dejamos funcionando. Usted sigue viendo sus citas en su Google Calendar de siempre, desde su celular.</p>
+    </details>
+
+    <details>
+      <summary>¿Cuánto tarda en estar listo?</summary>
+      <p>Siete días desde que nos comparte la información de su clínica. La mayoría queda antes.</p>
+    </details>
+
+    <details>
+      <summary>¿Y si quiero cancelar?</summary>
+      <p>Lo cancela cuando quiera, sin penalización. Le exportamos toda la información de sus pacientes y citas para que se la lleve.</p>
+    </details>
+  </div>
+</section>
+
+<!-- CIERRE -->
+<section class="cierre">
+  <div class="estrecho">
+    <h2>¿Cuántas citas se te fueron este mes por no contestar a tiempo?</h2>
+    <p>Escríbenos y te enseñamos el asistente funcionando en vivo, con los servicios y precios de tu clínica. Sin compromiso y sin presentaciones aburridas.</p>
+    <a class="btn" href="https://wa.me/5217774933883?text=Hola%2C%20quiero%20ver%20la%20demo%20del%20asistente%20para%20mi%20cl%C3%ADnica" target="_blank" rel="noopener">Ver la demo por WhatsApp</a>
+  </div>
+</section>
+
+<footer>
+  <div class="contenedor">
+    <p><strong>YaContesto</strong> — Asistentes con IA para el WhatsApp de tu negocio<br>
+    Cuernavaca, Morelos, México · <a href="mailto:diego@yacontesto.com">diego@yacontesto.com</a></p>
+    <p style="font-size:.82rem;color:#94a3b8">No estamos afiliados a WhatsApp ni a Meta Platforms, Inc.</p>
+  </div>
+</footer>
+
+<a class="btn flotante" href="https://wa.me/5217774933883?text=Hola%2C%20quiero%20la%20demo%20del%20asistente%20para%20mi%20cl%C3%ADnica" target="_blank" rel="noopener">Pedir demo por WhatsApp</a>
+
+</body>
+</html>
