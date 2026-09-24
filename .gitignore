@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Copia de out/ para la vista previa en Vercel (scripts/vista-previa.mjs)
+/.vista-previa/
