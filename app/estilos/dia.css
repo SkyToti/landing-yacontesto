@@ -119,6 +119,12 @@
   margin: 0 0.02em;
 }
 
+/* Con la historia animada, la agenda de las 9:00 y su frase esperan ocultas a que se arme su escena
+   (el Director las revela con autoAlpha): antes de eso quedarían, oscuras, sobre el cielo de noche. */
+.cine .dia-escena {
+  visibility: hidden;
+}
+
 .dia-escena {
   position: relative;
   width: min(1180px, 100% - 48px);

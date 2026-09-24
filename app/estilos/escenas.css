@@ -152,13 +152,17 @@
   filter: url(#morph-umbral);
 }
 
+/* Fuera de su turno, cada frase queda oculta de verdad (visibility): así nadie la mide como texto
+   de bajo contraste. El LCP no se mueve: es el primer renglón, más grande que cualquier frase. */
 @keyframes morph-rotar {
   0% {
+    visibility: hidden;
     opacity: 0.01;
     filter: blur(0);
     transform: none;
   }
   0.5% {
+    visibility: hidden;
     opacity: 0.01;
     filter: blur(14px);
     transform: scale(0.94);
@@ -170,12 +174,14 @@
     transform: none;
   }
   37.5% {
+    visibility: hidden;
     opacity: 0.01;
     filter: blur(14px);
     transform: scale(1.06);
   }
   38%,
   100% {
+    visibility: hidden;
     opacity: 0.01;
     filter: blur(0);
     transform: none;

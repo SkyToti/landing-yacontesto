@@ -75,7 +75,9 @@
 /* ── La notificación ── */
 .notif {
   --tono-fondo: #dcebe2;
-  --tono-tinta: var(--pino);
+  /* Tintas muy oscuras de su mismo tono: las iniciales siguen legibles (4.5:1) aun en las cartas
+     laterales, que se atenúan con el ángulo. */
+  --tono-tinta: #082c18;
   position: relative;
   font-family: var(--f-chat);
   display: grid;
@@ -95,22 +97,22 @@
 
 .notif[data-tono="1"] {
   --tono-fondo: #f3e2bd;
-  --tono-tinta: #6e4200;
+  --tono-tinta: #3d2400;
 }
 
 .notif[data-tono="2"] {
   --tono-fondo: #cfe8dc;
-  --tono-tinta: #10492b;
+  --tono-tinta: #0a2e1a;
 }
 
 .notif[data-tono="3"] {
   --tono-fondo: #dde6e1;
-  --tono-tinta: #33443b;
+  --tono-tinta: #1c2621;
 }
 
 .notif[data-tono="4"] {
   --tono-fondo: #d3e7e4;
-  --tono-tinta: #184a44;
+  --tono-tinta: #0b2d29;
 }
 
 .notif-av {
