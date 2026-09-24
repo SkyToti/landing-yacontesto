@@ -338,7 +338,8 @@ export function AnimatedTooltip({
             width,
             height,
             marginLeft: -width / 2,
-            pointerEvents: "none",
+            // Abierto, el globo es parte del contenedor: pasar el puntero encima no lo cierra.
+            pointerEvents: open ? "auto" : "none",
             zIndex: 50,
           }}
         >

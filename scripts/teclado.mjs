@@ -89,6 +89,27 @@ for (let i = 0; i < 80; i++) {
   if (invisible || tapado || fuera) fallas.push(r.nombre);
 }
 console.log(`Preguntas alcanzadas: ${preguntas}/6 · control del precio: ${controlPrecio ? "sí" : "NO"} · botón del cierre: ${botonCierre ? "sí" : "NO"}`);
+
+// 3. Con la historia ya avanzada (la portada se desvaneció), Tab desde arriba debe volver a mostrar
+//    lo que enfoca: el cilindro, el botón y la pista de la portada.
+await pagina.evaluate(() => window.scrollTo(0, Math.round(innerHeight * 3.5)));
+await pagina.waitForTimeout(1500);
+await pagina.evaluate(() => document.body.focus());
+for (let i = 0; i < 8; i++) {
+  await pagina.keyboard.press("Tab");
+  await pagina.waitForTimeout(1800);
+  const r = await pagina.evaluate(() => {
+    const el = document.activeElement;
+    if (!el || el === document.body || !el.closest("#noche")) return null;
+    let op = 1;
+    for (let n = el; n && n !== document.documentElement; n = n.parentElement) op *= Number(getComputedStyle(n).opacity);
+    return { nombre: (el.getAttribute("aria-label") || el.textContent || "").trim().replace(/\s+/g, " ").slice(0, 40), op: Math.round(op * 100) / 100 };
+  });
+  if (!r) continue;
+  const invisible = r.op < 0.5;
+  console.log(`   portada avanzada · op ${r.op} · ${r.nombre}${invisible ? "  ← INVISIBLE" : ""}`);
+  if (invisible) fallas.push(`portada avanzada: ${r.nombre}`);
+}
 console.log(`Fallas de foco: ${fallas.length} · errores de consola: ${errores.length}`, errores.slice(0, 2));
 await navegador.close();
 servidor.close();

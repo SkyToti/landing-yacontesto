@@ -10,6 +10,7 @@ const eslintConfig = defineConfig([
     // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",
+    ".vista-previa/**",
     "build/**",
     "next-env.d.ts",
     // Investigación interna: fuera de git y fuera del sitio.

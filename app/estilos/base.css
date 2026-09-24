@@ -214,3 +214,22 @@ html.lenis body {
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
+
+/* La 404 (app/not-found.tsx). */
+.no-encontrada {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  gap: 18px;
+  min-height: 100svh;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 48px var(--margen);
+  color: var(--tinta);
+}
+
+.no-encontrada-enlace {
+  color: var(--marca);
+  font-weight: 650;
+  text-underline-offset: 4px;
+}

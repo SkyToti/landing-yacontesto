@@ -106,6 +106,9 @@
   overflow: hidden;
   border-radius: calc(var(--radio-telefono) - var(--marco));
   background: var(--chat-fondo);
+  /* La interfaz responde al tamaño del teléfono, no al de la pantalla: en un celular real las
+     barras del navegador dejan 640-700 px de alto y el teléfono de la historia mide ~190 px. */
+  container-type: inline-size;
 }
 
 .tel-camara {
@@ -252,17 +255,38 @@
   gap: 13px;
 }
 
-/* Teléfonos angostos (celulares chicos, y el teléfono del equipo en celular, que es más
-   chico): menos iconos en la cabecera. */
-@media (max-width: 379px) {
-  .wa-acciones svg:first-child {
+/* Teléfono angosto: menos iconos, como en un celular chico. Y muy angosto: sin la línea de
+   «Cuenta de empresa» y con el campo de mensaje recortado con puntos suspensivos. */
+@container (max-width: 300px) {
+  .wa-acciones svg:first-child,
+  .wa-campo svg:nth-of-type(2) {
     display: none;
   }
 }
 
-@media (max-width: 899px) {
-  .escena-equipo .wa-acciones svg:first-child {
+@container (max-width: 250px) {
+  .wa-acciones svg:not(:last-child),
+  .wa-campo svg:not(:first-child),
+  .wa-quien span {
     display: none;
+  }
+
+  .wa-campo span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .b {
+    font-size: 12.5px;
+  }
+
+  .b .t {
+    font-size: 10.5px;
+  }
+
+  .wa-fecha {
+    margin-bottom: 4px;
   }
 }
 
@@ -405,12 +429,6 @@
   width: 20px;
   height: 20px;
   color: #8696a0;
-}
-
-@media (max-width: 379px) {
-  .wa-campo svg:nth-of-type(2) {
-    display: none;
-  }
 }
 
 .wa-mic {

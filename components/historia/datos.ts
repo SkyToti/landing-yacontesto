@@ -94,7 +94,7 @@ export const TARJETAS_DIA = [
 
 export const PASOS_INSTALACION = [
   { cuando: "Día 1", que: "Nos cuentas de tu clínica.", detalle: "Servicios, precios y horarios. 15 minutos." },
-  { cuando: "Días 2 a 6", que: "Lo configuramos y lo pruebas.", detalle: "Conectamos tu calendario y lo afinamos contigo." },
+  { cuando: "Días 2 a 6", que: "Lo configuramos y lo pruebas.", detalle: "Conectamos contigo tu WhatsApp y tu calendario, y lo afinamos." },
   { cuando: "Día 7", que: "Empieza a contestar.", detalle: "En tu WhatsApp, a cualquier hora." },
 ];
 

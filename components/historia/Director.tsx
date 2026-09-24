@@ -12,6 +12,17 @@ import { useEffect } from "react";
  */
 export function Director() {
   useEffect(() => {
+    // Si el Director recargó la página (girar el celular, cambiar de ancho), se vuelve a la
+    // sección donde estaba el visitante, sea en la versión animada o en la quieta.
+    try {
+      const volver = sessionStorage.getItem("yc:volver");
+      if (volver) {
+        sessionStorage.removeItem("yc:volver");
+        requestAnimationFrame(() => document.getElementById(volver)?.scrollIntoView({ block: "start" }));
+      }
+    } catch {
+      // Sin sessionStorage: se queda arriba.
+    }
     const raiz = document.documentElement;
     if (!raiz.classList.contains("cine")) return;
     window.__directorVivo = true;

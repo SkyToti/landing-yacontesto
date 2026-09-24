@@ -178,7 +178,8 @@ export async function armarHistoria(): Promise<() => void> {
   // Para el teclado: cómo revelar en el acto (precio, preguntas) o a qué punto llevar el scroll
   // (escenas con scroll) cuando el foco cae en algo que la historia todavía no enseña.
   const reveladores: Record<string, () => void> = {};
-  const puntosFoco: Record<string, () => number> = {};
+  // La portada (titular, botón, cilindro) se desvanece al avanzar: su punto es el principio.
+  const puntosFoco: Record<string, () => number> = { noche: () => 0 };
   const enTiempo = (tl: Timeline, t: number) => () => {
     const st = tl.scrollTrigger!;
     // Recién creado, GSAP todavía no lo mide (ver enCurso): se mide aquí mismo, o un salto a esta
@@ -591,7 +592,7 @@ export async function armarHistoria(): Promise<() => void> {
   medir("dia");
   };
 
-  // ═══ 5 · Tu parte: 15 minutos ══════════════════════════════════════════
+  // ═══ 5 · En 7 días contesta ═══════════════════════════════════════════
   const construirInstala = () => {
   ctx.add(() => {
     const escena = $("[data-escena=instala]");
@@ -766,6 +767,8 @@ export async function armarHistoria(): Promise<() => void> {
   // lo enfocado), se lleva ahí: un tercio abajo del borde, lejos de la muesca.
   const asegurarVista = (el: Element) => {
     const caja = el.getBoundingClientRect();
+    // Una región que llena la escena (el carrusel del día, pegada arriba) no se «acomoda».
+    if (caja.height > innerHeight / 2) return;
     if (caja.top < 72 || caja.bottom > innerHeight) irA(caja.top + scrollY - innerHeight / 3);
   };
   const alEnfocar = (e: FocusEvent) => {
@@ -787,7 +790,16 @@ export async function armarHistoria(): Promise<() => void> {
   window.addEventListener("yc:ir-dia", alIrDia);
 
   // Si cambia el ancho entre celular y escritorio, la historia se vuelve a armar desde cero.
-  const alCambiarAncho = () => location.reload();
+  const alCambiarAncho = () => {
+    const mitad = innerHeight / 2;
+    const actual = [...document.querySelectorAll("main > section")].filter((s) => s.getBoundingClientRect().top <= mitad).pop();
+    try {
+      if (actual?.id) sessionStorage.setItem("yc:volver", actual.id);
+    } catch {
+      // Sin sessionStorage (modo privado estricto): se recarga arriba.
+    }
+    location.reload();
+  };
   ancho.addEventListener("change", alCambiarAncho);
   // Igual si la pantalla queda de menos de 500 px de alto (girar el celular): el arranque decide.
   const bajo = matchMedia("(max-height: 499px)");
@@ -795,6 +807,10 @@ export async function armarHistoria(): Promise<() => void> {
 
   const pintarEnCurso = () => enCurso()?.pintar();
   ScrollTrigger.addEventListener("refresh", pintarEnCurso);
+  // Entre dos escenas no corre ningún timeline: sin esto, un salto dejaba el cielo y el reloj de
+  // la escena anterior (pintarReloj y pintarCielo no repiten trabajo si nada cambia).
+  window.addEventListener("scroll", pintarEnCurso, { passive: true });
+  limpiezas.push(() => window.removeEventListener("scroll", pintarEnCurso));
 
   // Las demás escenas se arman al acercarse (a 2.5 pantallas), siempre en orden: así el trabajo
   // se reparte a lo largo del scroll y ninguna tarea larga coincide con una animación. Si el

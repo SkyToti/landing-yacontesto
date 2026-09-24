@@ -164,11 +164,12 @@
   color: var(--pino);
 }
 
+/* La gráfica y las marcas van metidas 14 px de cada lado: lo que recorre el centro del pulgar del
+   control (28 px), para que el punto quede justo encima de él. */
 .grafica {
   position: relative;
-  width: 100%;
   aspect-ratio: 600 / 200;
-  margin-top: 28px;
+  margin: 28px 14px 0;
 }
 
 .grafica svg {
@@ -298,7 +299,7 @@
 .marcas {
   position: relative;
   height: 18px;
-  margin-top: 4px;
+  margin: 4px 14px 0;
   font-size: 13px;
   color: var(--tinta-suave-dia);
   font-variant-numeric: tabular-nums;
@@ -446,5 +447,15 @@
 @media (prefers-reduced-motion: reduce) {
   .tp-mes {
     animation: none;
+  }
+}
+
+/* Alto contraste (colores forzados): el control vuelve a ser el del sistema; si no, el pulgar y la
+   pista (sombra y degradado) desaparecen. */
+@media (forced-colors: active) {
+  .tp-control input[type="range"] {
+    -webkit-appearance: auto;
+    appearance: auto;
+    background: none;
   }
 }

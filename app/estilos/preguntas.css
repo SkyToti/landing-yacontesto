@@ -125,3 +125,16 @@
     font-size: 16px;
   }
 }
+
+/* Alto contraste: el + / − y las líneas se dibujan con el color del texto del sistema. */
+@media (forced-colors: active) {
+  .faq-signo::before,
+  .faq-signo::after {
+    background: CanvasText;
+  }
+
+  .faq-item {
+    border-bottom: 1px solid CanvasText;
+    background: none;
+  }
+}

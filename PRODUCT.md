@@ -38,7 +38,7 @@ Cubre a la recepción cuando no puede contestar; no la reemplaza.
 - Las citas viven en el Google Calendar de la propia clínica; el asistente consulta todos los
   calendarios que se le conecten antes de ofrecer una hora.
 - Instalación: día 1, la clínica cuenta sus servicios, precios y horarios (15 minutos); días 2 a 6,
-  se configura y se prueba con la clínica; día 7, empieza a contestar.
+  se conectan con la clínica su WhatsApp y su calendario, y se prueba; día 7, empieza a contestar.
 
 ## Capabilities and Constraints
 
@@ -71,7 +71,7 @@ Decisiones abiertas, marcadas en la página y nunca inventadas: cuántos lugares
 ## Brand Commitments
 
 - Nombre: YaContesto. Isotipo: globo de mensaje con palomita, con la cola abajo a la derecha
-  (`public/assets/isotipo.svg`).
+  (`app/icon.svg` y `components/historia/Isotipo.tsx`; `public/assets/` guarda el de la versión anterior).
 - Voz: español de México, de tú, frases cortas y concretas; describe lo que pasa, no vende humo.
 - Servicio independiente: no está afiliado a WhatsApp ni a Meta Platforms, Inc., y lo dice.
 - Contacto público: WhatsApp de ventas +52 220 639 5955 y diego@yacontesto.com, en Cuernavaca, Morelos.

@@ -198,6 +198,8 @@
 
 .dia-panel .blq.cita {
   flex-direction: column;
+  /* El título ocupa todo el ancho del bloque: así sí aparecen los puntos suspensivos. */
+  align-items: stretch;
   gap: 3px;
   padding: 7px 10px;
   background: var(--pino);

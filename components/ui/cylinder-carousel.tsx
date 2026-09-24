@@ -122,9 +122,12 @@ export function CylinderCarousel({
       // Si la visita lo arrastra o lo mueve con el teclado, toma el control: ya no gira solo
       // (WCAG 2.2.2: lo que se mueve solo se puede detener).
       tomado: false,
-      // Segundos que lleva girando solo: a los 4.5 s se asienta en la carta más cercana y ya no
-      // vuelve a girar por su cuenta (WCAG 2.2.2: lo automático termina antes de 5 s).
+      // Segundos que lleva girando solo: a los 2.8 s frena, vuelve a su carta y ya no gira por su
+      // cuenta (WCAG 2.2.2: todo el movimiento automático termina antes de 5 s).
       autoT: 0,
+      // Cuando se acaba ese tiempo, vuelve a la carta 0 (la de las 23:47, la que la historia hace
+      // volar al teléfono), no a la más cercana.
+      volver: false,
       guia: 0,
       guiaIndice: 0,
       otras: 1,
@@ -191,12 +194,16 @@ export function CylinderCarousel({
         // El scroll manda: no deriva.
       } else if (s.modo === "auto") {
         s.autoT += dt * s.factorAuto;
-        if (s.autoT > 4.5) s.tomado = true;
+        if (s.autoT > 2.8 && !s.tomado) {
+          s.tomado = true;
+          s.volver = true;
+        }
         const meta = s.pausa || s.tomado ? 0 : 1;
-        s.factorAuto += (meta - s.factorAuto) * Math.min(1, dt * 2.5);
+        s.factorAuto += (meta - s.factorAuto) * Math.min(1, dt * (s.tomado ? 5 : 2.5));
         s.angulo += autoVelocidad * s.factorAuto * dt;
         if ((s.pausa || s.tomado) && s.factorAuto < 0.05) {
-          s.objetivo = Math.round(s.angulo / paso) * paso;
+          s.objetivo = s.volver ? Math.round(s.angulo / 360) * 360 : Math.round(s.angulo / paso) * paso;
+          s.volver = false;
           s.vel = autoVelocidad * s.factorAuto;
           s.modo = "resorte";
         }

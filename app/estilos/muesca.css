@@ -236,3 +236,30 @@
     min-width: 0;
   }
 }
+
+/* Celulares angostos: el isotipo y «Precio» caben a la izquierda de la muesca sin que su curva los
+   tape (a 360 px se leía «Preci»; a 320, «Pr»). */
+@media (max-width: 379px) {
+  .muesca-barra-izq {
+    padding-left: 14px;
+    gap: 8px;
+  }
+
+  .muesca-precio-movil {
+    padding-inline: 2px;
+  }
+}
+
+@media (max-width: 340px) {
+  .muesca-esquina {
+    width: 28px;
+  }
+
+  .muesca-medio {
+    min-width: 84px;
+  }
+
+  .muesca-barra-der {
+    padding-right: 10px;
+  }
+}

@@ -11,6 +11,31 @@ export const ANUNCIOS_TAMBOR = NOTIFICACIONES.map(
   (n, i) => `Mensaje ${i + 1} de ${NOTIFICACIONES.length}, ${diaCompleto(n.dia)} a las ${n.hora}: ${n.texto}`,
 );
 
+/**
+ * La demo de la noche en texto, siempre en el árbol de accesibilidad: el teléfono entra con la
+ * historia (oculto hasta que el scroll llega) y quien avanza con lector no mueve el scroll. El
+ * teléfono, entonces, va aria-hidden: esto lo sustituye, en el mismo orden.
+ */
+function TranscripcionNoche() {
+  return (
+    <div className="solo-lectores">
+      <p>Conversación de ejemplo en WhatsApp, con una clínica ficticia:</p>
+      <ol>
+        {CHAT_NOCHE.map((b, i) => (
+          <li key={i}>
+            {b.de === "paciente" ? "Paciente" : "Asistente"}, {b.hora}: «{b.texto}»
+          </li>
+        ))}
+      </ol>
+      <p>
+        Antes de ofrecer una hora, el asistente revisa tu agenda del jueves 15: a las 9:00 y a las 10:00 ya está ocupado,
+        a las 10:30 y a las 11:00 hay lugar, y de 12:00 a 13:30 hay un bloque de otro calendario. La cita de las 10:30 queda
+        en tu Google Calendar a las 23:49.
+      </p>
+    </div>
+  );
+}
+
 export function ListaMensajes() {
   return (
     <ul className="solo-lectores">
@@ -34,18 +59,6 @@ export function EscenaNoche() {
       <div className="escena escena-noche" data-escena="noche">
         <div className="halo" data-halo aria-hidden="true" />
 
-        <CylinderCarousel
-          id="portada"
-          className="tambor-portada"
-          etiqueta="Mensajes que llegan a una clínica a toda hora. Usa las flechas para girarlos."
-          anuncios={ANUNCIOS_TAMBOR}
-          lista={<ListaMensajes />}
-        >
-          {NOTIFICACIONES.map((n, i) => (
-            <Notificacion key={n.hora} datos={n} tono={i % 5} />
-          ))}
-        </CylinderCarousel>
-
         <div className="portada" data-portada>
           <h1 id="titulo-portada" className="titular-1 h1" data-h1>
             <span className="h1-linea">Tu WhatsApp contesta solo,</span>{" "}
@@ -59,6 +72,19 @@ export function EscenaNoche() {
             </a>
           </div>
         </div>
+
+        {/* Después del titular en el DOM (orden de foco y de lectura); a la vista lo acomoda el CSS. */}
+        <CylinderCarousel
+          id="portada"
+          className="tambor-portada"
+          etiqueta="Mensajes que llegan a una clínica a toda hora. Usa las flechas para girarlos."
+          anuncios={ANUNCIOS_TAMBOR}
+          lista={<ListaMensajes />}
+        >
+          {NOTIFICACIONES.map((n, i) => (
+            <Notificacion key={n.hora} datos={n} tono={i % 5} />
+          ))}
+        </CylinderCarousel>
 
         <ol className="frases-pasos" data-frases>
           {PASOS_NOCHE.map((p, i) => (
@@ -86,9 +112,11 @@ export function EscenaNoche() {
           </div>
         </div>
 
+        <TranscripcionNoche />
         <Telefono
           id="tel-noche"
           className="tel-noche"
+          oculto
           hora="23:47"
           frente={<Chat burbujas={CHAT_NOCHE} prefijo="n" />}
           etiquetaFrente="Conversación de ejemplo en WhatsApp. A las 23:47 una paciente pregunta cuánto cuesta la limpieza. El asistente le contesta que cuesta 700 pesos y dura 40 minutos. Ella pide mañana a las 10; esa hora ya está ocupada y el asistente le ofrece 10:30 u 11:00. Ella elige 10:30 y el asistente le confirma la cita para el jueves 15 de octubre."

@@ -1,15 +1,19 @@
 import { PASOS_INSTALACION } from "./datos";
 
-/** Tu parte: 15 minutos. La línea de tiempo se dibuja con el scroll (DrawSVG). */
+/**
+ * En 7 días contesta. La línea de tiempo se dibuja con el scroll (DrawSVG). El titular antes decía
+ * «Tu parte dura 15 minutos», pero la clínica también prueba el asistente y conecta su WhatsApp
+ * con su propio Facebook (el QR del alta de Meta): 15 minutos es solo el día 1.
+ */
 export function EscenaInstala() {
   return (
     <section className="cap cap-instala" id="instala" data-tema="dia" aria-labelledby="titulo-instala">
       <div className="escena escena-instala" data-escena="instala">
         <div className="frase" data-frase-instala>
           <h2 id="titulo-instala" className="titular-2">
-            Tu parte dura 15 minutos.
+            En 7 días contesta por ti.
           </h2>
-          <p className="cuerpo">Lo demás lo hacemos nosotros.</p>
+          <p className="cuerpo">Tu parte: contarnos de tu clínica y probarlo con nosotros.</p>
         </div>
         <div className="ruta">
           <svg className="ruta-linea ruta-horizontal" viewBox="0 0 1000 16" preserveAspectRatio="none" aria-hidden="true">

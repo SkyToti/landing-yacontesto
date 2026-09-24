@@ -17,7 +17,7 @@ export const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
 export const PALETAS = [
   // noche
   {
-    "--muesca-fondo": "rgb(10, 50, 28)",
+    "--muesca-fondo": "rgb(11, 58, 32)",
     "--muesca-tinta": "rgb(232, 241, 236)",
     "--muesca-suave": "rgb(168, 188, 178)",
     "--muesca-linea": "rgba(255, 255, 255, 0.16)",

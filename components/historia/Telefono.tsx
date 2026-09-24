@@ -14,6 +14,7 @@ export function Telefono({
   reverso,
   etiquetaReverso,
   className,
+  oculto = false,
 }: {
   id: string;
   hora: string;
@@ -22,9 +23,11 @@ export function Telefono({
   reverso?: ReactNode;
   etiquetaReverso?: string;
   className?: string;
+  /** Si la escena ya lo cuenta en texto para lectores de pantalla, el teléfono se oculta de ellos. */
+  oculto?: boolean;
 }) {
   return (
-    <div className={className ? `tel ${className}` : "tel"} id={id} data-tel>
+    <div className={className ? `tel ${className}` : "tel"} id={id} data-tel aria-hidden={oculto || undefined}>
       <div className="tel-giro" data-giro data-cara="frente">
         <div className="tel-cara tel-frente" role="img" aria-label={etiquetaFrente}>
           <div className="tel-pantalla">
