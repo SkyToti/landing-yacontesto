@@ -128,7 +128,9 @@ for (const motor of motores) {
       await mkdir(carpeta, { recursive: true });
       const hallazgos = [];
       if (modo === "cine") {
+        await pagina.evaluate(() => window.scrollTo(0, 1));
         await pagina.waitForFunction(() => window.__historiaLista === true, null, { timeout: 30000 });
+        await pagina.evaluate(() => window.__historia.construirTodo());
         const puntos = await pagina.evaluate(() => window.__historia.puntos());
         for (const p of puntos) {
           await pagina.evaluate((y) => window.scrollTo(0, y), p.y);
