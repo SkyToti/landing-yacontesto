@@ -1,3 +1,4 @@
+import { fijarEstado } from "@/lib/historia-estado";
 import { cuandoTambor } from "@/lib/tambor";
 import { DIAS, PALETAS, cieloPorHora, clamp, esperarCuadro, horaDe, rectoRelativo } from "./utiles";
 
@@ -9,13 +10,16 @@ type Timeline = ReturnType<Gsap["timeline"]>;
  * una capacidad real. Un solo reloj y un solo cielo los recorren a todos.
  * Se arma en trozos (un cuadro entre escena y escena) para no bloquear el hilo principal.
  */
+const modulos = () =>
+  Promise.all([import("gsap"), import("gsap/ScrollTrigger"), import("gsap/SplitText"), import("gsap/DrawSVGPlugin")]);
+
+/** Descarga GSAP y sus plugins sin armar nada (se llama en un momento ocioso). */
+export async function precargarHistoria() {
+  await modulos();
+}
+
 export async function armarHistoria(): Promise<() => void> {
-  const [{ gsap }, { ScrollTrigger }, { SplitText }, { DrawSVGPlugin }] = await Promise.all([
-    import("gsap"),
-    import("gsap/ScrollTrigger"),
-    import("gsap/SplitText"),
-    import("gsap/DrawSVGPlugin"),
-  ]);
+  const [{ gsap }, { ScrollTrigger }, { SplitText }, { DrawSVGPlugin }] = await modulos();
   gsap.registerPlugin(ScrollTrigger, SplitText, DrawSVGPlugin);
   ScrollTrigger.config({ ignoreMobileResize: true });
   await document.fonts.ready;
@@ -67,20 +71,29 @@ export async function armarHistoria(): Promise<() => void> {
   pintarCielo(0);
 
   // ── Utilidades de escena ──────────────────────────────────────────────
-  function fijar(escena: HTMLElement, largo: string): Timeline {
+  /**
+   * El timeline de una escena, atado al recorrido de su sección. La escena ya está pegada con
+   * sticky (CSS): aquí no hay `pin`, así que ScrollTrigger no mueve nodos ni recalcula alturas.
+   */
+  function fijar(escena: HTMLElement): Timeline {
     return gsap.timeline({
       defaults: { ease: "power2.inOut" },
       scrollTrigger: {
         trigger: escena.parentElement,
         start: "top top",
-        end: `+=${largo}`,
-        pin: escena,
+        end: "bottom bottom",
         scrub: suavizado,
-        anticipatePin: 1,
         invalidateOnRefresh: true,
       },
     });
   }
+
+  // Marcas de tiempo del armado, para medirlo (performance.getEntriesByType("measure")).
+  let marca = performance.now();
+  const medir = (nombre: string) => {
+    performance.measure(`historia:${nombre}`, { start: marca, end: performance.now() });
+    marca = performance.now();
+  };
 
   /**
    * GSAP absorbe la propiedad `translate` de CSS al animar y la vuelve x/y: el centrado en
@@ -122,9 +135,10 @@ export async function armarHistoria(): Promise<() => void> {
 
   // Cada mensaje del chat vive en una fila que se abre; la burbuja entra con resorte.
   function prepararFilas(filas: HTMLElement[]) {
-    filas.forEach((fila) => {
+    const margenes = filas.map((fila) => getComputedStyle(fila).marginTop);
+    filas.forEach((fila, i) => {
       const b = fila.firstElementChild as HTMLElement;
-      fila.dataset.margen = getComputedStyle(fila).marginTop;
+      fila.dataset.margen = margenes[i];
       gsap.set(fila, { height: 0, marginTop: 0, overflow: "hidden" });
       gsap.set(b, { autoAlpha: 0, y: 14, scale: 0.94, transformOrigin: fila.classList.contains("pac") ? "100% 100%" : "0% 100%" });
     });
@@ -162,7 +176,8 @@ export async function armarHistoria(): Promise<() => void> {
 
   // ═══ 1 · 23:47 La noche ════════════════════════════════════════════════
   const escenaNoche = $("[data-escena=noche]");
-  const tlNoche = ctx.add(() => {
+  // Paso 1: el teléfono se maqueta y toma su estado inicial (primero lecturas, luego escrituras).
+  const preNoche = ctx.add(() => {
     const portada = $("[data-portada]");
     const lineasH1 = $$(".h1-linea", portada);
     const frases = $$("[data-frases] .frase");
@@ -183,18 +198,39 @@ export async function armarHistoria(): Promise<() => void> {
     const cita = $('#tel-noche [data-ag="cita"]');
     const globo = $('#tel-noche [data-ag="globo"]');
 
-    // Estados iniciales (el CSS de .cine ya esconde lo que no se ve al cargar).
-    const palabrasFrases = frases.map((f) => palabras($("h2", f)));
-    frases.forEach((f) => gsap.set(f, { opacity: 1 }));
-    palabrasFrases.forEach((ps) => gsap.set(ps, { yPercent: 115 }));
-    gsap.set(frases.map((f) => $("p", f)), { autoAlpha: 0, y: 10 });
-    prepararFilas(filas.slice(1));
-    gsap.set(b1, { autoAlpha: 0 });
+    tel.style.contentVisibility = "visible";
     centrar(tel);
     centrar(halo);
+    prepararFilas(filas.slice(1));
+    gsap.set(b1, { autoAlpha: 0 });
     gsap.set(tel, { autoAlpha: 0, y: () => innerHeight * 0.5, rotationX: 22, transformPerspective: 1400, transformOrigin: "50% 100%" });
     gsap.set(apagada, { opacity: 1 });
     gsap.set([...ocupados, pedida, libre1030, libre1100, cita, globo], { autoAlpha: 0 });
+    return { portada, lineasH1, frases, vuelo, tel, giro, chat, filas, b1, apagada, destello, halo, ficticia, ocupados, pedida, libre1030, libre1100, cita, globo };
+  });
+  medir("noche-telefono");
+  await esperarCuadro();
+  marca = performance.now();
+
+  // Paso 2: las frases de los pasos se parten en palabras (SplitText).
+  const palabrasFrases = ctx.add(() => {
+    const partidas = preNoche.frases.map((f) => palabras($("h2", f)));
+    preNoche.frases.forEach((f) => gsap.set(f, { opacity: 1 }));
+    partidas.forEach((ps) => gsap.set(ps, { yPercent: 115 }));
+    gsap.set(
+      preNoche.frases.map((f) => $("p", f)),
+      { autoAlpha: 0, y: 10 },
+    );
+    return partidas;
+  });
+  medir("noche-frases");
+  await esperarCuadro();
+  marca = performance.now();
+
+  // Paso 3: el timeline de la noche.
+  const tlNoche = ctx.add(() => {
+    const { portada, lineasH1, frases, vuelo, tel, giro, chat, filas, b1, apagada, destello, halo, ficticia, ocupados, pedida, libre1030, libre1100, cita, globo } =
+      preNoche;
 
     // Geometría del vuelo: de la carta del frente a la primera burbuja (se recalcula al redimensionar).
     type Caja = { x: number; y: number; w: number; h: number };
@@ -226,7 +262,7 @@ export async function armarHistoria(): Promise<() => void> {
 
     const guia = { f: 0 };
     const atenuacion = { otras: 1, frente: 1 };
-    const tl = fijar(escenaNoche, escritorio ? "760%" : "700%");
+    const tl = fijar(escenaNoche);
     tl.addLabel("inicio", 0)
       // La portada se retira; el cilindro se alinea en el mensaje de las 23:47.
       .to(lineasH1, { yPercent: -60, autoAlpha: 0, filter: "blur(6px)", duration: 0.55, stagger: 0.08, ease: "power2.in" }, 0.5)
@@ -308,6 +344,7 @@ export async function armarHistoria(): Promise<() => void> {
 
     // El día que mira la agenda, la hora y la portada en pausa, según el punto de la historia.
     let diaAgenda = 2;
+    fijarEstado({ diaAgenda: 2 });
     const pintar = registrarPintor(tl, () => {
       const t = tl.time();
       pintarReloj(t < 3.6 ? 1427 : t < 8.8 ? 1428 : 1429, horasNoche);
@@ -326,7 +363,7 @@ export async function armarHistoria(): Promise<() => void> {
       const d = t >= 4.9 ? 3 : 2;
       if (d !== diaAgenda) {
         diaAgenda = d;
-        window.dispatchEvent(new CustomEvent("yc:agenda-dia", { detail: d }));
+        fijarEstado({ diaAgenda: d });
       }
       portada.toggleAttribute("data-quieto", t > 1.2);
       pintar();
@@ -343,9 +380,11 @@ export async function armarHistoria(): Promise<() => void> {
     );
     return tl;
   });
+  medir("noche");
   await esperarCuadro();
 
   // ═══ 2 · La noche pasa y amanece (23:49 → jue 09:00) ═══════════════════
+  const construirAmanece = () => {
   ctx.add(() => {
     const rg = $("[data-reloj-grande]");
     const rgDia = $("[data-rg-dia]");
@@ -360,7 +399,6 @@ export async function armarHistoria(): Promise<() => void> {
     const panel = $(".dia-panel", diaEscena);
     const citaDia = $("[data-cita-dia]");
     const notaDia = $("[data-nota-dia]");
-    const ps = palabras($("h2", frase));
     centrar(rg);
     centrar(arco);
 
@@ -386,12 +424,15 @@ export async function armarHistoria(): Promise<() => void> {
     }
 
     // El sol va por ángulo (como las marcas de hora) y el trazo por longitud: una tabla los empata.
-    const largo = recorrido.getTotalLength();
-    const tabla = Array.from({ length: 121 }, (_, i) => {
-      const s = (i / 120) * largo;
-      const p = recorrido.getPointAtLength(s);
-      return { s, u: Math.acos(clamp((600 - p.x) / 540, -1, 1)) / Math.PI };
-    });
+    // La longitud del arco (elipse de 540 × 320) se integra en números: sin preguntarle al DOM.
+    const tabla = [{ s: 0, u: 0 }];
+    for (let i = 1, s = 0; i <= 60; i++) {
+      const t0 = (Math.PI * (i - 1)) / 60;
+      const t1 = (Math.PI * i) / 60;
+      s += Math.hypot(540 * (Math.cos(t0) - Math.cos(t1)), 320 * (Math.sin(t1) - Math.sin(t0)));
+      tabla.push({ s, u: i / 60 });
+    }
+    const largo = tabla[tabla.length - 1].s;
     const largoEn = (u: number) => {
       if (u <= 0) return 0;
       const i = tabla.findIndex((f) => f.u >= u);
@@ -410,6 +451,7 @@ export async function armarHistoria(): Promise<() => void> {
       gsap.set(sol, { x, y, opacity: u < -0.02 ? 0 : 1 });
       gsap.set(recorrido, { drawSVG: `0 ${largoEn(v).toFixed(1)}` });
     }
+    const ps = palabras($("h2", frase));
     const reloj = { m: 1429 };
     rodillo(1429);
     sol_(1429);
@@ -418,7 +460,7 @@ export async function armarHistoria(): Promise<() => void> {
     gsap.set($("p", frase), { autoAlpha: 0, y: 10 });
     gsap.set(notaDia, { autoAlpha: 0, y: 6 });
 
-    const tl = fijar(escenaAmanece, escritorio ? "300%" : "280%");
+    const tl = fijar(escenaAmanece);
     tl.fromTo(rg, { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, duration: 0.4, ease: "power2.out" }, 0)
       .fromTo(arco, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.05)
       .to(reloj, { m: 1980, duration: 2.1, ease: "power1.inOut" }, 0.3)
@@ -453,24 +495,26 @@ export async function armarHistoria(): Promise<() => void> {
       { nombre: "10-la-cita-ya-esta", y: enTiempo(tl, 4.2) },
     );
   });
-  await esperarCuadro();
+  medir("amanece");
+  };
 
   // ═══ 3 · 11:20 Tu equipo ═══════════════════════════════════════════════
+  const construirEquipo = () => {
   ctx.add(() => {
     const escena = $("[data-escena=equipo]");
     const frase = $("[data-frase-equipo]");
-    const ps = palabras($("h2", frase));
     const tel = $("#tel-equipo");
     const filas = ["e1", "e2", "e3"].map((n) => $(`[data-b="${n}"]`, tel));
     const pausa = $('[data-nota="pausa"]');
     const ana = $('[data-nota="ana"]');
+    centrar(tel);
+    prepararFilas(filas);
+    const ps = palabras($("h2", frase));
     gsap.set(ps, { yPercent: 115 });
     gsap.set($("p", frase), { autoAlpha: 0, y: 10 });
-    prepararFilas(filas);
-    centrar(tel);
     gsap.set([pausa, ana], { autoAlpha: 0, y: 12 });
 
-    const tl = fijar(escena, "220%");
+    const tl = fijar(escena);
     entrarPalabras(tl, ps, 0);
     tl.to($("p", frase), { autoAlpha: 1, y: 0, duration: 0.4 }, 0.25).fromTo(
       tel,
@@ -493,18 +537,20 @@ export async function armarHistoria(): Promise<() => void> {
     );
     puntos.push({ nombre: "11-algo-delicado", y: enTiempo(tl, 1.8) }, { nombre: "12-tu-equipo", y: enTiempo(tl, 3.2) });
   });
-  await esperarCuadro();
+  medir("equipo");
+  };
 
   // ═══ 4 · El resto del día (Diagonal Carousel) ══════════════════════════
   let irADia: ((i: number) => void) | null = null;
+  const construirDia = () => {
   ctx.add(() => {
     const escena = $("[data-escena=dia]");
     const frase = $("[data-frase-dia]");
-    const ps = palabras($("h2", frase));
     const controles = $(".diagonal-controles", escena);
     centrar(controles);
+    const ps = palabras($("h2", frase));
     gsap.set(ps, { yPercent: 115 });
-    const tl = fijar(escena, escritorio ? "340%" : "320%");
+    const tl = fijar(escena);
     entrarPalabras(tl, ps, 0);
     tl.fromTo(controles, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.3, immediateRender: false }, 0.2).to({}, { duration: 3.9 }, 0.1);
     const horas = [2190, 2405, 2560, 7805];
@@ -519,7 +565,7 @@ export async function armarHistoria(): Promise<() => void> {
       const i = cortes.filter((c) => t >= c).length;
       if (i !== activa) {
         activa = i;
-        window.dispatchEvent(new CustomEvent("yc:dia", { detail: i }));
+        fijarEstado({ diaActiva: i });
       }
       pintar();
     });
@@ -527,9 +573,11 @@ export async function armarHistoria(): Promise<() => void> {
     irADia = (i) => irA(enTiempo(tl, centros[i])());
     centros.forEach((c, i) => puntos.push({ nombre: `${13 + i}-dia-${i + 1}`, y: enTiempo(tl, c) }));
   });
-  await esperarCuadro();
+  medir("dia");
+  };
 
   // ═══ 5 · Tu parte: 15 minutos ══════════════════════════════════════════
+  const construirInstala = () => {
   ctx.add(() => {
     const escena = $("[data-escena=instala]");
     const frase = $("[data-frase-instala]");
@@ -540,7 +588,7 @@ export async function armarHistoria(): Promise<() => void> {
     gsap.set($("p", frase), { autoAlpha: 0, y: 10 });
     gsap.set(trazos, { drawSVG: "0%" });
     gsap.set(pasos, { autoAlpha: 0, y: 18 });
-    const tl = fijar(escena, "180%");
+    const tl = fijar(escena);
     entrarPalabras(tl, ps, 0);
     tl.to($("p", frase), { autoAlpha: 1, y: 0, duration: 0.4 }, 0.2)
       .to(trazos, { drawSVG: "100%", duration: 1.6, ease: "none" }, 0.3)
@@ -557,9 +605,11 @@ export async function armarHistoria(): Promise<() => void> {
     );
     puntos.push({ nombre: "17-tu-parte", y: enTiempo(tl, 2.4) });
   });
-  await esperarCuadro();
+  medir("instala");
+  };
 
   // ═══ 6 · Precio y preguntas: se leen y se juegan (sin fijar) ═══════════
+  const construirPrecio = () => {
   ctx.add(() => {
     const frase = $("[data-precio-frase]");
     const ps = palabras($("h2", frase));
@@ -609,9 +659,11 @@ export async function armarHistoria(): Promise<() => void> {
     puntos.push({ nombre: "18-precio", y: () => $("#precio").getBoundingClientRect().top + scrollY - 40 });
     puntos.push({ nombre: "19-preguntas", y: () => pregs.getBoundingClientRect().top + scrollY - 40 });
   });
-  await esperarCuadro();
+  medir("precio");
+  };
 
   // ═══ 7 · Vuelve a ser de noche ═════════════════════════════════════════
+  const construirCierre = () => {
   ctx.add(() => {
     const escena = $("[data-escena=cierre]");
     const tamborCierre = $(".tambor-cierre", escena);
@@ -622,7 +674,7 @@ export async function armarHistoria(): Promise<() => void> {
     gsap.set(ps, { yPercent: 115 });
     gsap.set(resto, { autoAlpha: 0, y: 16 });
     const reloj = { m: 7820 };
-    const tl = fijar(escena, "220%");
+    const tl = fijar(escena);
     tl.to(reloj, { m: 8627, duration: 1.3, ease: "power1.inOut" }, 0).to(tamborCierre, { autoAlpha: 1, duration: 0.8, ease: "power2.out" }, 0.7);
     entrarPalabras(tl, ps, 1.3, 0.55);
     tl.to(resto, { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.1, ease: "power2.out" }, 1.55).to({}, { duration: 0.6 }, 2.0);
@@ -636,6 +688,8 @@ export async function armarHistoria(): Promise<() => void> {
     puntos.push({ nombre: "20-esta-noche", y: enTiempo(tl, 2.4) });
     puntos.push({ nombre: "21-pie", y: () => document.documentElement.scrollHeight - innerHeight });
   });
+  medir("cierre");
+  };
 
   // ── Scroll suave en escritorio (Lenis), anclas y cierre ──────────────
   let lenis: import("lenis").default | null = null;
@@ -681,10 +735,57 @@ export async function armarHistoria(): Promise<() => void> {
 
   const pintarEnCurso = () => enCurso()?.pintar();
   ScrollTrigger.addEventListener("refresh", pintarEnCurso);
-  ScrollTrigger.refresh();
+
+  // Las demás escenas se arman al acercarse (a 2.5 pantallas), siempre en orden: así el trabajo
+  // se reparte a lo largo del scroll y ninguna tarea larga coincide con una animación. Si el
+  // visitante salta (un ancla), se arman todas las que quedaron arriba antes de pintar.
+  const pendientes: Array<{ seccion: HTMLElement; construir: () => void }> = [
+    { seccion: $("#amanece"), construir: construirAmanece },
+    { seccion: $("#equipo"), construir: construirEquipo },
+    { seccion: $("#dia"), construir: construirDia },
+    { seccion: $("#instala"), construir: construirInstala },
+    { seccion: $("#precio"), construir: construirPrecio },
+    { seccion: $("#cierre"), construir: construirCierre },
+  ];
+  // Un solo ciclo de armado a la vez, que persigue el límite más lejano que se haya pedido. Solo
+  // arranca si hay algo que armar, así que siempre espera al menos un cuadro: nunca termina en la
+  // misma llamada ni deja en `construyendo` una promesa ya resuelta (encadenarse a una así, en cada
+  // scroll, fue un bucle infinito de microtareas que congelaba la página).
+  let objetivo = 0;
+  let construyendo: Promise<void> | null = null;
+  const faltaArmar = () =>
+    pendientes.length > 0 && pendientes[0].seccion.getBoundingClientRect().top + scrollY < objetivo;
+  function construirHasta(limite: number): Promise<void> {
+    objetivo = Math.max(objetivo, limite);
+    if (construyendo) return construyendo;
+    if (!faltaArmar()) return Promise.resolve();
+    construyendo = (async () => {
+      try {
+        do {
+          const { construir } = pendientes.shift()!;
+          await esperarCuadro();
+          marca = performance.now();
+          construir();
+        } while (faltaArmar());
+      } finally {
+        construyendo = null;
+      }
+      pintarEnCurso();
+      if (!pendientes.length) window.removeEventListener("scroll", alDesplazar);
+    })();
+    return construyendo;
+  }
+  const alDesplazar = () => void construirHasta(scrollY + innerHeight * 2.5);
+  window.addEventListener("scroll", alDesplazar, { passive: true });
+  limpiezas.push(() => window.removeEventListener("scroll", alDesplazar));
+  alDesplazar();
+
+  pintarEnCurso();
   window.__historiaLista = true;
+  window.dispatchEvent(new Event("yc:historia"));
   (window as unknown as { __historia: unknown }).__historia = {
     puntos: () => puntos.map((p) => ({ nombre: p.nombre, y: Math.round(p.y()) })),
+    construirTodo: () => construirHasta(Infinity),
   };
 
   return () => {

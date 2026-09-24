@@ -177,10 +177,12 @@ html:not(.cine) .cierre-frase {
   .morph-palabra {
     animation: none;
     opacity: 0;
+    visibility: hidden;
   }
 
   .morph-palabra:first-child {
     opacity: 1;
+    visibility: visible;
   }
 
   .pista i {

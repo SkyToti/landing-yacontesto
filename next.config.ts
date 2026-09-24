@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   trailingSlash: true,
   images: { unoptimized: true },
   poweredByHeader: false,
+  // Una sola página y casi todos los visitantes son nuevos: el CSS va en el HTML y no bloquea.
+  experimental: { inlineCss: true },
 };
 
 export default nextConfig;

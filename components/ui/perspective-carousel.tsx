@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { motion, MotionConfig, type Transition } from "motion/react";
+import { m, type Transition } from "motion/react";
+import { MotionPerezoso } from "./motion-perezoso";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -94,10 +95,10 @@ export function PerspectiveCarousel({
       };
 
   return (
-    <MotionConfig reducedMotion="user">
+    <MotionPerezoso>
       <div className={cn("perspectiva", className)} {...accesible} {...props}>
         <div className="perspectiva-ventana" style={{ perspective: "1200px" }}>
-          <motion.div
+          <m.div
             className="perspectiva-tira"
             initial={false}
             animate={{ x: -(currentIndex * safeSlideWidth + safeSlideWidth / 2) }}
@@ -107,7 +108,7 @@ export function PerspectiveCarousel({
               const isActive = currentIndex === index;
               return (
                 <div key={item.clave} className="perspectiva-hueco" style={{ width: safeSlideWidth, perspective: "1200px" }}>
-                  <motion.div
+                  <m.div
                     className={cn("perspectiva-diapositiva", slideClassName)}
                     data-activa={isActive ? "" : undefined}
                     initial={false}
@@ -116,11 +117,11 @@ export function PerspectiveCarousel({
                     style={{ transformStyle: "preserve-3d" }}
                   >
                     {item.contenido}
-                  </motion.div>
+                  </m.div>
                 </div>
               );
             })}
-          </motion.div>
+          </m.div>
         </div>
 
         {showControls && !decorativo && (
@@ -134,7 +135,7 @@ export function PerspectiveCarousel({
           </div>
         )}
       </div>
-    </MotionConfig>
+    </MotionPerezoso>
   );
 }
 

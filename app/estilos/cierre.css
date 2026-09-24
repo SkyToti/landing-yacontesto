@@ -5,6 +5,26 @@
   --cw: 252px;
 }
 
+/* El cilindro del cierre gira solo, con CSS (transform en el compositor). */
+.tambor-giro-solo {
+  animation: tambor-girar 110s linear infinite;
+}
+
+@keyframes tambor-girar {
+  from {
+    transform: rotateX(-7deg) translateZ(calc(var(--radio) * -1)) rotateY(0deg);
+  }
+  to {
+    transform: rotateX(-7deg) translateZ(calc(var(--radio) * -1)) rotateY(-360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tambor-giro-solo {
+    animation: none;
+  }
+}
+
 .tambor-cierre .tambor-escena {
   -webkit-mask-image: linear-gradient(90deg, transparent 4%, #000 26%, #000 74%, transparent 96%);
   mask-image: linear-gradient(90deg, transparent 4%, #000 26%, #000 74%, transparent 96%);

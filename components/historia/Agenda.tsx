@@ -1,5 +1,5 @@
 import { Check } from "lucide-react";
-import { DiasAgenda } from "./DiasAgenda";
+import { DiasAgendaPerezoso } from "./Perezosos";
 
 /** Posición en la rejilla de 09:00 a 14:00 (cinco horas = 100 %). */
 function franja(desde: string, hasta: string) {
@@ -35,7 +35,7 @@ export function AgendaTelefono() {
         <b>Tu agenda</b>
         <span>Lo que revisa antes de contestar</span>
       </div>
-      <DiasAgenda />
+      <DiasAgendaPerezoso />
       <div className="ag-rejilla">
         <Horas />
         <div className="blq ocu" data-ag="ocupado" style={franja("09:00", "09:50")}>

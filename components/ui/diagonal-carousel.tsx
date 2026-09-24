@@ -1,7 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { motion, MotionConfig, type Transition } from "motion/react";
+import { m, type Transition } from "motion/react";
+import { MotionPerezoso } from "./motion-perezoso";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -73,7 +74,7 @@ export function DiagonalCarousel({
   if (!items.length) return null;
 
   return (
-    <MotionConfig reducedMotion="user">
+    <MotionPerezoso>
       <div
         role="region"
         aria-roledescription="carrusel"
@@ -93,7 +94,7 @@ export function DiagonalCarousel({
         {...props}
       >
         <div className="diagonal-ventana">
-          <motion.div
+          <m.div
             className="diagonal-tira"
             initial={false}
             animate={{ x: -(currentIndex * safeSlideSize + safeSlideSize / 2) }}
@@ -103,7 +104,7 @@ export function DiagonalCarousel({
               const isActive = currentIndex === index;
               const distance = index - currentIndex;
               return (
-                <motion.div
+                <m.div
                   key={item.clave}
                   className={cn("diagonal-diapositiva", slideClassName)}
                   style={{ width: safeSlideSize }}
@@ -120,10 +121,10 @@ export function DiagonalCarousel({
                   onClick={() => !isActive && selectSlide(index)}
                 >
                   {item.contenido}
-                </motion.div>
+                </m.div>
               );
             })}
-          </motion.div>
+          </m.div>
         </div>
 
         {showControls && (
@@ -149,7 +150,7 @@ export function DiagonalCarousel({
           </div>
         )}
       </div>
-    </MotionConfig>
+    </MotionPerezoso>
   );
 }
 

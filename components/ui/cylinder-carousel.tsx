@@ -46,13 +46,12 @@ function luzDe(rel: number): Luz {
   };
 }
 
+/** El primer cuadro (antes de hidratar) solo lleva opacidad por ángulo: la luz y el desenfoque
+ *  los pone el JavaScript después, para que la primera pintura no cargue filtros. */
 function estiloDe(l: Luz): CSSProperties {
   return {
     opacity: Number(l.opacidad.toFixed(3)),
     visibility: l.opacidad <= 0.001 ? "hidden" : "visible",
-    ["--luz" as string]: l.luz.toFixed(3),
-    ["--desenfoque" as string]: `${l.desenfoque.toFixed(2)}px`,
-    ["--brillo" as string]: l.brillo.toFixed(3),
   };
 }
 
@@ -95,6 +94,19 @@ export function CylinderCarousel({
     const contenedor = raiz.current;
     if (!el || !contenedor) return;
     const nodos = Array.from(el.children) as HTMLElement[];
+    // Se escriben estilos directos en cada pieza: una variable CSS en el contenedor invalidaría
+    // los estilos de todas las cartas en cada cuadro.
+    const piezas = nodos.map((nodo) => ({
+      notif: (nodo.firstElementChild as HTMLElement | null) ?? nodo,
+      luz: nodo.querySelector<HTMLElement>(".notif-luz"),
+      brillo: nodo.querySelector<HTMLElement>(".notif-brillo"),
+    }));
+    let radio = 0;
+    const medirRadio = () => {
+      const ancho = nodos[0]?.offsetWidth || 240;
+      radio = (ancho / 2 + 12) / Math.tan(Math.PI / n);
+    };
+    medirRadio();
     const reducido = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const s = {
@@ -126,7 +138,7 @@ export function CylinderCarousel({
 
     function pintar() {
       const angulo = anguloFinal();
-      el!.style.setProperty("--angulo", `${angulo.toFixed(3)}deg`);
+      el!.style.transform = `rotateX(-7deg) translateZ(${(-radio).toFixed(2)}px) rotateY(${angulo.toFixed(3)}deg)`;
       const f = frenteDe(angulo);
       for (let i = 0; i < n; i++) {
         const rel = normal(i * paso + angulo);
@@ -139,16 +151,17 @@ export function CylinderCarousel({
           nodo.style.visibility = opacidad <= 0.001 ? "hidden" : "visible";
           c.opacidad = opacidad;
         }
+        const p = piezas[i];
         if (Math.abs(c.luz - l.luz) > 0.004) {
-          nodo.style.setProperty("--luz", l.luz.toFixed(3));
+          if (p.luz) p.luz.style.opacity = l.luz.toFixed(3);
           c.luz = l.luz;
         }
         if (Math.abs(c.desenfoque - l.desenfoque) > 0.05) {
-          nodo.style.setProperty("--desenfoque", `${l.desenfoque.toFixed(2)}px`);
+          p.notif.style.filter = l.desenfoque > 0.05 ? `blur(${l.desenfoque.toFixed(2)}px)` : "none";
           c.desenfoque = l.desenfoque;
         }
         if (Math.abs(c.brillo - l.brillo) > 0.008) {
-          nodo.style.setProperty("--brillo", l.brillo.toFixed(3));
+          if (p.brillo) p.brillo.style.opacity = (l.brillo * 0.55).toFixed(3);
           c.brillo = l.brillo;
         }
         const alFrente = i === f && Math.abs(rel) < paso / 2;
@@ -310,6 +323,11 @@ export function CylinderCarousel({
       { rootMargin: "80px" },
     );
     observador.observe(contenedor);
+    const alRedimensionar = () => {
+      medirRadio();
+      solicitar();
+    };
+    window.addEventListener("resize", alRedimensionar);
 
     const quitar = registrarTambor(id, {
       guiar(factor, indice) {
@@ -341,6 +359,7 @@ export function CylinderCarousel({
       cancelAnimationFrame(raf);
       window.clearTimeout(temporizador);
       observador.disconnect();
+      window.removeEventListener("resize", alRedimensionar);
       quitar();
       zona?.removeEventListener("pointerdown", alPresionar);
       zona?.removeEventListener("pointermove", alMover);

@@ -1,14 +1,12 @@
 "use client";
 
-import { useEffect, useState, useSyncExternalStore } from "react";
+import { useSyncExternalStore } from "react";
 import { DiagonalCarousel, type DiagonalCarouselItem } from "@/components/ui/diagonal-carousel";
+import { fijarEstado, leer, leerInicial, suscribir } from "@/lib/historia-estado";
 
-/**
- * El resto del día en el Diagonal Carousel. Con la historia animada, el scroll decide cuál está
- * activa (evento `yc:dia`); si el visitante toca una tarjeta o usa las flechas, se le pide al
- * Director que lleve el scroll hasta ella (`yc:ir-dia`).
- */
 const ANGOSTO = "(max-width: 899px)";
+const leerActiva = leer("diaActiva");
+const leerActivaInicial = leerInicial("diaActiva");
 
 function suscribirAncho(avisar: () => void) {
   const consulta = matchMedia(ANGOSTO);
@@ -16,18 +14,15 @@ function suscribirAncho(avisar: () => void) {
   return () => consulta.removeEventListener("change", avisar);
 }
 
+/**
+ * El resto del día en el Diagonal Carousel. Con la historia animada, el scroll decide cuál está
+ * activa (el Director escribe el estado); si el visitante toca una tarjeta o usa las flechas, se
+ * le pide al Director que lleve el scroll hasta ella (`yc:ir-dia`).
+ */
 export function CarruselDia({ items }: { items: DiagonalCarouselItem[] }) {
-  const [activo, setActivo] = useState(0);
+  const activo = useSyncExternalStore(suscribir, leerActiva, leerActivaInicial);
   const angosto = useSyncExternalStore(suscribirAncho, () => matchMedia(ANGOSTO).matches, () => false);
   const tamano = angosto ? { slide: 230, bajada: 96 } : { slide: 300, bajada: 124 };
-
-  useEffect(() => {
-    const alCambiar = (e: Event) => setActivo((e as CustomEvent<number>).detail);
-    window.addEventListener("yc:dia", alCambiar);
-    return () => {
-      window.removeEventListener("yc:dia", alCambiar);
-    };
-  }, []);
 
   return (
     <DiagonalCarousel
@@ -40,11 +35,8 @@ export function CarruselDia({ items }: { items: DiagonalCarouselItem[] }) {
       rotationStep={11}
       inactiveScale={0.74}
       onActiveIndexChange={(indice) => {
-        if (document.documentElement.classList.contains("cine") && window.__historiaLista) {
-          window.dispatchEvent(new CustomEvent("yc:ir-dia", { detail: indice }));
-        } else {
-          setActivo(indice);
-        }
+        if (window.__historiaLista) window.dispatchEvent(new CustomEvent("yc:ir-dia", { detail: indice }));
+        else fijarEstado({ diaActiva: indice });
       }}
     />
   );

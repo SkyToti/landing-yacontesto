@@ -1,6 +1,6 @@
 import type { ReactElement } from "react";
 import { Check } from "lucide-react";
-import { CarruselDia } from "./CarruselDia";
+import { CarruselDiaPerezoso } from "./Perezosos";
 import { TARJETAS_DIA } from "./datos";
 
 type Clave = (typeof TARJETAS_DIA)[number]["id"];
@@ -100,7 +100,7 @@ export function EscenaDia() {
           </h2>
         </div>
         <div className="dia-cine">
-          <CarruselDia items={TARJETAS_DIA.map((t) => ({ clave: t.id, titulo: t.titulo, contenido: <Tarjeta t={t} /> }))} />
+          <CarruselDiaPerezoso items={TARJETAS_DIA.map((t) => ({ clave: t.id, titulo: t.titulo, contenido: <Tarjeta t={t} /> }))} />
         </div>
         <ul className="dia-rejilla">
           {TARJETAS_DIA.map((t) => (

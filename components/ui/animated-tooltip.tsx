@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { useEffect, useId, useRef, useState } from "react";
-import { AnimatePresence, motion, MotionConfig, type Variants } from "motion/react";
+import { AnimatePresence, m, type Variants } from "motion/react";
+import { MotionPerezoso } from "./motion-perezoso";
 import { cn } from "@/lib/utils";
 
 /**
@@ -286,7 +287,7 @@ export function AnimatedTooltip({
   }, [open]);
 
   return (
-    <MotionConfig reducedMotion="user">
+    <MotionPerezoso>
       <span
         ref={raiz}
         className={cn("globo-ayuda", className)}
@@ -297,7 +298,7 @@ export function AnimatedTooltip({
           if (!fijo.current) setOpen(false);
         }}
       >
-        <motion.button
+        <m.button
           type="button"
           className="globo-ayuda-disparador"
           aria-expanded={open}
@@ -315,7 +316,7 @@ export function AnimatedTooltip({
         >
           {icono}
           {children}
-        </motion.button>
+        </m.button>
 
         {/* El ancla fija centra el globo sobre el disparador; el interior solo anima la entrada. */}
         <span
@@ -332,7 +333,7 @@ export function AnimatedTooltip({
         >
           <AnimatePresence>
             {open && (
-              <motion.span
+              <m.span
                 key="base"
                 id={id}
                 role="note"
@@ -357,7 +358,7 @@ export function AnimatedTooltip({
                 >
                   {cfg.shape(shapeColor)}
                 </svg>
-                <motion.span
+                <m.span
                   variants={cfg.content}
                   initial="initial"
                   animate="animate"
@@ -373,13 +374,13 @@ export function AnimatedTooltip({
                   }}
                 >
                   {content}
-                </motion.span>
-              </motion.span>
+                </m.span>
+              </m.span>
             )}
           </AnimatePresence>
         </span>
       </span>
-    </MotionConfig>
+    </MotionPerezoso>
   );
 }
 

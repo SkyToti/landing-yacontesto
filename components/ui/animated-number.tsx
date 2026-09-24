@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, MotionConfig } from "motion/react";
+import { m } from "motion/react";
+import { MotionPerezoso } from "./motion-perezoso";
 import { cn } from "@/lib/utils";
 
 /**
@@ -18,7 +19,7 @@ const DIGITOS = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
 export function AnimatedNumber({ value, className }: { value: string; className?: string }) {
   const caracteres = value.split("");
   return (
-    <MotionConfig reducedMotion="user">
+    <MotionPerezoso>
       <span className={cn("numero-animado", className)} aria-hidden="true">
         {caracteres.map((c, i) => {
           const desdeDerecha = caracteres.length - i;
@@ -31,7 +32,7 @@ export function AnimatedNumber({ value, className }: { value: string; className?
           }
           return (
             <span key={`d${desdeDerecha}`} className="numero-ventana">
-              <motion.span
+              <m.span
                 className="numero-tira"
                 initial={false}
                 animate={{ y: `${-Number(c)}em` }}
@@ -40,12 +41,12 @@ export function AnimatedNumber({ value, className }: { value: string; className?
                 {DIGITOS.map((d) => (
                   <span key={d}>{d}</span>
                 ))}
-              </motion.span>
+              </m.span>
             </span>
           );
         })}
       </span>
-    </MotionConfig>
+    </MotionPerezoso>
   );
 }
 

@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
-import Script from "next/script";
 import { Sofia_Sans, Sofia_Sans_Condensed, Sofia_Sans_Extra_Condensed } from "next/font/google";
 import "./globals.css";
 
@@ -72,19 +71,18 @@ export const viewport: Viewport = {
 
 // Antes de pintar: con movimiento permitido, la historia se cuenta con scroll («cine»).
 // Con prefers-reduced-motion, sin JavaScript o con ?movimiento=0, se ve quieta y completa.
-// Si la historia no arranca en 10 s (un error, una red rota), se vuelve a la versión quieta.
-const arranque = `(function(){var d=document.documentElement;try{var q=new URLSearchParams(location.search).get('movimiento')==='0';if(q||matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('cine');setTimeout(function(){if(!window.__historiaLista)d.classList.remove('cine')},10000)}catch(e){d.classList.remove('cine')}})();`;
+// Si en 20 s no llegó el JavaScript que la cuenta (red rota, error), se vuelve a la versión quieta.
+const arranque = `(function(){var d=document.documentElement;try{var q=new URLSearchParams(location.search).get('movimiento')==='0';if(q||matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('cine');setTimeout(function(){if(!window.__directorVivo)d.classList.remove('cine')},20000)}catch(e){d.classList.remove('cine')}})();`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     // suppressHydrationWarning: el guion de arranque agrega la clase «cine» antes de hidratar.
     <html lang="es-MX" className={`${texto.variable} ${titular.variable} ${hora.variable}`} suppressHydrationWarning>
-      <body>
-        <Script id="arranque" strategy="beforeInteractive">
-          {arranque}
-        </Script>
-        {children}
-      </body>
+      <head>
+        {/* En línea y en el <head>: corre antes de pintar (next/script lo encolaba para después). */}
+        <script dangerouslySetInnerHTML={{ __html: arranque }} />
+      </head>
+      <body>{children}</body>
     </html>
   );
 }

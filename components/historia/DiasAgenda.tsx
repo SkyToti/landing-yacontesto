@@ -1,7 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { PerspectiveCarousel } from "@/components/ui/perspective-carousel";
+import { leer, leerInicial, suscribir } from "@/lib/historia-estado";
+
+const leerDia = leer("diaAgenda");
+const leerDiaInicial = leerInicial("diaAgenda");
 
 const DIAS = [
   { corto: "lun", numero: 12 },
@@ -12,18 +16,12 @@ const DIAS = [
 ];
 
 /**
- * Los días de la semana en la agenda del teléfono (Perspective Carousel, decorativo).
- * Empieza en «hoy» (miércoles 14) y el Director la pasa a «mañana» con el evento `yc:agenda-dia`.
+ * Los días de la semana en la agenda del teléfono (Perspective Carousel, decorativo). El HTML
+ * del servidor muestra el jueves 15 (el estado final); con la historia animada, el Director la
+ * pone en «hoy» (miércoles 14) y la pasa a «mañana» cuando el asistente revisa la agenda.
  */
-export function DiasAgenda({ inicial = 2 }: { inicial?: number }) {
-  const [activo, setActivo] = useState(inicial);
-
-  useEffect(() => {
-    const alCambiar = (e: Event) => setActivo((e as CustomEvent<number>).detail);
-    window.addEventListener("yc:agenda-dia", alCambiar);
-    return () => window.removeEventListener("yc:agenda-dia", alCambiar);
-  }, []);
-
+export function DiasAgenda() {
+  const activo = useSyncExternalStore(suscribir, leerDia, leerDiaInicial);
   return (
     <PerspectiveCarousel
       className="ag-dias"

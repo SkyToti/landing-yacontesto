@@ -1,6 +1,6 @@
 import { ShieldCheck } from "lucide-react";
 import { GlowBorderCard } from "@/components/ui/glow-border-card";
-import { PrecioInteractivo } from "./PrecioInteractivo";
+import { PrecioPerezoso } from "./Perezosos";
 
 /**
  * Precio. Modelo de cobro estándar (CLAUDE.md §2): la instalación se paga el día que se hace y,
@@ -25,7 +25,7 @@ export function SeccionPrecio() {
           </p>
         </div>
         <GlowBorderCard className="precio-tarjeta" data-precio-tarjeta>
-          <PrecioInteractivo />
+          <PrecioPerezoso />
         </GlowBorderCard>
       </div>
     </section>
