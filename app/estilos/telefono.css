@@ -298,7 +298,14 @@
   flex-direction: column;
   justify-content: flex-end;
   padding: 8px 2px 6px;
+  /* Recorta sin ser contenedor de scroll. Con overflow: hidden, al abrirse cada fila el anclaje
+     de scroll del navegador lo desplazaba para dejar quietos los primeros mensajes: bajando la
+     página poco a poco, el chat quedaba pegado arriba y los mensajes nuevos (la cita, la
+     confirmación) se escondían detrás de la barra de escribir. Con clip, lo que no cabe se corta
+     arriba, como en WhatsApp. */
   overflow: hidden;
+  overflow: clip;
+  overflow-anchor: none;
   /* Papel tapiz propio: puntos finos, apenas visibles. */
   background-image: radial-gradient(rgb(84 101 111 / 0.09) 1px, transparent 1.2px);
   background-size: 14px 14px;
