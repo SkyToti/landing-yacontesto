@@ -11,6 +11,14 @@
   transform: rotateX(-7deg) translateZ(calc(var(--radio) * -1)) rotateY(var(--giro, 0deg));
 }
 
+/* Cada carta se apaga cuando mira hacia atrás: el coseno de su ángulo más el giro de la escena.
+   WebKit (el motor de Safari) no ocultaba la cara trasera en este cilindro sin JavaScript: las
+   cartas de atrás salían en espejo, encima de las de enfrente. El de la portada lo resuelve su JS
+   con la luz de cada carta; este, con CSS, también en la versión quieta. */
+.tambor-cierre .tambor-carta {
+  opacity: clamp(0, calc(cos(calc(var(--i) * var(--paso) + var(--giro, 0deg))) * 2.2 - 0.25), 1);
+}
+
 .tambor-cierre .tambor-escena {
   -webkit-mask-image: linear-gradient(90deg, transparent 4%, #000 26%, #000 74%, transparent 96%);
   mask-image: linear-gradient(90deg, transparent 4%, #000 26%, #000 74%, transparent 96%);
