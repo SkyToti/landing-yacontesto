@@ -38,11 +38,11 @@
     linear-gradient(to top, #d8e6cf 0%, #b9dcc7 34%, #a3d2b9 68%, #93c8ad 100%);
 }
 
+/* Liso a propósito: es el mismo porcelana que pintan las escenas de día (escenas.css), así que
+   cuando entran no se nota la orilla. */
 .cielo-dia {
   opacity: 0;
-  background:
-    radial-gradient(140% 90% at 50% -10%, #ffffff 0%, rgb(255 255 255 / 0) 60%),
-    linear-gradient(to bottom, #f7f9f8 0%, #f2f6f3 100%);
+  background: var(--porcelana);
 }
 
 /* Grano de película: ruido fractal en SVG, estático, 160 px en mosaico. Blanco con alfa propia

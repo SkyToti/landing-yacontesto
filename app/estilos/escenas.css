@@ -38,6 +38,17 @@
   content-visibility: auto;
 }
 
+/* Las escenas de día pintan su propio porcelana, el mismo del cielo que tienen detrás: a la vista
+   no cambia nada, pero el texto oscuro nunca queda sobre el pino de la página, ni si el cielo fijo
+   tarda en pintarse ni para un lector de contraste que no ve esa capa. */
+.cine .escena-equipo,
+.cine .escena-dia,
+.cine .escena-instala,
+.cine .cap-precio,
+.cine .cap-preguntas {
+  background: var(--porcelana);
+}
+
 .cine .cap-amanece {
   height: calc(var(--alto) * 4);
 }
