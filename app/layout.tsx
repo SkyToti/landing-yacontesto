@@ -47,10 +47,11 @@ export const metadata: Metadata = {
       "Una recepcionista con inteligencia artificial para tu clínica dental: contesta, revisa tu agenda y deja la cita en tu calendario.",
     images: [
       {
-        url: "/og.png",
+        url: "/og.jpg",
+        type: "image/jpeg",
         width: 1200,
         height: 630,
-        alt: "YaContesto: a las 23:47 un paciente escribe y la cita queda en tu calendario.",
+        alt: "Tu WhatsApp contesta solo, a las 11 p. m.: mensajes de pacientes que llegan de noche y en fin de semana.",
       },
     ],
   },
@@ -58,7 +59,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Tu WhatsApp contesta solo, a las 11 p. m.",
     description: "Una recepcionista con inteligencia artificial para tu clínica dental.",
-    images: ["/og.png"],
+    images: ["/og.jpg"],
   },
 };
 
