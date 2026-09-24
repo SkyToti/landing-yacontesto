@@ -72,7 +72,7 @@ export function AgendaTelefono() {
 /** La agenda de la mañana, en grande: la cita de anoche ya está ahí. */
 export function AgendaDia() {
   return (
-    <div className="dia-panel" role="img" aria-label="Agenda del jueves 15 de octubre: la cita de limpieza dental de Mariana López a las 10:30, que tu asistente agendó anoche a las 23:49.">
+    <div className="dia-agenda" role="img" aria-label="Agenda del jueves 15 de octubre: la cita de limpieza dental de Mariana López a las 10:30, que tu asistente agendó anoche a las 23:49.">
       <div className="dp-cabeza">
         <b>Jueves 15</b>
         <span>Tu Google Calendar</span>

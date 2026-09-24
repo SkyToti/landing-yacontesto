@@ -411,7 +411,7 @@ export async function armarHistoria(): Promise<() => void> {
     const sol = $("[data-sol]");
     const diaEscena = $("[data-dia-escena]");
     const frase = $(".frase", diaEscena);
-    const panel = $(".dia-panel", diaEscena);
+    const hoja = $(".dia-agenda", diaEscena);
     const citaDia = $("[data-cita-dia]");
     const notaDia = $("[data-nota-dia]");
     centrar(rg);
@@ -486,7 +486,7 @@ export async function armarHistoria(): Promise<() => void> {
     entrarPalabras(tl, ps, 2.72);
     tl.to($("p", frase), { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 2.95)
       .fromTo(
-        panel,
+        hoja,
         { clipPath: "inset(0% 0% 100% 0% round 20px)", y: 40 },
         { clipPath: "inset(0% 0% 0% 0% round 20px)", y: 0, duration: 0.7, ease: "power3.out", immediateRender: false },
         2.8,

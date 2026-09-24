@@ -135,9 +135,9 @@
   align-items: center;
 }
 
-.dia-panel {
+.dia-agenda {
   padding: 22px 22px 26px;
-  border-radius: var(--radio-panel);
+  border-radius: var(--radio-agenda);
   background: #ffffff;
   color: var(--tinta-dia);
   box-shadow: 0 1px 2px rgb(15 29 22 / 0.06), 0 26px 60px -30px rgb(15 29 22 / 0.4);
@@ -179,24 +179,24 @@
   background: #ffffff;
 }
 
-.dia-panel .blq {
+.dia-agenda .blq {
   font-size: 14px;
   padding: 6px 10px;
 }
 
-.dia-panel .blq.ocu {
+.dia-agenda .blq.ocu {
   background: var(--velo);
   color: var(--tinta-suave-dia);
 }
 
-.dia-panel .blq.otro {
+.dia-agenda .blq.otro {
   background: repeating-linear-gradient(135deg, var(--velo) 0 6px, #ffffff 6px 12px);
   outline: 1px solid var(--linea-dia);
   outline-offset: -1px;
   color: var(--tinta-suave-dia);
 }
 
-.dia-panel .blq.cita {
+.dia-agenda .blq.cita {
   flex-direction: column;
   /* El título ocupa todo el ancho del bloque: así sí aparecen los puntos suspensivos. */
   align-items: stretch;
