@@ -32,6 +32,10 @@ export async function armarHistoria(): Promise<() => void> {
   const tambor = await cuandoTambor("portada");
   const limpiezas: Array<() => void> = [];
   const ctx = gsap.context(() => {});
+  // Las curvas de tokens.css en GSAP: salida para lo que entra, cambio para lo que va de un
+  // estado a otro y resorte solo para lo que llega como confirmación (una burbuja, un bloque de
+  // la agenda, la cita). Antes había siete back.out distintos, también en notas y avisos.
+  const CURVA = { salida: "power3.out", cambio: "power2.inOut", resorte: "back.out(1.7)" } as const;
 
   // ── Reloj de la muesca y de los teléfonos ─────────────────────────────
   const relojDia = $("[data-reloj-dia]");
@@ -64,8 +68,14 @@ export async function armarHistoria(): Promise<() => void> {
       capa.style.opacity = clamp(k - i).toFixed(3);
     });
     const i = Math.min(2, Math.floor(k));
-    const mezcla = gsap.utils.interpolate(PALETAS[i], PALETAS[i + 1], k - i) as Record<string, string>;
-    for (const clave in mezcla) muesca.style.setProperty(clave, mezcla[clave]);
+    const t = k - i;
+    // El fondo de la muesca se funde con el cielo; la tinta cambia de golpe a la mitad. Si también
+    // se fundía, entre la madrugada y el alba texto y fondo pasaban juntos por el mismo gris
+    // (contraste ~1.1:1). Así, antes de la mitad va tinta clara sobre fondo que aún es oscuro y
+    // después tinta oscura sobre fondo que ya es claro: nunca baja de ~3.8:1.
+    const fondo = gsap.utils.interpolate(PALETAS[i], PALETAS[i + 1], t) as Record<string, string>;
+    const tinta = t < 0.5 ? PALETAS[i] : PALETAS[i + 1];
+    for (const clave in fondo) muesca.style.setProperty(clave, clave === "--muesca-fondo" ? fondo[clave] : tinta[clave as keyof (typeof PALETAS)[number]]);
     escenaAmanece.style.setProperty("--dia", clamp((k - 1.2) / 1.8).toFixed(3));
   }
   pintarCielo(0);
@@ -86,6 +96,28 @@ export async function armarHistoria(): Promise<() => void> {
         invalidateOnRefresh: true,
       },
     });
+  }
+
+  /**
+   * La entrada de una escena: su propio tramo de scroll mientras la sección sube a la pantalla,
+   * de que asoma abajo a que se pega arriba. Sin esto, la escena subía en su estado inicial —su
+   * timeline arranca ya fija— y durante casi una pantalla solo se veía el fondo. El timeline dura
+   * 1: cada posición es la fracción de esa subida. Lo que un elemento hace aquí y en el timeline
+   * fijo va con fromTo en los dos, para que el orden en que se pintan no importe.
+   */
+  function entrada(escena: HTMLElement): Timeline {
+    return gsap
+      .timeline({
+        defaults: { ease: CURVA.salida },
+        scrollTrigger: {
+          trigger: escena.parentElement,
+          start: "top 90%",
+          end: "top top",
+          scrub: suavizado,
+          invalidateOnRefresh: true,
+        },
+      })
+      .to({}, { duration: 1 }, 0);
   }
 
   // Marcas de tiempo del armado, para medirlo (performance.getEntriesByType("measure")).
@@ -133,7 +165,9 @@ export async function armarHistoria(): Promise<() => void> {
     tl.fromTo(ps, { yPercent: 115 }, { yPercent: 0, duration: duracion, stagger: 0.035, ease: "power3.out", immediateRender: false }, en);
   }
 
-  // Cada mensaje del chat vive en una fila que se abre; la burbuja entra con resorte.
+  // Cada mensaje del chat vive en una fila que se abre; la burbuja entra con resorte cuando su
+  // fila ya casi tiene su alto. Así, donde se detenga el scroll, se ve un hueco que crece o una
+  // burbuja entera que aparece, nunca una burbuja cortada por su propia fila.
   function prepararFilas(filas: HTMLElement[]) {
     const margenes = filas.map((fila) => getComputedStyle(fila).marginTop);
     filas.forEach((fila, i) => {
@@ -145,10 +179,10 @@ export async function armarHistoria(): Promise<() => void> {
   }
 
   function mostrarFila(tl: Timeline, fila: HTMLElement, en: number) {
-    tl.to(fila, { height: "auto", marginTop: fila.dataset.margen, duration: 0.42, ease: "power2.out" }, en).to(
+    tl.to(fila, { height: "auto", marginTop: fila.dataset.margen, duration: 0.26, ease: "power2.out" }, en).to(
       fila.firstElementChild,
-      { autoAlpha: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.7)" },
-      en + 0.05,
+      { autoAlpha: 1, y: 0, scale: 1, duration: 0.36, ease: CURVA.resorte },
+      en + 0.18,
     );
   }
 
@@ -280,7 +314,10 @@ export async function armarHistoria(): Promise<() => void> {
     tl.addLabel("inicio", 0)
       // La portada se retira; el cilindro se alinea en el mensaje de las 23:47.
       // opacity y no autoAlpha: el H1 sale de la vista pero no del árbol de accesibilidad.
-      .to(lineasH1, { yPercent: -60, opacity: 0, filter: "blur(6px)", duration: 0.55, stagger: 0.08, ease: "power2.in" }, 0.5)
+      // Sube poco y se apaga antes de llegar a la muesca (con -60 % y power2.in, en celular pasaba
+      // todavía legible por debajo de la barra).
+      .to(lineasH1, { yPercent: -32, filter: "blur(6px)", duration: 0.55, stagger: 0.08, ease: "power2.in" }, 0.5)
+      .to(lineasH1, { opacity: 0, duration: 0.42, stagger: 0.08, ease: "power1.in" }, 0.5)
       .to($$(".portada-entrada, .acciones", portada), { y: -24, opacity: 0, duration: 0.45, stagger: 0.05, ease: "power2.in" }, 0.55)
       .to(guia, { f: 1, duration: 0.8, ease: "power2.inOut", onUpdate: () => tambor.guiar(guia.f, 0) }, 0.5)
       .to(atenuacion, { otras: 0, duration: 0.45, ease: "power1.in", onUpdate: () => tambor.atenuar(atenuacion.otras, atenuacion.frente) }, 1.15)
@@ -310,12 +347,16 @@ export async function armarHistoria(): Promise<() => void> {
       entrarPalabras(tl, palabrasFrases[i], en);
       tl.to($("p", frases[i]), { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, en + 0.18);
     };
-    const salirFrase = (i: number, en: number) => {
-      tl.to(palabrasFrases[i], { yPercent: -115, duration: 0.3, stagger: 0.02, ease: "power2.in" }, en).to(
-        $("p", frases[i]),
-        { opacity: 0, y: -8, duration: 0.25, ease: "power2.in" },
+    // Una frase a la vez: la que sale se desvanece entera y sube un poco (antes sus palabras
+    // salían por la máscara mientras las nuevas ya subían por la misma franja, y por ~230 px de
+    // scroll se leían pedazos de dos frases); la siguiente empieza a subir cuando ya se fue.
+    const cambiarFrase = (de: number, a: number, en: number) => {
+      tl.fromTo($("h2", frases[de]), { opacity: 1, y: 0 }, { opacity: 0, y: -14, duration: 0.2, ease: "power1.in", immediateRender: false }, en).to(
+        $("p", frases[de]),
+        { opacity: 0, y: -8, duration: 0.18, ease: "power1.in" },
         en,
       );
+      entrarFrase(a, en + 0.24);
     };
     const voltear = (grados: number, en: number) => {
       tl.to(giro, { rotationY: grados, duration: 0.72, ease: "power2.inOut" }, en).to(
@@ -328,34 +369,32 @@ export async function armarHistoria(): Promise<() => void> {
     entrarFrase(0, 2.65);
     mostrarFila(tl, filas[1], 2.95);
     mostrarFila(tl, filas[2], 3.6);
-    salirFrase(0, 4.1);
-    entrarFrase(1, 4.3);
+    cambiarFrase(0, 1, 4.1);
     voltear(180, 4.2);
     tl.fromTo(ocupados, { autoAlpha: 0, x: -8 }, { autoAlpha: 1, x: 0, duration: 0.3, stagger: 0.08, immediateRender: false }, 5.0)
-      .fromTo(pedida, { autoAlpha: 0, scale: 1.14 }, { autoAlpha: 1, scale: 1, duration: 0.3, ease: "back.out(2)", immediateRender: false }, 5.3)
+      .fromTo(pedida, { autoAlpha: 0, scale: 1.14 }, { autoAlpha: 1, scale: 1, duration: 0.3, ease: CURVA.resorte, immediateRender: false }, 5.3)
       .to(pedida, { keyframes: { x: [0, 6, -6, 4, -3, 0] }, duration: 0.42, ease: "none" }, 5.6)
       .fromTo(
         [libre1030, libre1100],
         { autoAlpha: 0, scale: 0.94 },
-        { autoAlpha: 1, scale: 1, duration: 0.3, stagger: 0.1, ease: "back.out(1.8)", immediateRender: false },
+        { autoAlpha: 1, scale: 1, duration: 0.3, stagger: 0.1, ease: CURVA.resorte, immediateRender: false },
         5.8,
       );
-    salirFrase(1, 6.1);
-    entrarFrase(2, 6.3);
+    cambiarFrase(1, 2, 6.1);
     voltear(360, 6.2);
     mostrarFila(tl, filas[3], 6.95);
     mostrarFila(tl, filas[4], 7.45);
-    salirFrase(2, 7.9);
-    entrarFrase(3, 8.1);
+    cambiarFrase(2, 3, 7.9);
     voltear(540, 8.0);
     tl.to([pedida, libre1030, libre1100], { autoAlpha: 0, duration: 0.3 }, 8.72)
-      .fromTo(cita, { autoAlpha: 0, y: -34, scale: 1.08 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.5, ease: "back.out(1.8)", immediateRender: false }, 8.8)
-      .fromTo(globo, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: "back.out(2)", immediateRender: false }, 9.2);
-    salirFrase(3, 9.8);
-    entrarFrase(4, 10.0);
+      .fromTo(cita, { autoAlpha: 0, y: -34, scale: 1.08 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.5, ease: CURVA.resorte, immediateRender: false }, 8.8)
+      .fromTo(globo, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: CURVA.resorte, immediateRender: false }, 9.2);
+    cambiarFrase(3, 4, 9.8);
     voltear(720, 9.9);
     mostrarFila(tl, filas[5], 10.65);
-    tl.to({}, { duration: 1.0 }, 11.2);
+    // Un respiro para leer «Listo» con la confirmación completa, y de ahí sube el amanecer. Antes
+    // era un segundo entero: más de 3/4 de pantalla en que nada cambiaba.
+    tl.to({}, { duration: 0.6 }, 11.2);
 
     // El día que mira la agenda, la hora y la portada en pausa, según el punto de la historia.
     let diaAgenda = 2;
@@ -417,26 +456,49 @@ export async function armarHistoria(): Promise<() => void> {
     centrar(rg);
     centrar(arco);
 
-    // Reloj de rodillo: las unidades giran siempre; decenas y horas ruedan al acarreo.
+    // Reloj de rodillo, como un odómetro: las unidades ruedan en el último 30 % de cada minuto y
+    // las decenas y las horas ruedan solo mientras rueda el dígito de abajo (antes las decenas
+    // rodaban todo el último minuto de la decena y el reloj se quedaba en «04:U9»). Y cuando el
+    // scroll se detiene, cada tira termina de rodar hasta su dígito entero.
     const suave = (x: number) => x * x * (3 - 2 * x);
     const escalon = (x: number) => {
       const base = Math.floor(x);
       const f = x - base;
       return base + (f < 0.7 ? 0 : suave((f - 0.7) / 0.3));
     };
+    const tiras = { h: 0, m1: 0, m2: 0 };
+    const aplicarTiras = () => {
+      tiraH.style.transform = `translateY(${-tiras.h}em)`;
+      tiraM1.style.transform = `translateY(${-tiras.m1}em)`;
+      tiraM2.style.transform = `translateY(${-tiras.m2}em)`;
+    };
+    let asiento: ReturnType<typeof setTimeout> | undefined;
+    const asentarTiras = () =>
+      gsap.to(tiras, {
+        h: Math.round(tiras.h),
+        m1: Math.round(tiras.m1),
+        m2: Math.round(tiras.m2),
+        duration: 0.22,
+        ease: CURVA.salida,
+        onUpdate: aplicarTiras,
+      });
     function rodillo(minutos: number) {
       const delDia = ((minutos % 1440) + 1440) % 1440;
       const h = Math.floor(delDia / 60);
       const min = delDia - h * 60;
-      const unidades = min % 10;
-      tiraM2.style.transform = `translateY(${-escalon(unidades)}em)`;
-      const decenas = Math.floor(min / 10) + (unidades > 9 ? suave(unidades - 9) : 0);
-      tiraM1.style.transform = `translateY(${-decenas}em)`;
-      const horas = h + (min > 59 ? suave(min - 59) : 0);
-      tiraH.style.transform = `translateY(${-horas}em)`;
+      const unidades = escalon(min % 10);
+      const acarreo = Math.max(0, unidades - 9);
+      gsap.killTweensOf(tiras);
+      tiras.m2 = unidades;
+      tiras.m1 = Math.floor(min / 10) + acarreo;
+      tiras.h = h + (min >= 59 ? acarreo : 0);
+      aplicarTiras();
+      clearTimeout(asiento);
+      asiento = setTimeout(asentarTiras, 140);
       const dia = DIAS[Math.floor(minutos / 1440) % 7];
       if (rgDia.textContent !== dia) rgDia.textContent = dia;
     }
+    limpiezas.push(() => clearTimeout(asiento));
 
     // El sol va por ángulo (como las marcas de hora) y el trazo por longitud: una tabla los empata.
     // La longitud del arco (elipse de 540 × 320) se integra en números: sin preguntarle al DOM.
@@ -475,25 +537,34 @@ export async function armarHistoria(): Promise<() => void> {
     gsap.set($("p", frase), { opacity: 0, y: 10 });
     gsap.set(notaDia, { opacity: 0, y: 6 });
 
+    // Entra con su subida: el reloj grande (23:49, la misma hora de la muesca) y el arco ya vienen
+    // mientras se va la noche. Antes subía vacía y el reloj aparecía hasta que se fijaba.
+    entrada(escenaAmanece)
+      .fromTo(rg, { autoAlpha: 0, scale: 0.92, y: 48 }, { autoAlpha: 1, scale: 1, y: 0, duration: 0.6 }, 0.25)
+      .fromTo(arco, { autoAlpha: 0, y: 40 }, { autoAlpha: 1, y: 0, duration: 0.6 }, 0.4);
+
     const tl = fijar(escenaAmanece);
-    tl.fromTo(rg, { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, duration: 0.4, ease: "power2.out" }, 0)
-      .fromTo(arco, { autoAlpha: 0, y: 30 }, { autoAlpha: 1, y: 0, duration: 0.5, ease: "power2.out" }, 0.05)
-      .to(reloj, { m: 1980, duration: 2.1, ease: "power1.inOut" }, 0.3)
-      // El reloj grande sube y se vuelve el de la muesca; la agenda de la mañana aparece.
-      .to(rg, { autoAlpha: 0, scale: 0.42, y: () => -innerHeight * 0.36, duration: 0.5, ease: "power2.in" }, 2.45)
-      .to(arco, { autoAlpha: 0, y: 40, duration: 0.45, ease: "power2.in" }, 2.45)
-      .set(diaEscena, { opacity: 1 }, 2.7);
-    entrarPalabras(tl, ps, 2.72);
-    tl.to($("p", frase), { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 2.95)
+    // La noche pasa volando y la madrugada despacio: el cielo aclara a lo largo de más de media
+    // pantalla de scroll. Antes, con un solo tween power1.inOut, la hora corría más rápido justo
+    // en la madrugada y el cielo pasaba de noche a alba en ~70 px, como un destello.
+    tl.fromTo(reloj, { m: 1429 }, { m: 1710, duration: 0.8, ease: "power1.in" }, 0)
+      .to(reloj, { m: 1980, duration: 1.8, ease: "none" }, 0.8)
+      // A las 09:00 el reloj grande sube y se vuelve el de la muesca; la agenda llega cuando ya se
+      // fue (antes subía encima de él mientras todavía se leía).
+      .fromTo(rg, { autoAlpha: 1, scale: 1, y: 0 }, { autoAlpha: 0, scale: 0.42, y: () => -innerHeight * 0.36, duration: 0.45, ease: "power2.in", immediateRender: false }, 2.62)
+      .fromTo(arco, { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: 40, duration: 0.4, ease: "power2.in", immediateRender: false }, 2.62)
+      .set(diaEscena, { opacity: 1 }, 3.0);
+    entrarPalabras(tl, ps, 3.02);
+    tl.to($("p", frase), { opacity: 1, y: 0, duration: 0.4, ease: CURVA.salida }, 3.25)
       .fromTo(
         hoja,
         { clipPath: "inset(0% 0% 100% 0% round 20px)", y: 40 },
-        { clipPath: "inset(0% 0% 0% 0% round 20px)", y: 0, duration: 0.7, ease: "power3.out", immediateRender: false },
-        2.8,
+        { clipPath: "inset(0% 0% 0% 0% round 20px)", y: 0, duration: 0.7, ease: CURVA.salida, immediateRender: false },
+        3.1,
       )
-      .fromTo(citaDia, { scale: 0.92 }, { scale: 1, duration: 0.45, ease: "back.out(2.4)", immediateRender: false }, 3.25)
-      .to(notaDia, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 3.4)
-      .to({}, { duration: 0.6 }, 3.8);
+      .fromTo(citaDia, { scale: 0.92 }, { scale: 1, duration: 0.45, ease: CURVA.resorte, immediateRender: false }, 3.55)
+      .to(notaDia, { opacity: 1, y: 0, duration: 0.35, ease: CURVA.salida }, 3.7)
+      .to({}, { duration: 0.6 }, 4.1);
 
     const pintar = registrarPintor(tl, () => {
       pintarReloj(reloj.m);
@@ -505,9 +576,9 @@ export async function armarHistoria(): Promise<() => void> {
       pintar();
     });
     puntos.push(
-      { nombre: "08-madrugada", y: enTiempo(tl, 1.2) },
-      { nombre: "09-amanece", y: enTiempo(tl, 2.2) },
-      { nombre: "10-la-cita-ya-esta", y: enTiempo(tl, 4.2) },
+      { nombre: "08-madrugada", y: enTiempo(tl, 1.3) },
+      { nombre: "09-amanece", y: enTiempo(tl, 2.45) },
+      { nombre: "10-la-cita-ya-esta", y: enTiempo(tl, 4.5) },
     );
   });
   medir("amanece");
@@ -529,28 +600,32 @@ export async function armarHistoria(): Promise<() => void> {
     gsap.set($("p", frase), { opacity: 0, y: 10 });
     gsap.set([pausa, ana], { opacity: 0, y: 12 });
 
-    const tl = fijar(escena);
-    entrarPalabras(tl, ps, 0);
-    tl.to($("p", frase), { opacity: 1, y: 0, duration: 0.4 }, 0.25).fromTo(
+    // Entra con su subida: el título, el párrafo y el teléfono. Antes el teléfono subía entero y,
+    // al fijarse la escena, caía de golpe a 0.2 y volvía (su fromTo no se aplicaba hasta arrancar).
+    const ent = entrada(escena);
+    entrarPalabras(ent, ps, 0.2, 0.5);
+    ent.fromTo($("p", frase), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4 }, 0.55).fromTo(
       tel,
-      { y: 36, autoAlpha: 0.2 },
-      { y: 0, autoAlpha: 1, duration: 0.5, ease: "power2.out", immediateRender: false },
-      0,
+      { y: 60, autoAlpha: 0 },
+      { y: 0, autoAlpha: 1, duration: 0.8 },
+      0.1,
     );
-    mostrarFila(tl, filas[0], 0.35);
-    mostrarFila(tl, filas[1], 0.9);
-    tl.to(pausa, { opacity: 1, y: 0, duration: 0.4, ease: "back.out(1.6)" }, 1.3);
-    mostrarFila(tl, filas[2], 2.0);
-    if (!escritorio) tl.to(pausa, { opacity: 0, y: -8, duration: 0.3 }, 2.15);
-    tl.to(ana, { opacity: 1, y: 0, duration: 0.4, ease: "back.out(1.6)" }, 2.3).to({}, { duration: 0.6 }, 2.8);
+
+    const tl = fijar(escena);
+    mostrarFila(tl, filas[0], 0.15);
+    mostrarFila(tl, filas[1], 0.7);
+    tl.to(pausa, { opacity: 1, y: 0, duration: 0.4, ease: CURVA.salida }, 1.1);
+    mostrarFila(tl, filas[2], 1.8);
+    if (!escritorio) tl.to(pausa, { opacity: 0, y: -8, duration: 0.3 }, 1.95);
+    tl.to(ana, { opacity: 1, y: 0, duration: 0.4, ease: CURVA.salida }, 2.1).to({}, { duration: 0.6 }, 2.6);
     tl.eventCallback(
       "onUpdate",
       registrarPintor(tl, () => {
-        pintarReloj(tl.time() < 1.95 ? 2120 : 2126, horasEquipo);
+        pintarReloj(tl.time() < 1.75 ? 2120 : 2126, horasEquipo);
         pintarCielo(3);
       }),
     );
-    puntos.push({ nombre: "11-algo-delicado", y: enTiempo(tl, 1.8) }, { nombre: "12-tu-equipo", y: enTiempo(tl, 3.2) });
+    puntos.push({ nombre: "11-algo-delicado", y: enTiempo(tl, 1.6) }, { nombre: "12-tu-equipo", y: enTiempo(tl, 3.0) });
   });
   medir("equipo");
   };
@@ -565,9 +640,14 @@ export async function armarHistoria(): Promise<() => void> {
     centrar(controles);
     const ps = palabras($("h2", frase));
     gsap.set(ps, { yPercent: 115 });
+    // Entra con su subida: el título y los controles llegan con la primera tarjeta. Antes el
+    // título entraba hasta que la escena se fijaba y los controles, visibles al subir, se apagaban
+    // de golpe al fijarse (su fromTo no se aplicaba hasta arrancar).
+    const ent = entrada(escena);
+    entrarPalabras(ent, ps, 0.25, 0.5);
+    ent.fromTo(controles, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4 }, 0.55);
     const tl = fijar(escena);
-    entrarPalabras(tl, ps, 0);
-    tl.fromTo(controles, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, immediateRender: false }, 0.2).to({}, { duration: 3.9 }, 0.1);
+    tl.to({}, { duration: 4.0 }, 0);
     const horas = [2190, 2405, 2560, 7805];
     const cortes = [1.05, 2.05, 3.05];
     let activa = 0;
@@ -575,12 +655,21 @@ export async function armarHistoria(): Promise<() => void> {
       pintarReloj(horas[activa]);
       pintarCielo(3);
     });
+    // Mientras se recorre una tarjeta, su punto se llena como barra: la escena está fija y la
+    // tarjeta quieta ~0.8 pantallas, y sin esto el scroll no daba señal de avanzar.
+    const limites = [0, ...cortes, tl.duration()];
+    let ultimoAvance = "";
     tl.eventCallback("onUpdate", () => {
       const t = tl.time();
       const i = cortes.filter((c) => t >= c).length;
       if (i !== activa) {
         activa = i;
         fijarEstado({ diaActiva: i });
+      }
+      const avance = clamp((t - limites[i]) / (limites[i + 1] - limites[i])).toFixed(3);
+      if (avance !== ultimoAvance) {
+        ultimoAvance = avance;
+        controles.style.setProperty("--avance", avance);
       }
       pintar();
     });
@@ -604,14 +693,20 @@ export async function armarHistoria(): Promise<() => void> {
     gsap.set($("p", frase), { opacity: 0, y: 10 });
     gsap.set(trazos, { drawSVG: "0%" });
     gsap.set(pasos, { opacity: 0, y: 18 });
+    // Entra con su subida: el título, el párrafo, el principio de la ruta y el día 1. Antes se
+    // fijaba vacía (porcelana y una raya) y todo empezaba ahí.
+    const ent = entrada(escena);
+    entrarPalabras(ent, ps, 0.15, 0.5);
+    ent.fromTo($("p", frase), { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4 }, 0.45)
+      .fromTo(trazos, { drawSVG: "0% 0%" }, { drawSVG: "0% 16%", duration: 0.4, ease: "none" }, 0.6)
+      .fromTo(pasos[0], { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.35 }, 0.62);
     const tl = fijar(escena);
-    entrarPalabras(tl, ps, 0);
-    tl.to($("p", frase), { opacity: 1, y: 0, duration: 0.4 }, 0.2)
-      .to(trazos, { drawSVG: "100%", duration: 1.6, ease: "none" }, 0.3)
-      .to(pasos, { opacity: 1, y: 0, duration: 0.35, stagger: 0.62, ease: "power2.out" }, 0.35)
-      .to({}, { duration: 0.5 }, 1.95);
+    // Ya fija, la ruta sigue dibujándose con el scroll y cada día aparece cuando la ruta lo alcanza.
+    tl.fromTo(trazos, { drawSVG: "0% 16%" }, { drawSVG: "0% 100%", duration: 1.4, ease: "none", immediateRender: false }, 0)
+      .fromTo(pasos.slice(1), { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.62, ease: CURVA.salida, immediateRender: false }, 0.35)
+      .to({}, { duration: 0.5 }, 1.4);
     const reloj = { m: 7805 };
-    tl.to(reloj, { m: 7820, duration: 1.6, ease: "none" }, 0.3);
+    tl.to(reloj, { m: 7820, duration: 1.4, ease: "none" }, 0);
     tl.eventCallback(
       "onUpdate",
       registrarPintor(tl, () => {
@@ -619,7 +714,7 @@ export async function armarHistoria(): Promise<() => void> {
         pintarCielo(3);
       }),
     );
-    puntos.push({ nombre: "17-tu-parte", y: enTiempo(tl, 2.4) });
+    puntos.push({ nombre: "17-tu-parte", y: enTiempo(tl, 1.75) });
   });
   medir("instala");
   };
@@ -659,7 +754,8 @@ export async function armarHistoria(): Promise<() => void> {
         },
       );
     };
-    disparoPrecio = ScrollTrigger.create({ trigger: "#precio", start: "top 70%", once: true, onEnter: revelarPrecio });
+    // En cuanto asoma (antes, al 70 %: la parte de abajo de la pantalla subía vacía un buen tramo).
+    disparoPrecio = ScrollTrigger.create({ trigger: "#precio", start: "top 88%", once: true, onEnter: revelarPrecio });
     reveladores.precio = revelarPrecio;
     const pregs = $("#preguntas");
     const titulo = palabras($("h2", pregs));
@@ -675,7 +771,7 @@ export async function armarHistoria(): Promise<() => void> {
       gsap.to(titulo, { yPercent: 0, duration: 0.6, stagger: 0.05, ease: "power3.out" });
       gsap.to(items, { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: "power3.out", delay: 0.15 });
     };
-    disparoPreguntas = ScrollTrigger.create({ trigger: pregs, start: "top 72%", once: true, onEnter: revelarPreguntas });
+    disparoPreguntas = ScrollTrigger.create({ trigger: pregs, start: "top 88%", once: true, onEnter: revelarPreguntas });
     reveladores.preguntas = revelarPreguntas;
     // Si el foco ya estaba adentro cuando se armó (Tab más rápido que el scroll), se revela ya.
     if ($("#precio").contains(document.activeElement)) revelarPrecio();
@@ -698,21 +794,36 @@ export async function armarHistoria(): Promise<() => void> {
     gsap.set(ps, { yPercent: 115 });
     gsap.set(resto, { opacity: 0, y: 16 });
     const reloj = { m: 7820 };
+    const pintarAtardecer = () => {
+      pintarReloj(reloj.m);
+      pintarCielo(cieloPorHora(reloj.m % 1440));
+    };
+    // Atardece mientras la escena sube. La escena es transparente: el cielo que oscurece se ve
+    // por la ventana que abre al subir, y la noche llega de abajo hacia arriba. Antes subía vacía
+    // sobre el porcelana, se fijaba vacía casi media pantalla y ahí el cielo pasaba a noche de golpe.
+    // La tarde pasa rápido (10:20 → 17:30) y el atardecer despacio (17:30 → 20:30).
+    const ent = entrada(escena);
+    ent.fromTo(reloj, { m: 7820 }, { m: 8250, duration: 0.3, ease: "none" }, 0)
+      .to(reloj, { m: 8430, duration: 0.7, ease: "none" }, 0.3)
+      .fromTo(tamborCierre, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5 }, 0.45);
+    ent.eventCallback("onUpdate", registrarPintor(ent, pintarAtardecer));
     const tl = fijar(escena);
-    tl.to(reloj, { m: 8627, duration: 1.3, ease: "power1.inOut" }, 0).to(tamborCierre, { autoAlpha: 1, duration: 0.8, ease: "power2.out" }, 0.7);
-    entrarPalabras(tl, ps, 1.3, 0.55);
-    tl.to(resto, { opacity: 1, y: 0, duration: 0.45, stagger: 0.1, ease: "power2.out" }, 1.55).to({}, { duration: 0.6 }, 2.0);
-    // Los mensajes de la noche giran con el scroll, no solos.
-    tl.fromTo($(".tambor-giro-solo", escena), { "--giro": "0deg" }, { "--giro": "-72deg", ease: "none", duration: tl.duration() }, 0);
-    tl.eventCallback(
-      "onUpdate",
-      registrarPintor(tl, () => {
-        pintarReloj(reloj.m);
-        pintarCielo(cieloPorHora(reloj.m % 1440));
-      }),
-    );
-    puntos.push({ nombre: "20-esta-noche", y: enTiempo(tl, 2.4) });
-    puntosFoco.cierre = enTiempo(tl, 2.4);
+    tl.fromTo(reloj, { m: 8430 }, { m: 8627, duration: 0.8, ease: CURVA.salida }, 0);
+    entrarPalabras(tl, ps, 0.15, 0.55);
+    tl.to(resto, { opacity: 1, y: 0, duration: 0.45, stagger: 0.1, ease: CURVA.salida }, 0.4).to({}, { duration: 0.8 }, 0.95);
+    // Los mensajes de la noche giran con el scroll, no solos. El giro se escribe en el transform
+    // con el ángulo ya resuelto, como en la portada, y en --giro para la opacidad de cada carta.
+    const giro = $(".tambor-giro-solo", escena);
+    const vuelta = { a: 0 };
+    const girar = () => {
+      const a = vuelta.a.toFixed(3);
+      giro.style.transform = `rotateX(-7deg) translateZ(calc(var(--radio) * -1)) rotateY(${a}deg)`;
+      giro.style.setProperty("--giro", `${a}deg`);
+    };
+    tl.fromTo(vuelta, { a: 0 }, { a: -72, ease: "none", duration: tl.duration(), onUpdate: girar, immediateRender: false }, 0);
+    tl.eventCallback("onUpdate", registrarPintor(tl, pintarAtardecer));
+    puntos.push({ nombre: "20-esta-noche", y: enTiempo(tl, 1.5) });
+    puntosFoco.cierre = enTiempo(tl, 1.5);
     puntos.push({ nombre: "21-pie", y: () => document.documentElement.scrollHeight - innerHeight });
   });
   medir("cierre");

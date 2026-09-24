@@ -63,19 +63,21 @@ export const PALETAS = [
 
 /**
  * Minutos del día → f del cielo (0 noche, 1 madrugada, 2 alba, 3 día). En Cuernavaca, en
- * octubre, amanece hacia las 06:50: la madrugada aclara desde las 05:00 y a las 08:30 ya es de día.
+ * octubre, amanece hacia las 06:50: la madrugada aclara desde las 04:30 y a las 08:30 ya es de día.
+ * El paso de madrugada a alba (del verde oscuro al menta claro) es el que más cambia la pantalla:
+ * se le da hora y media, y lo mismo al atardecer, para que no se vea como un destello.
  */
 export function cieloPorHora(minutosDelDia: number) {
   const h = minutosDelDia / 60;
   if (h < 4.5) return 0;
-  if (h < 6) return (h - 4.5) / 1.5;
-  if (h < 7) return 1 + (h - 6);
-  if (h < 8.5) return 2 + (h - 7) / 1.5;
-  // Atardece: a las 18:40 se mete el sol y a las 20:00 ya es de noche.
-  if (h < 18) return 3;
-  if (h < 18.7) return 3 - (h - 18) / 0.7;
-  if (h < 19.3) return 2 - (h - 18.7) / 0.6;
-  if (h < 20) return 1 - (h - 19.3) / 0.7;
+  if (h < 5.75) return (h - 4.5) / 1.25;
+  if (h < 7.25) return 1 + (h - 5.75) / 1.5;
+  if (h < 8.5) return 2 + (h - 7.25) / 1.25;
+  // Atardece: a las 18:40 se mete el sol y hacia las 20:15 ya es de noche.
+  if (h < 17.75) return 3;
+  if (h < 18.5) return 3 - (h - 17.75) / 0.75;
+  if (h < 19.5) return 2 - (h - 18.5) / 1;
+  if (h < 20.25) return 1 - (h - 19.5) / 0.75;
   return 0;
 }
 
