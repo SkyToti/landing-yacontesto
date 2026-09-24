@@ -555,14 +555,18 @@ export async function armarHistoria(): Promise<() => void> {
       .fromTo(arco, { autoAlpha: 1, y: 0 }, { autoAlpha: 0, y: 40, duration: 0.4, ease: "power2.in", immediateRender: false }, 2.62)
       .set(diaEscena, { opacity: 1 }, 3.0);
     entrarPalabras(tl, ps, 3.02);
+    // La agenda y la cita toman su estado inicial desde que se arma la escena (render inmediato):
+    // con immediateRender: false, entre 3.0 (la escena se enciende) y 3.1 (empieza el dibujo) la
+    // agenda se veía completa, luego saltaba a recortada y se volvía a dibujar (lo vio Diego en la
+    // PC; scripts/agenda-0900.mjs lo reproduce).
     tl.to($("p", frase), { opacity: 1, y: 0, duration: 0.4, ease: CURVA.salida }, 3.25)
       .fromTo(
         hoja,
         { clipPath: "inset(0% 0% 100% 0% round 20px)", y: 40 },
-        { clipPath: "inset(0% 0% 0% 0% round 20px)", y: 0, duration: 0.7, ease: CURVA.salida, immediateRender: false },
+        { clipPath: "inset(0% 0% 0% 0% round 20px)", y: 0, duration: 0.7, ease: CURVA.salida },
         3.1,
       )
-      .fromTo(citaDia, { scale: 0.92 }, { scale: 1, duration: 0.45, ease: CURVA.resorte, immediateRender: false }, 3.55)
+      .fromTo(citaDia, { scale: 0.92 }, { scale: 1, duration: 0.45, ease: CURVA.resorte }, 3.55)
       .to(notaDia, { opacity: 1, y: 0, duration: 0.35, ease: CURVA.salida }, 3.7)
       .to({}, { duration: 0.6 }, 4.1);
 
