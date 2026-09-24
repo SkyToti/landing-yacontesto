@@ -51,8 +51,10 @@
   height: calc(var(--alto) * 3.2);
 }
 
+/* Cuatro tarjetas en ~2.8 pantallas fijas: unas 0.7 por tarjeta (con 4.4, cada una se quedaba
+   quieta casi una pantalla y el scroll parecía no avanzar). */
 .cine .cap-dia {
-  height: calc(var(--alto) * 4.4);
+  height: calc(var(--alto) * 3.8);
 }
 
 .cine .cap-instala {
@@ -73,7 +75,7 @@
   }
 
   .cine .cap-dia {
-    height: calc(var(--alto) * 4.2);
+    height: calc(var(--alto) * 3.6);
   }
 }
 

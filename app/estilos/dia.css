@@ -404,6 +404,13 @@
   opacity: 1;
 }
 
+/* Con la historia animada, el punto activo es una barra que se llena mientras se recorre su
+   tarjeta (el Director escribe --avance): el scroll siempre enseña que avanza. */
+.cine .diagonal-puntos button.activo::after {
+  width: 26px;
+  background: linear-gradient(90deg, var(--pino) calc(var(--avance, 1) * 100%), rgb(12 61 34 / 0.24) 0);
+}
+
 .tarjeta {
   display: flex;
   flex-direction: column;
@@ -803,6 +810,22 @@
 }
 
 @media (max-width: 899px) {
+  /* Centradas bajo la muesca, no detrás: en pantallas bajas (iPhone SE, 553 px) el título de las
+     09:00 y el de «En 7 días» empezaban debajo de la barra. `safe` alinea arriba cuando el
+     contenido no cabe, en lugar de repartir lo que sobra por arriba y por abajo. */
+  .cine .escena-amanece,
+  .cine .escena-instala {
+    padding-top: 72px;
+  }
+
+  .cine .escena-amanece {
+    place-items: safe center;
+  }
+
+  .cine .escena-instala {
+    align-content: safe center;
+  }
+
   .arco {
     width: 150vw;
     bottom: 5vh;
