@@ -1,0 +1,25 @@
+@import "tailwindcss";
+@source not "../investigacion";
+@import "./estilos/tokens.css";
+@import "./estilos/base.css";
+@import "./estilos/cielo.css";
+@import "./estilos/muesca.css";
+@import "./estilos/boton.css";
+@import "./estilos/escenas.css";
+@import "./estilos/tambor.css";
+@import "./estilos/telefono.css";
+@import "./estilos/dia.css";
+@import "./estilos/precio.css";
+@import "./estilos/preguntas.css";
+@import "./estilos/cierre.css";
+@import "./estilos/quieto.css";
+
+/* Tokens de la marca para las utilidades de Tailwind (los componentes de Vengeance las usan). */
+@theme inline {
+  --color-pino: #0c3d22;
+  --color-menta: #91d5b8;
+  --color-porcelana: #f7f9f8;
+  --color-tinta: var(--tinta);
+  --color-marca: var(--marca);
+  --font-sans: var(--f-texto);
+}

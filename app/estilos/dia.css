@@ -1,0 +1,935 @@
+/* Escenas de día: amanece, tu equipo, el resto del día y tu parte. */
+
+/* ── La noche pasa y amanece ─────────────────────────────── */
+.escena-amanece {
+  --dia: 1;
+  display: grid;
+  place-items: center;
+}
+
+.arco {
+  position: absolute;
+  left: 50%;
+  bottom: 3vh;
+  width: min(1040px, 94vw);
+  translate: -50% 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.cine .arco {
+  opacity: 0;
+}
+
+.arco-horizonte {
+  stroke: color-mix(in oklab, rgb(255 255 255 / 0.28) calc((1 - var(--dia)) * 100%), rgb(15 29 22 / 0.18));
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.arco-guia {
+  fill: none;
+  stroke: color-mix(in oklab, rgb(255 255 255 / 0.14) calc((1 - var(--dia)) * 100%), rgb(15 29 22 / 0.1));
+  stroke-width: 1.5;
+  stroke-dasharray: 2 7;
+  vector-effect: non-scaling-stroke;
+}
+
+.arco-recorrido {
+  fill: none;
+  stroke: var(--ambar-noche);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.arco-marca line {
+  stroke: color-mix(in oklab, rgb(255 255 255 / 0.4) calc((1 - var(--dia)) * 100%), rgb(15 29 22 / 0.35));
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+
+.arco-marca text {
+  font-family: var(--f-hora);
+  font-size: 22px;
+  font-weight: 700;
+  fill: color-mix(in oklab, var(--tinta-suave-noche) calc((1 - var(--dia)) * 100%), var(--tinta-suave-dia));
+}
+
+.arco-sol {
+  fill: var(--ambar-noche);
+  stroke: #fff4d9;
+  stroke-width: 2;
+}
+
+.reloj-grande {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 38%;
+  translate: 0 -50%;
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 2vw;
+  pointer-events: none;
+  color: color-mix(in oklab, var(--ambar-noche) calc((1 - var(--dia)) * 100%), var(--ambar-dia));
+}
+
+.cine .reloj-grande {
+  opacity: 0;
+}
+
+.rg-dia {
+  font-size: clamp(20px, 2.4vw, 34px);
+  font-weight: 600;
+  color: color-mix(in oklab, var(--tinta-suave-noche) calc((1 - var(--dia)) * 100%), var(--tinta-suave-dia));
+}
+
+.rg-hora {
+  display: inline-flex;
+  align-items: flex-start;
+  font-size: clamp(116px, 21vw, 300px);
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.rg-ventana {
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+}
+
+.rg-tira {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+
+.rg-tira > span {
+  display: block;
+  height: 1em;
+  line-height: 1;
+  text-align: center;
+}
+
+.rg-dos {
+  display: inline-block;
+  line-height: 0.92;
+  margin: 0 0.02em;
+}
+
+.dia-escena {
+  position: relative;
+  width: min(1180px, 100% - 48px);
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 6vw;
+  align-items: center;
+}
+
+.dia-panel {
+  padding: 22px 22px 26px;
+  border-radius: var(--radio-panel);
+  background: #ffffff;
+  color: var(--tinta-dia);
+  box-shadow: 0 1px 2px rgb(15 29 22 / 0.06), 0 26px 60px -30px rgb(15 29 22 / 0.4);
+}
+
+.dp-cabeza {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.dp-cabeza b {
+  font-family: var(--f-titular);
+  font-size: 30px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.dp-cabeza span {
+  font-size: 14px;
+  color: var(--tinta-suave-dia);
+}
+
+.dp-rejilla {
+  position: relative;
+  height: 300px;
+  margin: 20px 0 0 54px;
+}
+
+.dp-rejilla .ag-h {
+  left: -54px;
+  border-top-color: var(--linea-dia);
+}
+
+.dp-rejilla .ag-h span {
+  font-size: 16px;
+  color: var(--tinta-suave-dia);
+  background: #ffffff;
+}
+
+.dia-panel .blq {
+  font-size: 14px;
+  padding: 6px 10px;
+}
+
+.dia-panel .blq.ocu {
+  background: var(--velo);
+  color: var(--tinta-suave-dia);
+}
+
+.dia-panel .blq.otro {
+  background: repeating-linear-gradient(135deg, var(--velo) 0 6px, #ffffff 6px 12px);
+  box-shadow: inset 0 0 0 1px var(--linea-dia);
+  color: var(--tinta-suave-dia);
+}
+
+.dia-panel .blq.cita {
+  flex-direction: column;
+  gap: 3px;
+  padding: 7px 10px;
+  background: var(--pino);
+  color: #ffffff;
+  box-shadow: 0 14px 30px -14px rgb(12 61 34 / 0.75);
+}
+
+.cita-titulo {
+  font-weight: 700;
+}
+
+.dia-panel .blq.cita small {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #cfe3d8;
+}
+
+.dp-nota {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(43.4% + 10px);
+  font-size: 14px;
+  line-height: 1.3;
+  color: var(--tinta-suave-dia);
+}
+
+.dp-nota b {
+  font-size: 18px;
+  color: var(--ambar-dia);
+}
+
+/* ── 11:20 · Tu equipo ───────────────────────────────────── */
+.escena-equipo {
+  --cx: 64%;
+  --cy: 52%;
+  --tel-h: min(600px, calc(var(--alto) - 140px));
+  --tel-w: calc(var(--tel-h) * 0.482);
+}
+
+.cine .frase-lateral {
+  position: absolute;
+  left: var(--margen);
+  top: 50%;
+  translate: 0 -50%;
+  width: min(36vw, 540px);
+}
+
+.cine .equipo-escenario {
+  position: absolute;
+  inset: 0;
+}
+
+.nota {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  max-width: 250px;
+  padding: 11px 14px 12px;
+  border-radius: var(--radio-tarjeta);
+  background: #ffffff;
+  color: var(--tinta-dia);
+  font-size: 15px;
+  line-height: 1.35;
+  box-shadow: 0 1px 2px rgb(15 29 22 / 0.06), 0 14px 34px -18px rgb(15 29 22 / 0.4);
+}
+
+.nota svg {
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  flex-shrink: 0;
+  color: var(--pino);
+}
+
+.cine .nota {
+  position: absolute;
+  z-index: 6;
+  left: calc(var(--cx) + var(--tel-w) / 2 + 28px);
+}
+
+.cine .nota-pausa {
+  top: calc(var(--cy) - 4%);
+}
+
+.cine .nota-ana {
+  top: calc(var(--cy) + 16%);
+}
+
+/* ── El resto del día (Diagonal Carousel) ─────────────────── */
+.cine .frase-arriba {
+  position: absolute;
+  z-index: 20;
+  left: var(--margen);
+  top: calc(64px + 8vh);
+  width: min(38vw, 560px);
+}
+
+.dia-cine {
+  position: absolute;
+  inset: 0;
+}
+
+.dia-carrusel {
+  position: absolute;
+  inset: 0;
+  outline-offset: -8px;
+}
+
+.diagonal-tira {
+  position: absolute;
+  left: 63%;
+  top: calc(53% - 185px);
+  display: flex;
+}
+
+.diagonal-diapositiva {
+  display: flex;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.diagonal-diapositiva[data-activa] {
+  cursor: default;
+}
+
+.diagonal-controles {
+  position: absolute;
+  z-index: 25;
+  left: 63%;
+  bottom: max(20px, 4vh);
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(15 29 22 / 0.08), 0 10px 26px -14px rgb(15 29 22 / 0.4);
+}
+
+.diagonal-controles > button {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--pino);
+  cursor: pointer;
+  transition: background var(--duracion-toque) ease;
+}
+
+.diagonal-controles > button:hover:not(:disabled) {
+  background: var(--velo);
+}
+
+.diagonal-controles > button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.diagonal-controles svg {
+  width: 20px;
+  height: 20px;
+}
+
+.diagonal-puntos {
+  display: flex;
+  gap: 2px;
+}
+
+.diagonal-puntos button {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.diagonal-puntos button::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  translate: -50% -50%;
+  border-radius: 999px;
+  background: var(--pino);
+  opacity: 0.28;
+  transition:
+    width var(--duracion-corta) var(--curva-salida),
+    opacity var(--duracion-corta) var(--curva-salida);
+}
+
+.diagonal-puntos button.activo::after {
+  width: 20px;
+  opacity: 1;
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 300px;
+  height: 372px;
+  padding: 22px 22px 20px;
+  border-radius: 22px;
+  background: #ffffff;
+  color: var(--tinta-dia);
+  box-shadow: 0 1px 2px rgb(15 29 22 / 0.06), 0 30px 70px -36px rgb(15 29 22 / 0.5);
+}
+
+.tj-hora {
+  font-size: 30px;
+  line-height: 1;
+  color: var(--ambar-dia);
+}
+
+.tarjeta .titular-3 {
+  color: var(--tinta-dia);
+  font-size: 26px;
+}
+
+.tj-texto {
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--tinta-suave-dia);
+}
+
+.mini {
+  position: relative;
+  margin-top: auto;
+  height: 168px;
+  border-radius: 14px;
+  background: var(--porcelana);
+  box-shadow: inset 0 0 0 1px rgb(15 29 22 / 0.05);
+  overflow: hidden;
+}
+
+/* Varios a la vez */
+.fila-chat {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: calc(12px + var(--orden) * 50px);
+  height: 44px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.fila-av {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--velo);
+  color: var(--pino);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.fila-texto {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.fila-texto b {
+  font-size: 13px;
+}
+
+.fila-texto span {
+  font-size: 13px;
+  color: var(--tinta-suave-dia);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fila-ok {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--pino);
+  color: #ffffff;
+}
+
+.fila-ok svg {
+  width: 13px;
+  height: 13px;
+}
+
+.dia-cine .fila-ok {
+  transform: scale(0);
+}
+
+.dia-cine [data-activa] .fila-ok {
+  animation: pop 0.5s var(--curva-resorte) calc(0.35s + var(--orden) * 0.12s) both;
+}
+
+@keyframes pop {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* Burbujas mínimas dentro de las tarjetas */
+.mini-burbuja {
+  position: absolute;
+  max-width: 80%;
+  padding: 6px 9px;
+  border-radius: 10px;
+  font-family: var(--f-chat);
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--chat-texto);
+  box-shadow: 0 1px 0.5px rgb(11 20 26 / 0.13);
+}
+
+.mini-burbuja.pac {
+  right: 12px;
+  top: 12px;
+  background: var(--chat-saliente);
+  border-top-right-radius: 2px;
+}
+
+.mini-burbuja.cli {
+  left: 12px;
+  top: 70px;
+  background: var(--chat-entrante);
+  border-top-left-radius: 2px;
+}
+
+.dia-cine .mini-burbuja {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.45s var(--curva-salida),
+    transform 0.45s var(--curva-salida);
+}
+
+.dia-cine [data-activa] .mini-burbuja.pac {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.2s;
+}
+
+.dia-cine [data-activa] .mini-burbuja.cli {
+  opacity: 1;
+  transform: none;
+  transition-delay: 0.85s;
+}
+
+/* Mueve una cita */
+.mini-semana {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 56px;
+  bottom: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto 1fr;
+  column-gap: 10px;
+}
+
+.col-titulo {
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--tinta-suave-dia);
+  padding: 0 0 4px 4px;
+}
+
+.col-dia {
+  border-radius: 9px;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1px rgb(15 29 22 / 0.06);
+}
+
+.mueve {
+  position: absolute;
+  left: 4px;
+  top: 34px;
+  width: calc(50% - 13px);
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: var(--pino);
+  color: #ffffff;
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.mueve b {
+  display: block;
+  font-size: 16px;
+}
+
+.dia-rejilla .mueve {
+  transform: translateX(calc(100% + 10px));
+}
+
+.dia-cine .mueve {
+  transition: transform 0.9s var(--curva-cambio) 1s;
+}
+
+.dia-cine [data-activa] .mueve {
+  transform: translateX(calc(100% + 10px));
+}
+
+/* Cancela */
+.cancela-hueco {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 70px;
+  height: 64px;
+}
+
+.cancela {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.cancela b {
+  font-size: 17px;
+}
+
+.cancela.antes {
+  background: var(--pino);
+  color: #ffffff;
+}
+
+.cancela.despues {
+  background: #ffffff;
+  outline: 1.5px dashed var(--pino);
+  outline-offset: -1.5px;
+  color: var(--pino);
+}
+
+.dia-rejilla .cancela.antes {
+  opacity: 0;
+}
+
+.dia-cine .cancela.antes {
+  transition:
+    opacity 0.6s var(--curva-salida) 1.1s,
+    transform 0.6s var(--curva-salida) 1.1s;
+}
+
+.dia-cine .cancela.despues {
+  opacity: 0;
+  transition: opacity 0.6s var(--curva-salida) 1.5s;
+}
+
+.dia-cine [data-activa] .cancela.antes {
+  opacity: 0;
+  transform: scale(0.94);
+}
+
+.dia-cine [data-activa] .cancela.despues {
+  opacity: 1;
+}
+
+/* ── Tu parte ────────────────────────────────────────────── */
+.escena-instala {
+  display: grid;
+  align-content: center;
+  justify-items: start;
+  padding-inline: var(--margen);
+}
+
+.ruta {
+  position: relative;
+  width: min(1100px, 100%);
+  margin-top: 8vh;
+}
+
+.ruta-linea {
+  position: absolute;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.ruta-horizontal {
+  left: 0;
+  right: 0;
+  top: 0;
+  width: 100%;
+  height: 16px;
+}
+
+.ruta-vertical {
+  display: none;
+}
+
+.ruta-guia {
+  fill: none;
+  stroke: var(--linea);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.ruta-trazo {
+  fill: none;
+  stroke: var(--marca);
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.ruta-pasos {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.paso {
+  position: relative;
+  padding-top: 42px;
+}
+
+.paso::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--fondo);
+  box-shadow: inset 0 0 0 2px var(--marca);
+}
+
+.paso-cuando {
+  display: block;
+  font-size: 34px;
+  line-height: 1;
+  color: var(--hora);
+}
+
+.paso-que {
+  margin-top: 10px;
+  max-width: 22ch;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--tinta);
+}
+
+.paso-detalle {
+  display: block;
+  margin-top: 6px;
+  max-width: 30ch;
+  font-size: 16px;
+  color: var(--tinta-suave);
+}
+
+/* ── Celular ─────────────────────────────────────────────── */
+@media (max-width: 1099px) {
+  .cine .nota {
+    left: var(--margen);
+    max-width: min(34vw, 300px);
+  }
+
+  .cine .nota-pausa {
+    top: 66%;
+  }
+
+  .cine .nota-ana {
+    top: 78%;
+  }
+
+  .escena-equipo {
+    --cx: 68%;
+  }
+}
+
+@media (max-width: 899px) {
+  .arco {
+    width: 150vw;
+    bottom: 5vh;
+  }
+
+  .arco-marca text {
+    font-size: 34px;
+  }
+
+  .reloj-grande {
+    top: 40%;
+  }
+
+  .dia-escena {
+    grid-template-columns: 1fr;
+    gap: 26px;
+    width: calc(100% - 40px);
+  }
+
+  .dp-rejilla {
+    height: 250px;
+    margin-left: 48px;
+  }
+
+  .dp-rejilla .ag-h {
+    left: -48px;
+  }
+
+  .dp-nota {
+    font-size: 13px;
+  }
+
+  .escena-equipo {
+    --cx: 50%;
+    --tel-h: min(520px, calc(var(--alto) - 300px));
+    --tel-w: min(280px, calc(var(--tel-h) * 0.5), calc(100vw - 72px));
+  }
+
+  .cine .frase-lateral {
+    left: 20px;
+    right: 20px;
+    top: 80px;
+    width: auto;
+    translate: none;
+  }
+
+  .cine .tel.tel-equipo {
+    top: 222px;
+    translate: -50% 0;
+  }
+
+  .cine .nota {
+    left: 20px;
+    right: 20px;
+    max-width: none;
+    top: auto;
+    bottom: 16px;
+  }
+
+  .cine .frase-arriba {
+    left: 20px;
+    right: 20px;
+    top: 80px;
+    width: auto;
+  }
+
+  .diagonal-tira {
+    left: 50%;
+    top: calc(58% - 160px);
+  }
+
+  .diagonal-controles {
+    left: 50%;
+  }
+
+  .tarjeta {
+    width: 256px;
+    height: 322px;
+    padding: 18px;
+  }
+
+  .tarjeta .titular-3 {
+    font-size: 22px;
+  }
+
+  .tj-hora {
+    font-size: 26px;
+  }
+
+  .tj-texto {
+    font-size: 14px;
+  }
+
+  .mini {
+    height: 150px;
+  }
+
+  .fila-chat {
+    top: calc(8px + var(--orden) * 46px);
+  }
+
+  .ruta {
+    margin-top: 6vh;
+  }
+
+  .ruta-horizontal {
+    display: none;
+  }
+
+  .ruta-vertical {
+    display: block;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 16px;
+    height: 100%;
+  }
+
+  .ruta-pasos {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    padding-left: 38px;
+  }
+
+  .paso {
+    padding-top: 0;
+  }
+
+  .paso::before {
+    left: -38px;
+    top: 8px;
+  }
+
+  .paso-cuando {
+    font-size: 30px;
+  }
+
+  .paso-que {
+    font-size: 18px;
+  }
+}

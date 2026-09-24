@@ -1,0 +1,146 @@
+/*
+ * Botón (Animated Button adaptado): lleno en `marca`, radio de botón, brillo que cruza el texto
+ * y el borde una vez al cargar y otra al pasar el cursor; resorte al presionar.
+ */
+.boton {
+  --brillo: rgb(255 255 255 / 0.85);
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 54px;
+  padding: 0 24px;
+  border-radius: var(--radio-boton);
+  background: var(--marca);
+  color: var(--sobre-marca);
+  font-weight: 650;
+  font-size: 17px;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    transform var(--duracion-corta) var(--curva-resorte),
+    box-shadow var(--duracion-corta) var(--curva-salida);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.18) inset, 0 10px 24px -14px rgb(0 0 0 / 0.55);
+}
+
+[data-tema="dia"] .boton {
+  --brillo: rgb(255 255 255 / 0.55);
+}
+
+.boton:hover {
+  transform: translateY(-1px) scale(1.012);
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.2) inset, 0 16px 30px -16px rgb(0 0 0 / 0.6);
+}
+
+.boton:active {
+  transform: scale(0.97);
+  transition-duration: var(--duracion-toque);
+}
+
+.boton-texto {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  /* El brillo del texto: una ventana transparente que cruza a -75°. */
+  -webkit-mask-image: linear-gradient(-75deg, #000 calc(var(--mascara-x) + 20%), rgb(0 0 0 / 0.45) calc(var(--mascara-x) + 30%), #000 calc(var(--mascara-x) + 100%));
+  mask-image: linear-gradient(-75deg, #000 calc(var(--mascara-x) + 20%), rgb(0 0 0 / 0.45) calc(var(--mascara-x) + 30%), #000 calc(var(--mascara-x) + 100%));
+  --mascara-x: -100%;
+  animation: boton-brillo-texto 1.1s 1.2s var(--curva-cambio) both;
+}
+
+.boton-texto svg {
+  width: 20px;
+  height: 20px;
+}
+
+.boton-borde {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(-75deg, transparent 30%, var(--brillo) 50%, transparent 70%) 100% 0 / 200% 100% no-repeat;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box exclude, linear-gradient(#fff 0 0);
+  opacity: 0;
+  animation: boton-brillo-borde 1.1s 1.2s var(--curva-cambio) both;
+  pointer-events: none;
+}
+
+.boton:hover .boton-texto {
+  animation: boton-brillo-texto 0.9s var(--curva-cambio) both;
+}
+
+.boton:hover .boton-borde {
+  animation: boton-brillo-borde-2 0.9s var(--curva-cambio) both;
+}
+
+@property --mascara-x {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: -100%;
+}
+
+@keyframes boton-brillo-texto {
+  from {
+    --mascara-x: 100%;
+  }
+  to {
+    --mascara-x: -100%;
+  }
+}
+
+@keyframes boton-brillo-borde {
+  0% {
+    background-position: 100% 0;
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    background-position: 0% 0;
+    opacity: 0;
+  }
+}
+
+@keyframes boton-brillo-borde-2 {
+  0% {
+    background-position: 100% 0;
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    background-position: 0% 0;
+    opacity: 0;
+  }
+}
+
+.boton-chico {
+  min-height: 34px;
+  padding: 0 14px;
+  font-size: 14px;
+  border-radius: var(--radio-boton);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .boton-texto,
+  .boton-borde,
+  .boton:hover .boton-texto,
+  .boton:hover .boton-borde {
+    animation: none;
+  }
+
+  .boton,
+  .boton:hover,
+  .boton:active {
+    transition: none;
+    transform: none;
+  }
+}

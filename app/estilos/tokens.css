@@ -1,0 +1,105 @@
+/*
+ * Tokens del sistema de diseño «YaContesto» (investigacion/sistema-diseno/tokens.json), verde pino.
+ * Los temas `dia` y `noche` no son preferencias de pantalla: son horas del día. Cada escena
+ * declara la suya con data-tema.
+ */
+:root {
+  /* Pino y sus tonos */
+  --pino: #0c3d22;
+  --pino-profundo: #051a10;
+  --pino-sup: #0b2519;
+  --menta: #91d5b8;
+  --velo: #e4f0e8;
+
+  /* Neutros con sesgo verde: ningún gris puro */
+  --porcelana: #f7f9f8;
+  --tinta-dia: #0f1d16;
+  --tinta-suave-dia: #4b5b53;
+  --linea-dia: #d5dfd9;
+  --tinta-noche: #e8f1ec;
+  --tinta-suave-noche: #a8bcb2;
+  --linea-noche: rgb(255 255 255 / 0.15);
+
+  /* Ámbar: solo para el tiempo */
+  --ambar-noche: #f2b84b;
+  --ambar-dia: #9a5800;
+
+  /* Solo dentro del teléfono, como lo ve el paciente */
+  --chat-fondo: #efeae2;
+  --chat-encabezado: #ffffff;
+  --chat-saliente: #d9fdd3;
+  --chat-entrante: #ffffff;
+  --chat-texto: #111b21;
+  --chat-meta: #5f6f77;
+  --chat-palomitas: #53bdeb;
+
+  /* Tipografía: Sofia Sans en tres anchos */
+  --f-texto: var(--font-texto), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-titular: var(--font-titular), "Arial Narrow", system-ui, sans-serif;
+  --f-hora: var(--font-hora), "Arial Narrow", system-ui, sans-serif;
+  --f-chat: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+
+  /* Espacio (base 4 px) */
+  --espacio-1: 4px;
+  --espacio-2: 8px;
+  --espacio-3: 12px;
+  --espacio-4: 16px;
+  --espacio-5: 24px;
+  --espacio-6: 32px;
+  --espacio-7: 48px;
+  --espacio-8: 64px;
+  --espacio-9: 96px;
+  --espacio-10: 128px;
+  --margen: max(20px, 6vw);
+
+  /* Un radio por papel */
+  --radio-boton: 6px;
+  --radio-burbuja: 10px;
+  --radio-tarjeta: 12px;
+  --radio-panel: 20px;
+  --radio-telefono: 44px;
+
+  /* Movimiento */
+  --curva-salida: cubic-bezier(0.22, 1, 0.36, 1);
+  --curva-cambio: cubic-bezier(0.65, 0, 0.35, 1);
+  --curva-resorte: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duracion-toque: 120ms;
+  --duracion-corta: 240ms;
+  --duracion-media: 480ms;
+  --duracion-larga: 900ms;
+
+  /* Alto de pantalla estable en celulares (sin el brinco de la barra del navegador) */
+  --alto: 100vh;
+}
+
+@supports (height: 100svh) {
+  :root {
+    --alto: 100svh;
+  }
+}
+
+[data-tema="noche"] {
+  --fondo: var(--pino);
+  --superficie: var(--pino-profundo);
+  --tinta: var(--tinta-noche);
+  --tinta-suave: var(--tinta-suave-noche);
+  --linea: var(--linea-noche);
+  --marca: var(--menta);
+  --sobre-marca: var(--pino);
+  --hora: var(--ambar-noche);
+  --foco: var(--menta);
+  color-scheme: dark;
+}
+
+[data-tema="dia"] {
+  --fondo: var(--porcelana);
+  --superficie: #ffffff;
+  --tinta: var(--tinta-dia);
+  --tinta-suave: var(--tinta-suave-dia);
+  --linea: var(--linea-dia);
+  --marca: var(--pino);
+  --sobre-marca: #ffffff;
+  --hora: var(--ambar-dia);
+  --foco: var(--pino);
+  color-scheme: light;
+}

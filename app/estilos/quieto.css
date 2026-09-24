@@ -1,0 +1,189 @@
+/*
+ * La historia quieta y completa: sin JavaScript, con prefers-reduced-motion o con ?movimiento=0.
+ * Cada escena fluye con su fondo, cada animación muestra su estado final.
+ */
+.cine .dia-rejilla {
+  display: none;
+}
+
+html:not(.cine) .cap {
+  background: var(--fondo);
+}
+
+html:not(.cine) .escena {
+  padding: 112px var(--margen) 88px;
+}
+
+/* Noche: portada, los mensajes, los pasos y los dos lados del teléfono. */
+html:not(.cine) .escena-noche {
+  --tel-w: 290px;
+  --tel-h: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+  padding-top: 128px;
+}
+
+html:not(.cine) .halo,
+html:not(.cine) .vuelo,
+html:not(.cine) .pista {
+  display: none;
+}
+
+html:not(.cine) .portada {
+  order: 1;
+  max-width: 720px;
+}
+
+html:not(.cine) .escena-noche .tambor,
+html:not(.cine) .escena-cierre .tambor {
+  --cx: 50%;
+  --cy: 50%;
+  position: relative;
+  order: 2;
+  height: 260px;
+  margin-inline: calc(var(--margen) * -1);
+}
+
+html:not(.cine) .frases-pasos {
+  order: 3;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 32px 40px;
+}
+
+html:not(.cine) .frases-pasos .titular-2 {
+  font-size: clamp(26px, 2.6vw, 36px);
+}
+
+html:not(.cine) .tel-noche {
+  order: 4;
+}
+
+html:not(.cine) .etiqueta-ficticia {
+  order: 5;
+  position: static;
+}
+
+html:not(.cine) .tel {
+  width: auto;
+  height: auto;
+  perspective: none;
+}
+
+html:not(.cine) .tel-giro {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 32px;
+}
+
+html:not(.cine) .tel-cara {
+  position: relative;
+  inset: auto;
+  width: var(--tel-w);
+  height: var(--tel-h);
+  transform: none;
+}
+
+html:not(.cine) .tel-canto {
+  display: none;
+}
+
+/* La agenda en su estado final: la cita ya quedó; la hora pedida y las que ofreció, ya no. */
+html:not(.cine) [data-ag="pedida"],
+html:not(.cine) [data-ag="libre-1030"],
+html:not(.cine) [data-ag="libre-1100"] {
+  display: none;
+}
+
+/* Amanece: sin el reloj de rodillo ni el arco. */
+html:not(.cine) .arco,
+html:not(.cine) .reloj-grande {
+  display: none;
+}
+
+html:not(.cine) .escena-amanece {
+  display: block;
+}
+
+html:not(.cine) .dia-escena {
+  margin: 0 auto;
+}
+
+/* Tu equipo */
+html:not(.cine) .escena-equipo {
+  --tel-w: 290px;
+  --tel-h: 600px;
+}
+
+html:not(.cine) .equipo-escenario {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 24px 32px;
+  margin-top: 48px;
+}
+
+/* El resto del día: las cuatro tarjetas a la vista. */
+html:not(.cine) .dia-cine {
+  display: none;
+}
+
+html:not(.cine) .dia-rejilla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 24px;
+  margin-top: 40px;
+}
+
+html:not(.cine) .dia-rejilla .tarjeta {
+  width: auto;
+}
+
+/* Cierre */
+html:not(.cine) .escena-cierre {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+html:not(.cine) .cierre-frase {
+  order: 1;
+}
+
+@media (max-width: 899px) {
+  html:not(.cine) .escena {
+    padding: 96px 20px 72px;
+  }
+
+  html:not(.cine) .escena-noche,
+  html:not(.cine) .escena-equipo {
+    --tel-w: min(300px, calc(100vw - 64px));
+    --tel-h: calc(var(--tel-w) * 2.05);
+  }
+
+  html:not(.cine) .escena-noche .tambor,
+  html:not(.cine) .escena-cierre .tambor {
+    height: 220px;
+    margin-inline: -20px;
+  }
+}
+
+/* Con movimiento reducido, lo que se mueve solo se detiene. */
+@media (prefers-reduced-motion: reduce) {
+  .morph-palabra {
+    animation: none;
+    opacity: 0;
+  }
+
+  .morph-palabra:first-child {
+    opacity: 1;
+  }
+
+  .pista i {
+    animation: none;
+  }
+}

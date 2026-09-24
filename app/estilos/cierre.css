@@ -1,0 +1,102 @@
+/* Vuelve a ser de noche, y el pie. */
+.escena-cierre {
+  --cx: 50%;
+  --cy: 72%;
+  --cw: 252px;
+}
+
+.tambor-cierre .tambor-escena {
+  -webkit-mask-image: linear-gradient(90deg, transparent 4%, #000 26%, #000 74%, transparent 96%);
+  mask-image: linear-gradient(90deg, transparent 4%, #000 26%, #000 74%, transparent 96%);
+  opacity: 0.8;
+}
+
+.cierre-frase {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+}
+
+.cine .cierre-frase {
+  position: absolute;
+  left: 50%;
+  top: 33%;
+  translate: -50% -50%;
+  width: min(920px, 100% - 40px);
+}
+
+.cierre-frase .titular-2 {
+  font-size: clamp(36px, 5.2vw, 78px);
+  line-height: 0.98;
+}
+
+.cierre-frase .entrada {
+  max-width: 40ch;
+}
+
+.pie {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 20px 48px;
+  padding: 44px var(--margen) 52px;
+  background:
+    linear-gradient(rgb(255 255 255 / 0.15), rgb(255 255 255 / 0.15)) left top / 100% 1px no-repeat,
+    linear-gradient(rgb(255 255 255 / 0.07), rgb(255 255 255 / 0.07)) left 3px / 100% 1px no-repeat,
+    var(--pino-profundo);
+  color: var(--tinta-noche);
+  font-size: 15px;
+}
+
+.pie .marca {
+  font-size: 20px;
+}
+
+.pie-marca p {
+  margin-top: 10px;
+  max-width: 44ch;
+  color: var(--tinta-suave-noche);
+}
+
+.pie-datos {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: right;
+  color: var(--tinta-suave-noche);
+}
+
+.pie-datos a {
+  color: var(--tinta-noche);
+  text-underline-offset: 4px;
+}
+
+.pie-legal {
+  grid-column: 1 / -1;
+  padding-top: 18px;
+  font-size: 14px;
+  color: var(--tinta-suave-noche);
+}
+
+@media (max-width: 899px) {
+  .escena-cierre {
+    --cy: 76%;
+    --cw: 204px;
+  }
+
+  .cine .cierre-frase {
+    top: 36%;
+  }
+
+  .pie {
+    grid-template-columns: 1fr;
+    padding: 40px 20px 44px;
+  }
+
+  .pie-datos {
+    text-align: left;
+  }
+}

@@ -1,0 +1,443 @@
+/* Precio: la escalera real, con la tarjeta de borde luminoso (Glow Border Card adaptada). */
+.cap-precio {
+  padding: 128px var(--margen) 112px;
+}
+
+.precio {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 6vw;
+  align-items: center;
+}
+
+.precio-frase .cuerpo {
+  margin-top: 16px;
+  max-width: 34ch;
+  font-size: 19px;
+}
+
+.garantia {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-top: 28px;
+  max-width: 40ch;
+  font-size: 17px;
+  line-height: 1.5;
+  color: var(--tinta);
+}
+
+.garantia svg {
+  width: 26px;
+  height: 26px;
+  color: var(--marca);
+}
+
+.fundador {
+  margin-top: 18px;
+  font-size: 15px;
+  color: var(--tinta-suave);
+}
+
+.fundador .pendiente,
+.tp-lista .pendiente {
+  color: var(--tinta);
+}
+
+/* Glow Border Card: el ángulo de la luz lo mueve el control del precio. */
+@property --glow-angle {
+  syntax: "<angle>";
+  initial-value: 140deg;
+  inherits: false;
+}
+
+.brillo-tarjeta {
+  position: relative;
+  isolation: isolate;
+}
+
+.brillo-borde {
+  position: absolute;
+  z-index: -1;
+  border-style: solid;
+  border-color: transparent;
+  border-radius: inherit;
+  opacity: 0.55;
+  transition: --glow-angle 0.7s var(--curva-salida);
+}
+
+.glow-conic {
+  border-image: conic-gradient(
+      from var(--glow-angle),
+      var(--glow-color-1),
+      var(--glow-color-2),
+      var(--glow-color-3),
+      var(--glow-color-4),
+      var(--glow-color-5),
+      var(--glow-color-6),
+      var(--glow-color-7),
+      var(--glow-color-8),
+      var(--glow-color-9),
+      var(--glow-color-10),
+      var(--glow-color-1)
+    )
+    1;
+}
+
+.brillo-contenido {
+  position: relative;
+  border-radius: inherit;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgb(15 29 22 / 0.06);
+}
+
+.tarjeta-precio {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  padding: 32px;
+  color: var(--tinta-dia);
+  --marca: var(--pino);
+  --sobre-marca: #ffffff;
+  --foco: var(--pino);
+}
+
+.tp-inst {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px 16px;
+  flex-wrap: wrap;
+}
+
+.tp-etiqueta {
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--tinta-suave-dia);
+}
+
+.tp-cifra {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.tp-cifra b {
+  font-size: 56px;
+  line-height: 0.9;
+}
+
+.tp-cifra s {
+  font-size: 22px;
+  color: var(--tinta-suave-dia);
+  text-decoration-thickness: 1.5px;
+}
+
+.tp-inst small {
+  font-size: 14px;
+  color: var(--tinta-suave-dia);
+}
+
+.tp-sep {
+  height: 4px;
+  background:
+    linear-gradient(var(--linea-dia), var(--linea-dia)) left top / 100% 1px no-repeat,
+    linear-gradient(rgb(15 29 22 / 0.06), rgb(15 29 22 / 0.06)) left bottom / 100% 1px no-repeat;
+}
+
+.tp-cabeza {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 12px;
+  flex-wrap: wrap;
+}
+
+.tp-cabeza label {
+  font-size: 17px;
+  font-weight: 650;
+}
+
+.tp-cuantos {
+  font-size: 22px;
+  color: var(--pino);
+}
+
+.grafica {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 600 / 200;
+  margin-top: 28px;
+}
+
+.grafica svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.grafica-area {
+  fill: var(--velo);
+}
+
+.grafica-borde {
+  fill: none;
+  stroke: var(--pino);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.grafica-base {
+  stroke: var(--linea-dia);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.g-et {
+  position: absolute;
+  translate: 0 -125%;
+  font-size: 13px;
+  font-weight: 650;
+  white-space: nowrap;
+  color: var(--tinta-suave-dia);
+  transition: color var(--duracion-corta) ease;
+}
+
+.g-et[data-activo] {
+  color: var(--pino);
+}
+
+.g-linea {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 1.5px solid var(--tinta-dia);
+  opacity: 0.35;
+  transition: left 0.25s var(--curva-salida);
+}
+
+.g-punto {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: var(--pino);
+  box-shadow: 0 0 0 3px #ffffff, 0 0 0 4px var(--pino), 0 6px 14px -4px rgb(12 61 34 / 0.6);
+  transition:
+    left 0.25s var(--curva-salida),
+    top 0.35s var(--curva-resorte);
+}
+
+/* El control: pista con el tramo recorrido en pino y un pulgar grande para el dedo. */
+.tp-control input[type="range"] {
+  --llenado: 12.5%;
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  width: 100%;
+  height: 32px;
+  margin: 10px 0 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.tp-control input[type="range"]::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 3px;
+  background: linear-gradient(to right, var(--pino) var(--llenado), var(--linea-dia) var(--llenado));
+}
+
+.tp-control input[type="range"]::-moz-range-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--linea-dia);
+}
+
+.tp-control input[type="range"]::-moz-range-progress {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--pino);
+}
+
+.tp-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -11px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 3px var(--pino), 0 4px 12px -4px rgb(12 61 34 / 0.55);
+  transition: transform var(--duracion-corta) var(--curva-resorte);
+}
+
+.tp-control input[type="range"]::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: inset 0 0 0 3px var(--pino), 0 4px 12px -4px rgb(12 61 34 / 0.55);
+}
+
+.tp-control input[type="range"]:active::-webkit-slider-thumb {
+  transform: scale(1.12);
+}
+
+.tp-control input[type="range"]:focus-visible {
+  outline: 2px solid var(--pino);
+  outline-offset: 4px;
+}
+
+.marcas {
+  position: relative;
+  height: 18px;
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--tinta-suave-dia);
+  font-variant-numeric: tabular-nums;
+}
+
+.marcas span {
+  position: absolute;
+}
+
+.tp-mes {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  animation: pulso-b 0.5s var(--curva-resorte);
+}
+
+.tp-mes[data-escalon="1"] {
+  animation-name: pulso-a;
+}
+
+@keyframes pulso-a {
+  from {
+    transform: scale(1.05);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes pulso-b {
+  from {
+    transform: scale(1.05);
+  }
+  to {
+    transform: none;
+  }
+}
+
+.tp-mes .numero-animado {
+  font-size: 84px;
+  line-height: 0.84;
+  color: var(--tinta-dia);
+}
+
+.tp-al-mes {
+  font-size: 20px;
+  color: var(--tinta-suave-dia);
+}
+
+.tp-detalle {
+  margin-top: 10px;
+  font-size: 15px;
+  color: var(--tinta-suave-dia);
+}
+
+/* Animated Number: tiras de dígitos en em. */
+.numero-animado {
+  display: inline-flex;
+  align-items: flex-start;
+}
+
+.numero-ventana {
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+}
+
+.numero-tira {
+  display: flex;
+  flex-direction: column;
+}
+
+.numero-tira > span,
+.numero-simbolo {
+  display: block;
+  height: 1em;
+  line-height: 1;
+}
+
+/* Animated Tooltip adaptado */
+.globo-ayuda {
+  position: relative;
+  display: inline-block;
+  align-self: flex-start;
+}
+
+.globo-ayuda-disparador {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 0;
+  border: 0;
+  background: none;
+  font-size: 15px;
+  font-weight: 650;
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-underline-offset: 4px;
+}
+
+.globo-ayuda-disparador svg {
+  width: 18px;
+  height: 18px;
+}
+
+.tp-lista {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--tinta-suave-dia);
+}
+
+.tp-boton {
+  align-self: stretch;
+}
+
+@media (max-width: 899px) {
+  .cap-precio {
+    padding: 96px 20px 88px;
+  }
+
+  .precio {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .tarjeta-precio {
+    padding: 24px 18px;
+  }
+
+  .tp-cifra b {
+    font-size: 50px;
+  }
+
+  .tp-mes .numero-animado {
+    font-size: 68px;
+  }
+
+  .tp-boton {
+    white-space: normal;
+  }
+}

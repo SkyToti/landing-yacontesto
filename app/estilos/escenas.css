@@ -1,0 +1,290 @@
+/*
+ * Escenas. Con la historia animada (html.cine), cada escena mide una pantalla y el Director la
+ * fija con ScrollTrigger. Sin ella (quieta), las escenas fluyen: ver quieto.css.
+ */
+.cap {
+  position: relative;
+  color: var(--tinta);
+}
+
+.escena {
+  position: relative;
+}
+
+.cine .escena {
+  height: var(--alto);
+  min-height: 560px;
+  overflow: hidden;
+}
+
+.frase .cuerpo {
+  margin-top: 14px;
+  font-size: clamp(17px, 1.45vw, 21px);
+  line-height: 1.45;
+  max-width: 32ch;
+}
+
+/* ── 23:47 · Noche ──────────────────────────────────────────── */
+.escena-noche {
+  --cx: 67%;
+  --cy: 54%;
+  --cw: 252px;
+  --tel-h: min(640px, calc(var(--alto) - 128px));
+  --tel-w: calc(var(--tel-h) * 0.482);
+}
+
+.halo {
+  position: absolute;
+  left: var(--cx);
+  top: var(--cy);
+  width: 118vmin;
+  height: 118vmin;
+  translate: -50% -50%;
+  background: radial-gradient(circle, rgb(145 213 184 / 0.26) 0%, rgb(145 213 184 / 0.09) 34%, rgb(145 213 184 / 0) 64%);
+  pointer-events: none;
+}
+
+.cine .halo {
+  opacity: 0.35;
+}
+
+.portada {
+  position: relative;
+  z-index: 4;
+}
+
+.cine .portada {
+  position: absolute;
+  left: var(--margen);
+  top: 50%;
+  translate: 0 -46%;
+  width: min(42vw, 640px);
+}
+
+.h1 {
+  display: block;
+}
+
+.h1-linea {
+  display: block;
+}
+
+/* Morph Text: las frases se apilan en la misma celda; el renglón mide la más larga. */
+.morph {
+  display: grid;
+  justify-items: start;
+}
+
+.morph-palabra {
+  grid-area: 1 / 1;
+  white-space: nowrap;
+  animation: morph-rotar var(--morph-total, 9s) cubic-bezier(0.45, 0, 0.25, 1) infinite both;
+  will-change: opacity, filter, transform;
+  transform-origin: left 60%;
+}
+
+.morph-goo {
+  filter: url(#morph-umbral);
+}
+
+@keyframes morph-rotar {
+  0% {
+    opacity: 0;
+    filter: blur(14px);
+    transform: scale(0.94);
+  }
+  8%,
+  30% {
+    opacity: 1;
+    filter: blur(0);
+    transform: scale(1);
+  }
+  38%,
+  100% {
+    opacity: 0;
+    filter: blur(14px);
+    transform: scale(1.06);
+  }
+}
+
+.portada[data-quieto] .morph-palabra {
+  animation-play-state: paused;
+}
+
+.portada-entrada {
+  margin-top: 22px;
+  max-width: 34ch;
+}
+
+.acciones {
+  margin-top: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px 24px;
+}
+
+.pista {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 15px;
+  color: var(--tinta-suave);
+  text-decoration: none;
+  padding: 8px 0;
+}
+
+.pista i {
+  display: inline-block;
+  width: 1px;
+  height: 24px;
+  background: linear-gradient(var(--marca), transparent);
+  animation: pista 1.8s ease-in-out infinite;
+}
+
+@keyframes pista {
+  0%,
+  100% {
+    transform: translateY(-4px);
+    opacity: 0.4;
+  }
+  50% {
+    transform: translateY(4px);
+    opacity: 1;
+  }
+}
+
+.pista:hover {
+  color: var(--tinta);
+}
+
+/* Las frases de los pasos: una a la vez, a la izquierda del teléfono. */
+.frases-pasos {
+  position: relative;
+  z-index: 4;
+}
+
+.cine .frases-pasos {
+  position: absolute;
+  left: var(--margen);
+  top: 50%;
+  width: min(38vw, 560px);
+  height: 0;
+}
+
+.cine .frases-pasos .frase {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  translate: 0 -50%;
+  opacity: 0;
+}
+
+.etiqueta-ficticia {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  z-index: 6;
+  text-align: center;
+  font-size: 13px;
+  color: var(--tinta-suave);
+}
+
+.cine .etiqueta-ficticia {
+  opacity: 0;
+}
+
+/* El mensaje que se desprende del cilindro y cae al WhatsApp. */
+.vuelo {
+  position: absolute;
+  z-index: 7;
+  left: 0;
+  top: 0;
+  display: none;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #eef4f0;
+  box-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.7), 0 2px 6px -2px rgb(0 0 0 / 0.3);
+  transform-origin: 0 0;
+}
+
+.cine .vuelo {
+  display: block;
+  visibility: hidden;
+}
+
+.vuelo-notif {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 34px 1fr;
+  gap: 10px;
+  padding: 11px 13px 12px 11px;
+  color: var(--tinta-dia);
+}
+
+/* ── Escritorio angosto y celular ─────────────────────────── */
+@media (max-width: 899px) {
+  .escena-noche {
+    --cx: 50%;
+    --cy: 70%;
+    --cw: 228px;
+    --tel-h: min(560px, calc(var(--alto) - 272px));
+    --tel-w: min(300px, calc(var(--tel-h) * 0.5), calc(100vw - 64px));
+  }
+
+  .cine .tel.tel-noche {
+    top: 232px;
+    translate: -50% 0;
+  }
+
+  .cine .portada {
+    left: 20px;
+    right: 20px;
+    top: 84px;
+    translate: none;
+    width: auto;
+  }
+
+  .portada-entrada {
+    margin-top: 14px;
+  }
+
+  .acciones {
+    margin-top: 20px;
+  }
+
+  .acciones .boton {
+    min-height: 50px;
+    font-size: 16px;
+  }
+
+  .cine .frases-pasos {
+    left: 20px;
+    right: 20px;
+    top: 80px;
+    width: auto;
+  }
+
+  .cine .frases-pasos .frase {
+    translate: none;
+  }
+
+  .frase .cuerpo {
+    margin-top: 8px;
+  }
+
+  .etiqueta-ficticia {
+    bottom: 8px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 899px) and (max-height: 700px) {
+  .escena-noche {
+    --cy: 76%;
+  }
+}

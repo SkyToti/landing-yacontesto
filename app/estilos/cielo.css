@@ -1,0 +1,59 @@
+/*
+ * Un solo cielo para toda la página. Cuatro capas que se funden por opacidad (solo el
+ * compositor trabaja): noche → madrugada → alba → día, y de vuelta a la noche en el cierre.
+ * El grano vive dentro del cielo (aislado), no encima del contenido.
+ */
+.cielo {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  isolation: isolate;
+  background: var(--pino);
+  contain: strict;
+}
+
+.cielo > i {
+  position: absolute;
+  inset: 0;
+}
+
+.cielo-noche {
+  background:
+    radial-gradient(90% 70% at 66% 46%, rgb(145 213 184 / 0.1) 0%, rgb(145 213 184 / 0) 60%),
+    radial-gradient(130% 95% at 60% 40%, #11482b 0%, #0c3d22 42%, #082d19 74%, #041a0e 100%);
+}
+
+.cielo-madrugada {
+  opacity: 0;
+  background:
+    radial-gradient(120% 55% at 50% 108%, rgb(242 184 75 / 0.16) 0%, rgb(242 184 75 / 0) 60%),
+    linear-gradient(to top, #2b6a4b 0%, #1a5739 32%, #0f4428 70%, #0a3520 100%);
+}
+
+.cielo-alba {
+  opacity: 0;
+  background:
+    radial-gradient(110% 60% at 50% 110%, #f3dfae 0%, rgb(243 223 174 / 0) 62%),
+    linear-gradient(to top, #d8e6cf 0%, #b9dcc7 34%, #a3d2b9 68%, #93c8ad 100%);
+}
+
+.cielo-dia {
+  opacity: 0;
+  background:
+    radial-gradient(140% 90% at 50% -10%, #ffffff 0%, rgb(255 255 255 / 0) 60%),
+    linear-gradient(to bottom, #f7f9f8 0%, #f2f6f3 100%);
+}
+
+/* Grano de película: ruido fractal en SVG, estático, 160 px en mosaico. */
+.cielo-grano {
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+}
+
+/* Sin la historia animada, cada escena pinta su propio fondo. */
+html:not(.cine) .cielo {
+  display: none;
+}
