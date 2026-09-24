@@ -13,11 +13,15 @@ export function Muesca() {
       data-muesca
       aria-label="YaContesto"
       izquierda={
-        <a className="marca" href="#noche">
-          <Isotipo tamano={28} />
-          <span className="marca-nombre">YaContesto</span>
-          <span className="solo-lectores">, inicio</span>
-        </a>
+        <>
+          <a className="marca" href="#noche" aria-label="YaContesto, inicio">
+            <Isotipo tamano={28} />
+            <span className="marca-nombre">YaContesto</span>
+          </a>
+          <a className="muesca-precio-movil" href="#precio">
+            Precio
+          </a>
+        </>
       }
       muesca={
         <div className="reloj" aria-hidden="true">

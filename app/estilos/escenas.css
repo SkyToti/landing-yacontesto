@@ -28,15 +28,9 @@
   height: calc(var(--alto) * 8.6);
 }
 
-/* Las escenas de abajo no se maquetan ni se pintan hasta que se acercan: su alto ya está puesto,
-   así que nada brinca, y la primera pintura solo trabaja la portada. */
-.cine .cap-amanece,
-.cine .cap-equipo,
-.cine .cap-dia,
-.cine .cap-instala,
-.cine .cap-cierre {
-  content-visibility: auto;
-}
+/* Sin content-visibility en las escenas: un lector de pantalla las encontraba vacías hasta que el
+   visitante llegaba a ellas. (Tampoco en las ilustraciones: su contención de pintura recortaría
+   las sombras y aplanaría el teléfono en 3D.) */
 
 /* Las escenas de día pintan su propio porcelana, el mismo del cielo que tienen detrás: a la vista
    no cambia nada, pero el texto oscuro nunca queda sobre el pino de la página, ni si el cielo fijo
@@ -141,11 +135,18 @@
   justify-items: start;
 }
 
+/* Una sola vuelta: cada frase pasa una vez y la primera regresa y se queda (termina en la meseta
+   de su segunda vuelta, al 20 %). Con 1.4 s por frase, todo termina antes de 5 s: lo que se mueve
+   solo y dura más necesitaría un botón para pausarlo (WCAG 2.2.2). */
 .morph-palabra {
   grid-area: 1 / 1;
   white-space: nowrap;
-  animation: morph-rotar var(--morph-total, 9s) cubic-bezier(0.45, 0, 0.25, 1) infinite both;
+  animation: morph-rotar var(--morph-total, 9s) cubic-bezier(0.45, 0, 0.25, 1) 1 both;
   transform-origin: left 60%;
+}
+
+.morph-palabra:first-child {
+  animation-iteration-count: 1.2;
 }
 
 .morph-goo {
@@ -153,7 +154,9 @@
 }
 
 /* Fuera de su turno, cada frase queda oculta de verdad (visibility): así nadie la mide como texto
-   de bajo contraste. El LCP no se mueve: es el primer renglón, más grande que cualquier frase. */
+   de bajo contraste. El LCP no se mueve: es el primer renglón, más grande que cualquier frase.
+   La meseta declara visibility: visible; si solo hubiera valores hidden, la frase nunca se vería
+   (visibility se interpola por pasos: se ve en cuanto uno de los dos extremos es visible). */
 @keyframes morph-rotar {
   0% {
     visibility: hidden;
@@ -161,14 +164,17 @@
     filter: blur(0);
     transform: none;
   }
+  /* Entra sin desenfoque: la primera vez que una frase se pinta, el blur inflaba su área, la
+     volvía más grande que el titular y la contaba como un LCP nuevo, segundos después. */
   0.5% {
     visibility: hidden;
     opacity: 0.01;
-    filter: blur(14px);
+    filter: blur(0);
     transform: scale(0.94);
   }
   8%,
   30% {
+    visibility: visible;
     opacity: 1;
     filter: blur(0);
     transform: none;
@@ -212,7 +218,7 @@
   font-size: 15px;
   color: var(--tinta-suave);
   text-decoration: none;
-  padding: 8px 0;
+  padding: 10px 0;
 }
 
 .pista i {
@@ -220,7 +226,8 @@
   width: 1px;
   height: 24px;
   background: linear-gradient(var(--marca), transparent);
-  animation: pista 1.8s ease-in-out infinite;
+  /* Dos veces y se queda: lo que se mueve solo termina antes de 5 s (WCAG 2.2.2). */
+  animation: pista 1.8s ease-in-out 2;
 }
 
 @keyframes pista {
@@ -305,6 +312,8 @@
 }
 
 .vuelo-notif {
+  --tono-fondo: #dcebe2;
+  --tono-tinta: #082c18;
   position: absolute;
   inset: 0;
   font-family: var(--f-chat);

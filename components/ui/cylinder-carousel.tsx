@@ -107,7 +107,10 @@ export function CylinderCarousel({
       radio = (ancho / 2 + 12) / Math.tan(Math.PI / n);
     };
     medirRadio();
-    const reducido = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Quieto con movimiento reducido y también en la versión quieta de la página (sin la clase
+    // «cine»: ?movimiento=0 o pantalla baja): ahí nada se mueve solo.
+    const reducido =
+      matchMedia("(prefers-reduced-motion: reduce)").matches || !document.documentElement.classList.contains("cine");
 
     const s = {
       angulo: 0,
@@ -116,6 +119,12 @@ export function CylinderCarousel({
       objetivo: 0,
       factorAuto: reducido ? 0 : 1,
       pausa: false,
+      // Si la visita lo arrastra o lo mueve con el teclado, toma el control: ya no gira solo
+      // (WCAG 2.2.2: lo que se mueve solo se puede detener).
+      tomado: false,
+      // Segundos que lleva girando solo: a los 4.5 s se asienta en la carta más cercana y ya no
+      // vuelve a girar por su cuenta (WCAG 2.2.2: lo automático termina antes de 5 s).
+      autoT: 0,
       guia: 0,
       guiaIndice: 0,
       otras: 1,
@@ -181,10 +190,12 @@ export function CylinderCarousel({
       if (s.guia > 0) {
         // El scroll manda: no deriva.
       } else if (s.modo === "auto") {
-        const meta = s.pausa ? 0 : 1;
+        s.autoT += dt * s.factorAuto;
+        if (s.autoT > 4.5) s.tomado = true;
+        const meta = s.pausa || s.tomado ? 0 : 1;
         s.factorAuto += (meta - s.factorAuto) * Math.min(1, dt * 2.5);
         s.angulo += autoVelocidad * s.factorAuto * dt;
-        if (s.pausa && s.factorAuto < 0.05) {
+        if ((s.pausa || s.tomado) && s.factorAuto < 0.05) {
           s.objetivo = Math.round(s.angulo / paso) * paso;
           s.vel = autoVelocidad * s.factorAuto;
           s.modo = "resorte";
@@ -221,7 +232,7 @@ export function CylinderCarousel({
 
     function programarReanudar() {
       window.clearTimeout(temporizador);
-      if (reducido) return;
+      if (reducido || s.tomado) return;
       temporizador = window.setTimeout(() => {
         if (s.pausa || s.modo !== "reposo" || s.guia > 0) return;
         s.factorAuto = 0;
@@ -245,6 +256,7 @@ export function CylinderCarousel({
       if (e.button !== 0 || s.guia > 0) return;
       zona?.setPointerCapture(e.pointerId);
       window.clearTimeout(temporizador);
+      s.tomado = true;
       s.modo = "arrastre";
       s.vel = 0;
       s.xPrevio = e.clientX;
@@ -309,6 +321,7 @@ export function CylinderCarousel({
       else if (e.key === "End") destino = hacia(n - 1);
       if (destino === null) return;
       e.preventDefault();
+      s.tomado = true;
       if (f === frenteDe(destino) && e.key !== "Home" && e.key !== "End") return;
       irA(destino, true);
     };

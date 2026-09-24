@@ -4,8 +4,9 @@ import { cn } from "@/lib/utils";
 /**
  * FAQ Accordion de Vengeance UI (MIT, © Ashutoshx7), adaptado a YaContesto.
  *
- * Se conserva su anatomía: lista de preguntas con un signo que cambia de + a − y un galón que
- * gira, una sola abierta a la vez y la respuesta que se despliega por altura.
+ * Se conserva su anatomía: lista de preguntas con un signo que cambia de + a −, una sola abierta
+ * a la vez y la respuesta que se despliega por altura. Se quitó su galón: dos indicadores para
+ * la misma acción eran ruido (crítica del 24-sep).
  * Cambios: el estado lo lleva el navegador con <details name> (exclusivo, sin JavaScript, con
  * teclado y lectores de pantalla nativos); la altura se anima con `interpolate-size` donde
  * existe; sin el borde lateral grueso del original (el sistema de diseño separa con líneas
@@ -24,7 +25,6 @@ export function FaqAccordion({ items, nombre, className }: { items: FaqItem[]; n
           <summary className="faq-pregunta">
             <span className="faq-signo" aria-hidden="true" />
             <span className="faq-texto">{item.question}</span>
-            <span className="faq-galon" aria-hidden="true" />
           </summary>
           <div className="faq-respuesta">
             <p>{item.answer}</p>

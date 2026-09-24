@@ -4,9 +4,9 @@ import { Notificacion } from "./Notificacion";
 
 /**
  * El cilindro del cierre: la misma geometría del Cylinder Carousel de la portada, pero sin
- * JavaScript. Gira con una animación CSS de `transform` (la hace el compositor), como el
- * componente original de Vengeance, y no hidrata nada. Es decorativo: los mensajes ya se
- * leyeron en la portada. Con movimiento reducido, se queda quieto.
+ * JavaScript propio y sin hidratar nada. Gira con el scroll de su escena (el Director mueve la
+ * variable --giro), no solo. Es decorativo: los mensajes ya se leyeron en la portada. En la
+ * versión quieta, se queda de frente.
  */
 export function CilindroCierre() {
   const n = NOTIFICACIONES.length;

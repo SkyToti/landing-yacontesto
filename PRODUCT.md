@@ -57,7 +57,8 @@ Lo que el asistente hace hoy (cada frase de la landing está verificada contra e
 
 No existe hoy y no se promete en ningún texto: recordatorios automáticos, reporte semanal, panel del
 cliente ni aviso al dueño cuando el chat pasa a una persona. En el chat de la demostración tampoco se
-muestra «escribiendo…» ni «revisando tu agenda…»: el asistente no envía esos estados.
+muestra «escribiendo…» ni «revisando tu agenda…», ni las palomitas azules de «leído»: el asistente no
+envía esos estados (los mensajes del paciente quedan en gris, «entregado»).
 
 Precios publicados: precio fundador de $2,900 de instalación (de lista, $5,900) y mensualidad por
 paciente atendido: $990 hasta 300 pacientes al mes, $1,490 hasta 800 y $3 por paciente arriba de 800.

@@ -58,7 +58,7 @@ export function AgendaTelefono() {
         </div>
         <div className="blq cita" data-ag="cita" style={franja("10:30", "11:10")}>
           <Check aria-hidden="true" strokeWidth={2.6} />
-          <span>Limpieza dental — Mariana L.</span>
+          <span className="cita-titulo">Limpieza dental (profilaxis) — Mariana López</span>
         </div>
         <div className="ag-globo" data-ag="globo" style={{ top: "46%" }}>
           Cita creada en tu Google Calendar
@@ -87,7 +87,6 @@ export function AgendaDia() {
         </div>
         <div className="blq cita" data-cita-dia style={franja("10:30", "11:10")}>
           <span className="cita-titulo">Limpieza dental (profilaxis) — Mariana López</span>
-          <small>Agendado automáticamente por la recepcionista IA.</small>
         </div>
         <div className="blq otro" style={franja("12:00", "13:30")}>
           Ocupado

@@ -77,21 +77,6 @@
   transform: rotate(0deg);
 }
 
-.faq-galon {
-  width: 9px;
-  height: 9px;
-  margin-right: 8px;
-  flex-shrink: 0;
-  border-top: 2px solid var(--tinta-suave);
-  border-right: 2px solid var(--tinta-suave);
-  transform: rotate(135deg);
-  transition: transform var(--duracion-corta) var(--curva-salida);
-}
-
-.faq-item[open] .faq-galon {
-  transform: rotate(-45deg);
-}
-
 .faq-pregunta:hover .faq-texto {
   text-decoration: underline;
   text-decoration-thickness: 1px;

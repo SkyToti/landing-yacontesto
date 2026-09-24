@@ -5,7 +5,7 @@
 .tel {
   --grosor: 9px;
   --marco: 7px;
-  --sombra-tel: 0 0 0 1px rgb(255 255 255 / 0.06), 0 44px 120px -24px rgb(145 213 184 / 0.4);
+  --sombra-tel: 0 0 0 1px rgb(255 255 255 / 0.06), 0 44px 110px -28px rgb(0 0 0 / 0.65);
   position: relative;
   z-index: 5;
   width: var(--tel-w);
@@ -102,6 +102,7 @@
   display: flex;
   flex-direction: column;
   height: 100%;
+  padding-bottom: 12px;
   overflow: hidden;
   border-radius: calc(var(--radio-telefono) - var(--marco));
   background: var(--chat-fondo);
@@ -126,8 +127,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 30px;
-  padding: 7px 20px 0 24px;
+  height: 34px;
+  padding: 7px 20px 4px 24px;
   background: var(--chat-encabezado);
   color: var(--chat-texto);
   font: 600 13px/1 var(--f-chat);
@@ -222,6 +223,7 @@
 }
 
 .wa-quien {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -229,15 +231,19 @@
 }
 
 .wa-quien b {
+  overflow: hidden;
   font-size: 15px;
   font-weight: 600;
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .wa-quien span {
+  overflow: hidden;
   font-size: 12px;
   color: #667781;
   white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .wa-acciones {
@@ -246,9 +252,16 @@
   gap: 13px;
 }
 
-/* Teléfonos angostos (celulares chicos): menos iconos en la cabecera. */
+/* Teléfonos angostos (celulares chicos, y el teléfono del equipo en celular, que es más
+   chico): menos iconos en la cabecera. */
 @media (max-width: 379px) {
   .wa-acciones svg:first-child {
+    display: none;
+  }
+}
+
+@media (max-width: 899px) {
+  .escena-equipo .wa-acciones svg:first-child {
     display: none;
   }
 }
@@ -275,11 +288,14 @@
   background: #ffffff;
   color: #54656f;
   font-size: 12px;
-  box-shadow: 0 1px 0.5px rgb(11 20 26 / 0.13);
 }
 
+/* Ninguna fila se encoge: si no caben, los mensajes viejos salen por arriba, como en WhatsApp.
+   Sin esto, el flex las aplastaba (cada fila lleva overflow: hidden por su animación de entrada)
+   y cortaba las burbujas a media línea en pantallas bajas. */
 .b-fila {
   display: flex;
+  flex-shrink: 0;
   margin-top: 3px;
   padding: 0 12px;
 }
@@ -299,7 +315,6 @@
   border-radius: 8px;
   font-size: 14.5px;
   line-height: 1.34;
-  box-shadow: 0 1px 0.5px rgb(11 20 26 / 0.13);
   overflow-wrap: break-word;
 }
 
@@ -416,7 +431,8 @@
 
 /* ── Tu agenda (el reverso) ── */
 .tel-pantalla-agenda {
-  background: linear-gradient(180deg, #0f2d1e 0%, var(--pino-sup) 40%);
+  background-color: #0f2d1e;
+  background-image: linear-gradient(180deg, #0f2d1e 0%, var(--pino-sup) 40%);
 }
 
 .ag {
@@ -571,13 +587,15 @@
 
 .ag .blq.otro {
   background: repeating-linear-gradient(135deg, rgb(255 255 255 / 0.1) 0 6px, rgb(255 255 255 / 0.03) 6px 12px);
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16);
+  outline: 1px solid rgb(255 255 255 / 0.16);
+  outline-offset: -1px;
   color: var(--tinta-suave-noche);
 }
 
 .ag .blq.pedida {
   background: var(--pino-sup);
-  box-shadow: inset 0 0 0 1.5px var(--tinta-noche);
+  outline: 1.5px solid var(--tinta-noche);
+  outline-offset: -1.5px;
   color: var(--tinta-noche);
   font-weight: 650;
 }
@@ -591,10 +609,10 @@
 }
 
 .ag .blq.cita {
+  min-width: 0;
   background: var(--menta);
   color: var(--pino);
   font-weight: 700;
-  box-shadow: 0 10px 26px -10px rgb(145 213 184 / 0.7);
 }
 
 .ag-globo {
@@ -609,7 +627,6 @@
   font-size: 13px;
   font-weight: 700;
   line-height: 1.25;
-  box-shadow: 0 14px 30px -12px rgb(0 0 0 / 0.65);
 }
 
 .ag-globo::before {

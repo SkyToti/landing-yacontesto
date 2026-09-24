@@ -10,7 +10,7 @@ function Varios() {
   const filas = [
     { ini: "JR", quien: "Jorge R.", texto: "¿Tienen lugar hoy?" },
     { ini: "PS", quien: "Paty S.", texto: "¿Cuánto cuesta la resina?" },
-    { ini: "RP", quien: "Rocío P.", texto: "¿Aceptan tarjeta?" },
+    { ini: "RP", quien: "Rocío P.", texto: "¿Atienden niños?" },
   ];
   return (
     <div className="mini mini-varios" aria-hidden="true">

@@ -192,9 +192,25 @@
   transform-origin: left center;
 }
 
+/* En el celular, «Precio» vive a la izquierda, junto al isotipo (a la derecha no cabe). */
+.muesca-precio-movil {
+  display: none;
+}
+
 @media (max-width: 899px) {
   .muesca-nav {
     display: none;
+  }
+
+  .muesca-precio-movil {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 4px;
+    color: var(--muesca-tinta);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
   }
 }
 

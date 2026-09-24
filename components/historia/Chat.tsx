@@ -64,7 +64,7 @@ export function Chat({
   );
 }
 
-/** Doble palomita azul: el paciente ya vio la respuesta. */
+/** Doble palomita gris («entregado»): el asistente no marca como leído, así que nunca se ponen azules. */
 export function Palomitas() {
   return (
     <svg className="palomitas" viewBox="0 0 17 12" aria-hidden="true">

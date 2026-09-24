@@ -71,9 +71,10 @@ export const viewport: Viewport = {
 };
 
 // Antes de pintar: con movimiento permitido, la historia se cuenta con scroll («cine»).
-// Con prefers-reduced-motion, sin JavaScript o con ?movimiento=0, se ve quieta y completa.
+// Con prefers-reduced-motion, sin JavaScript, con ?movimiento=0 o en pantallas de menos de 500 px
+// de alto (celular acostado, zoom de 200 %), se ve quieta y completa: ahí el teléfono no cabe.
 // Si en 20 s no llegó el JavaScript que la cuenta (red rota, error), se vuelve a la versión quieta.
-const arranque = `(function(){var d=document.documentElement;try{var q=new URLSearchParams(location.search).get('movimiento')==='0';if(q||matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('cine');setTimeout(function(){if(!window.__directorVivo)d.classList.remove('cine')},20000)}catch(e){d.classList.remove('cine')}})();`;
+const arranque = `(function(){var d=document.documentElement;try{var q=new URLSearchParams(location.search).get('movimiento')==='0';if(q||matchMedia('(prefers-reduced-motion: reduce)').matches||matchMedia('(max-height: 499px)').matches)return;d.classList.add('cine');setTimeout(function(){if(!window.__directorVivo)d.classList.remove('cine')},20000)}catch(e){d.classList.remove('cine')}})();`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

@@ -64,7 +64,8 @@ export function PrecioInteractivo() {
           <span className="tp-etiqueta">Instalación</span>
           <div className="tp-cifra">
             <b className="cifra">{precio(PRECIO.instalacionFundador)}</b>
-            <s className="cifra" aria-label={`antes ${precio(PRECIO.instalacionLista)}`}>
+            <s className="cifra">
+              <span className="solo-lectores">antes </span>
               {precio(PRECIO.instalacionLista)}
             </s>
           </div>
@@ -76,7 +77,7 @@ export function PrecioInteractivo() {
 
       <div className="tp-control">
         <div className="tp-cabeza">
-          <label htmlFor="pacientes">¿Cuántos pacientes te escriben al mes?</label>
+          <label htmlFor="pacientes">¿Cuántos pacientes distintos te escriben al mes?</label>
           <span className="tp-cuantos cifra" aria-hidden="true">
             {fmt(pacientes)} pacientes
           </span>
@@ -122,7 +123,7 @@ export function PrecioInteractivo() {
         <div className="tp-mes" data-escalon={escalon}>
           <AnimatedNumber className="cifra" value={precio(total)} />
           <span className="solo-lectores">{precio(total)}</span>
-          <span className="tp-al-mes">al mes</span>
+          <span className="tp-al-mes">al mes, precio fundador</span>
         </div>
         <p className="tp-detalle">{detalleDe(pacientes)}</p>
       </div>
@@ -144,7 +145,7 @@ export function PrecioInteractivo() {
       </p>
 
       <AnimatedButton href={ENLACE_FUNDADOR} className="tp-boton">
-        Ver la demo por WhatsApp
+        Pedir el precio fundador por WhatsApp
       </AnimatedButton>
     </div>
   );

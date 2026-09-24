@@ -258,6 +258,7 @@ export function AnimatedTooltip({
 }: AnimatedTooltipProps) {
   const [open, setOpen] = useState(false);
   const fijo = useRef(false);
+  const focoEn = useRef(-Infinity);
   const raiz = useRef<HTMLSpanElement>(null);
   const cfg = VARIANTS[variant] ?? VARIANTS.indis;
   const id = useId().replace(/:/g, "");
@@ -304,10 +305,20 @@ export function AnimatedTooltip({
           aria-expanded={open}
           aria-controls={open ? id : undefined}
           onClick={() => {
+            // Un toque enfoca y hace clic casi a la vez: si el foco acaba de abrirlo, el clic lo
+            // fija en vez de cerrarlo (antes el globo abría hasta el segundo toque).
+            if (performance.now() - focoEn.current < 400) {
+              fijo.current = true;
+              setOpen(true);
+              return;
+            }
             fijo.current = !open;
             setOpen(!open);
           }}
-          onFocus={() => setOpen(true)}
+          onFocus={() => {
+            focoEn.current = performance.now();
+            setOpen(true);
+          }}
           onBlur={() => {
             if (!fijo.current) setOpen(false);
           }}

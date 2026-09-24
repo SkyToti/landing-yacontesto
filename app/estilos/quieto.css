@@ -172,6 +172,18 @@ html:not(.cine) .cierre-frase {
   }
 }
 
+/* En la versión quieta (sin JavaScript, ?movimiento=0 o pantalla baja) el titular tampoco rota. */
+html:not(.cine) .morph-palabra {
+  animation: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+html:not(.cine) .morph-palabra:first-child {
+  opacity: 1;
+  visibility: visible;
+}
+
 /* Con movimiento reducido, lo que se mueve solo se detiene. */
 @media (prefers-reduced-motion: reduce) {
   .morph-palabra {

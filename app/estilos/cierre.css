@@ -5,24 +5,10 @@
   --cw: 252px;
 }
 
-/* El cilindro del cierre gira solo, con CSS (transform en el compositor). */
+/* El cilindro del cierre gira con el scroll de su escena (el Director mueve --giro): no se mueve
+   solo, así que no hace falta un botón para pausarlo (WCAG 2.2.2). Quieto, se queda de frente. */
 .tambor-giro-solo {
-  animation: tambor-girar 110s linear infinite;
-}
-
-@keyframes tambor-girar {
-  from {
-    transform: rotateX(-7deg) translateZ(calc(var(--radio) * -1)) rotateY(0deg);
-  }
-  to {
-    transform: rotateX(-7deg) translateZ(calc(var(--radio) * -1)) rotateY(-360deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .tambor-giro-solo {
-    animation: none;
-  }
+  transform: rotateX(-7deg) translateZ(calc(var(--radio) * -1)) rotateY(var(--giro, 0deg));
 }
 
 .tambor-cierre .tambor-escena {

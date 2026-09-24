@@ -157,7 +157,13 @@ export async function armarHistoria(): Promise<() => void> {
   const enCurso = () => {
     const y = scrollY + 2;
     let actual = pintores[0];
-    for (const p of pintores) if (p.tl.scrollTrigger && p.tl.scrollTrigger.start <= y) actual = p;
+    // El disparador de un timeline nace con inicio y fin en 0 y GSAP lo mide hasta el siguiente
+    // tick (ScrollTrigger.js, init): sin esta guarda, la escena recién armada se adueñaba del
+    // reloj y del cielo aunque el visitante estuviera muy arriba de ella.
+    for (const p of pintores) {
+      const st = p.tl.scrollTrigger;
+      if (st && st.end > st.start && st.start <= y) actual = p;
+    }
     return actual;
   };
   function registrarPintor(tl: Timeline, pintar: () => void) {
@@ -169,8 +175,15 @@ export async function armarHistoria(): Promise<() => void> {
   }
 
   const puntos: Array<{ nombre: string; y: () => number }> = [];
+  // Para el teclado: cómo revelar en el acto (precio, preguntas) o a qué punto llevar el scroll
+  // (escenas con scroll) cuando el foco cae en algo que la historia todavía no enseña.
+  const reveladores: Record<string, () => void> = {};
+  const puntosFoco: Record<string, () => number> = {};
   const enTiempo = (tl: Timeline, t: number) => () => {
     const st = tl.scrollTrigger!;
+    // Recién creado, GSAP todavía no lo mide (ver enCurso): se mide aquí mismo, o un salto a esta
+    // escena daría NaN y el navegador lo tomaría como «ir al principio».
+    if (!(st.end > st.start)) st.refresh();
     return st.start + (t / tl.duration()) * (st.end - st.start);
   };
 
@@ -219,7 +232,7 @@ export async function armarHistoria(): Promise<() => void> {
     partidas.forEach((ps) => gsap.set(ps, { yPercent: 115 }));
     gsap.set(
       preNoche.frases.map((f) => $("p", f)),
-      { autoAlpha: 0, y: 10 },
+      { opacity: 0, y: 10 },
     );
     return partidas;
   });
@@ -265,8 +278,9 @@ export async function armarHistoria(): Promise<() => void> {
     const tl = fijar(escenaNoche);
     tl.addLabel("inicio", 0)
       // La portada se retira; el cilindro se alinea en el mensaje de las 23:47.
-      .to(lineasH1, { yPercent: -60, autoAlpha: 0, filter: "blur(6px)", duration: 0.55, stagger: 0.08, ease: "power2.in" }, 0.5)
-      .to($$(".portada-entrada, .acciones", portada), { y: -24, autoAlpha: 0, duration: 0.45, stagger: 0.05, ease: "power2.in" }, 0.55)
+      // opacity y no autoAlpha: el H1 sale de la vista pero no del árbol de accesibilidad.
+      .to(lineasH1, { yPercent: -60, opacity: 0, filter: "blur(6px)", duration: 0.55, stagger: 0.08, ease: "power2.in" }, 0.5)
+      .to($$(".portada-entrada, .acciones", portada), { y: -24, opacity: 0, duration: 0.45, stagger: 0.05, ease: "power2.in" }, 0.55)
       .to(guia, { f: 1, duration: 0.8, ease: "power2.inOut", onUpdate: () => tambor.guiar(guia.f, 0) }, 0.5)
       .to(atenuacion, { otras: 0, duration: 0.45, ease: "power1.in", onUpdate: () => tambor.atenuar(atenuacion.otras, atenuacion.frente) }, 1.15)
       // El mensaje se desprende y cae al WhatsApp: de notificación a burbuja.
@@ -293,12 +307,12 @@ export async function armarHistoria(): Promise<() => void> {
 
     const entrarFrase = (i: number, en: number) => {
       entrarPalabras(tl, palabrasFrases[i], en);
-      tl.to($("p", frases[i]), { autoAlpha: 1, y: 0, duration: 0.4, ease: "power2.out" }, en + 0.18);
+      tl.to($("p", frases[i]), { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, en + 0.18);
     };
     const salirFrase = (i: number, en: number) => {
       tl.to(palabrasFrases[i], { yPercent: -115, duration: 0.3, stagger: 0.02, ease: "power2.in" }, en).to(
         $("p", frases[i]),
-        { autoAlpha: 0, y: -8, duration: 0.25, ease: "power2.in" },
+        { opacity: 0, y: -8, duration: 0.25, ease: "power2.in" },
         en,
       );
     };
@@ -455,10 +469,10 @@ export async function armarHistoria(): Promise<() => void> {
     const reloj = { m: 1429 };
     rodillo(1429);
     sol_(1429);
-    gsap.set(diaEscena, { autoAlpha: 0 });
+    gsap.set(diaEscena, { opacity: 0 });
     gsap.set(ps, { yPercent: 115 });
-    gsap.set($("p", frase), { autoAlpha: 0, y: 10 });
-    gsap.set(notaDia, { autoAlpha: 0, y: 6 });
+    gsap.set($("p", frase), { opacity: 0, y: 10 });
+    gsap.set(notaDia, { opacity: 0, y: 6 });
 
     const tl = fijar(escenaAmanece);
     tl.fromTo(rg, { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, duration: 0.4, ease: "power2.out" }, 0)
@@ -467,9 +481,9 @@ export async function armarHistoria(): Promise<() => void> {
       // El reloj grande sube y se vuelve el de la muesca; la agenda de la mañana aparece.
       .to(rg, { autoAlpha: 0, scale: 0.42, y: () => -innerHeight * 0.36, duration: 0.5, ease: "power2.in" }, 2.45)
       .to(arco, { autoAlpha: 0, y: 40, duration: 0.45, ease: "power2.in" }, 2.45)
-      .set(diaEscena, { autoAlpha: 1 }, 2.7);
+      .set(diaEscena, { opacity: 1 }, 2.7);
     entrarPalabras(tl, ps, 2.72);
-    tl.to($("p", frase), { autoAlpha: 1, y: 0, duration: 0.4, ease: "power2.out" }, 2.95)
+    tl.to($("p", frase), { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, 2.95)
       .fromTo(
         panel,
         { clipPath: "inset(0% 0% 100% 0% round 20px)", y: 40 },
@@ -477,7 +491,7 @@ export async function armarHistoria(): Promise<() => void> {
         2.8,
       )
       .fromTo(citaDia, { scale: 0.92 }, { scale: 1, duration: 0.45, ease: "back.out(2.4)", immediateRender: false }, 3.25)
-      .to(notaDia, { autoAlpha: 1, y: 0, duration: 0.35, ease: "power2.out" }, 3.4)
+      .to(notaDia, { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" }, 3.4)
       .to({}, { duration: 0.6 }, 3.8);
 
     const pintar = registrarPintor(tl, () => {
@@ -511,12 +525,12 @@ export async function armarHistoria(): Promise<() => void> {
     prepararFilas(filas);
     const ps = palabras($("h2", frase));
     gsap.set(ps, { yPercent: 115 });
-    gsap.set($("p", frase), { autoAlpha: 0, y: 10 });
-    gsap.set([pausa, ana], { autoAlpha: 0, y: 12 });
+    gsap.set($("p", frase), { opacity: 0, y: 10 });
+    gsap.set([pausa, ana], { opacity: 0, y: 12 });
 
     const tl = fijar(escena);
     entrarPalabras(tl, ps, 0);
-    tl.to($("p", frase), { autoAlpha: 1, y: 0, duration: 0.4 }, 0.25).fromTo(
+    tl.to($("p", frase), { opacity: 1, y: 0, duration: 0.4 }, 0.25).fromTo(
       tel,
       { y: 36, autoAlpha: 0.2 },
       { y: 0, autoAlpha: 1, duration: 0.5, ease: "power2.out", immediateRender: false },
@@ -524,10 +538,10 @@ export async function armarHistoria(): Promise<() => void> {
     );
     mostrarFila(tl, filas[0], 0.35);
     mostrarFila(tl, filas[1], 0.9);
-    tl.to(pausa, { autoAlpha: 1, y: 0, duration: 0.4, ease: "back.out(1.6)" }, 1.3);
+    tl.to(pausa, { opacity: 1, y: 0, duration: 0.4, ease: "back.out(1.6)" }, 1.3);
     mostrarFila(tl, filas[2], 2.0);
-    if (!escritorio) tl.to(pausa, { autoAlpha: 0, y: -8, duration: 0.3 }, 2.15);
-    tl.to(ana, { autoAlpha: 1, y: 0, duration: 0.4, ease: "back.out(1.6)" }, 2.3).to({}, { duration: 0.6 }, 2.8);
+    if (!escritorio) tl.to(pausa, { opacity: 0, y: -8, duration: 0.3 }, 2.15);
+    tl.to(ana, { opacity: 1, y: 0, duration: 0.4, ease: "back.out(1.6)" }, 2.3).to({}, { duration: 0.6 }, 2.8);
     tl.eventCallback(
       "onUpdate",
       registrarPintor(tl, () => {
@@ -552,7 +566,7 @@ export async function armarHistoria(): Promise<() => void> {
     gsap.set(ps, { yPercent: 115 });
     const tl = fijar(escena);
     entrarPalabras(tl, ps, 0);
-    tl.fromTo(controles, { autoAlpha: 0, y: 10 }, { autoAlpha: 1, y: 0, duration: 0.3, immediateRender: false }, 0.2).to({}, { duration: 3.9 }, 0.1);
+    tl.fromTo(controles, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3, immediateRender: false }, 0.2).to({}, { duration: 3.9 }, 0.1);
     const horas = [2190, 2405, 2560, 7805];
     const cortes = [1.05, 2.05, 3.05];
     let activa = 0;
@@ -572,6 +586,7 @@ export async function armarHistoria(): Promise<() => void> {
     const centros = [0.55, 1.55, 2.55, 3.55];
     irADia = (i) => irA(enTiempo(tl, centros[i])());
     centros.forEach((c, i) => puntos.push({ nombre: `${13 + i}-dia-${i + 1}`, y: enTiempo(tl, c) }));
+    puntosFoco.dia = enTiempo(tl, centros[0]);
   });
   medir("dia");
   };
@@ -585,14 +600,14 @@ export async function armarHistoria(): Promise<() => void> {
     const trazos = $$("[data-ruta-trazo]", escena);
     const pasos = $$("[data-paso-instala]", escena);
     gsap.set(ps, { yPercent: 115 });
-    gsap.set($("p", frase), { autoAlpha: 0, y: 10 });
+    gsap.set($("p", frase), { opacity: 0, y: 10 });
     gsap.set(trazos, { drawSVG: "0%" });
-    gsap.set(pasos, { autoAlpha: 0, y: 18 });
+    gsap.set(pasos, { opacity: 0, y: 18 });
     const tl = fijar(escena);
     entrarPalabras(tl, ps, 0);
-    tl.to($("p", frase), { autoAlpha: 1, y: 0, duration: 0.4 }, 0.2)
+    tl.to($("p", frase), { opacity: 1, y: 0, duration: 0.4 }, 0.2)
       .to(trazos, { drawSVG: "100%", duration: 1.6, ease: "none" }, 0.3)
-      .to(pasos, { autoAlpha: 1, y: 0, duration: 0.35, stagger: 0.62, ease: "power2.out" }, 0.35)
+      .to(pasos, { opacity: 1, y: 0, duration: 0.35, stagger: 0.62, ease: "power2.out" }, 0.35)
       .to({}, { duration: 0.5 }, 1.95);
     const reloj = { m: 7805 };
     tl.to(reloj, { m: 7820, duration: 1.6, ease: "none" }, 0.3);
@@ -617,45 +632,53 @@ export async function armarHistoria(): Promise<() => void> {
     const tarjeta = $("[data-precio-tarjeta]");
     const borde = $(".brillo-borde", tarjeta);
     gsap.set(ps, { yPercent: 115 });
-    gsap.set(resto, { autoAlpha: 0, y: 18 });
-    gsap.set(tarjeta, { autoAlpha: 0, y: 44 });
-    ScrollTrigger.create({
-      trigger: "#precio",
-      start: "top 70%",
-      once: true,
-      onEnter: () => {
-        gsap.to(ps, { yPercent: 0, duration: 0.6, stagger: 0.05, ease: "power3.out" });
-        gsap.to(resto, { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.08, ease: "power3.out", delay: 0.2 });
-        gsap.to(tarjeta, { autoAlpha: 1, y: 0, duration: 0.8, ease: "power3.out", delay: 0.1 });
-        // La luz recorre la tarjeta una vez, como invitación a mover el control.
-        borde.style.transition = "none";
-        gsap.fromTo(
-          borde,
-          { "--glow-angle": "-220deg" },
-          {
-            "--glow-angle": "140deg",
-            duration: 1.8,
-            ease: "power2.out",
-            delay: 0.3,
-            onComplete: () => void (borde.style.transition = ""),
-          },
-        );
-      },
-    });
+    gsap.set(resto, { opacity: 0, y: 18 });
+    gsap.set(tarjeta, { opacity: 0, y: 44 });
+    // La revelación la dispara el scroll o, antes, el foco del teclado (ver alEnfocar).
+    let precioVisto = false;
+    let disparoPrecio: { kill: () => void } | null = null;
+    const revelarPrecio = () => {
+      if (precioVisto) return;
+      precioVisto = true;
+      disparoPrecio?.kill();
+      gsap.to(ps, { yPercent: 0, duration: 0.6, stagger: 0.05, ease: "power3.out" });
+      gsap.to(resto, { opacity: 1, y: 0, duration: 0.6, stagger: 0.08, ease: "power3.out", delay: 0.2 });
+      gsap.to(tarjeta, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out", delay: 0.1 });
+      // La luz recorre la tarjeta una vez, como invitación a mover el control.
+      borde.style.transition = "none";
+      gsap.fromTo(
+        borde,
+        { "--glow-angle": "-220deg" },
+        {
+          "--glow-angle": "140deg",
+          duration: 1.8,
+          ease: "power2.out",
+          delay: 0.3,
+          onComplete: () => void (borde.style.transition = ""),
+        },
+      );
+    };
+    disparoPrecio = ScrollTrigger.create({ trigger: "#precio", start: "top 70%", once: true, onEnter: revelarPrecio });
+    reveladores.precio = revelarPrecio;
     const pregs = $("#preguntas");
     const titulo = palabras($("h2", pregs));
     const items = $$(".faq-item", pregs);
     gsap.set(titulo, { yPercent: 115 });
-    gsap.set(items, { autoAlpha: 0, y: 16 });
-    ScrollTrigger.create({
-      trigger: pregs,
-      start: "top 72%",
-      once: true,
-      onEnter: () => {
-        gsap.to(titulo, { yPercent: 0, duration: 0.6, stagger: 0.05, ease: "power3.out" });
-        gsap.to(items, { autoAlpha: 1, y: 0, duration: 0.5, stagger: 0.06, ease: "power3.out", delay: 0.15 });
-      },
-    });
+    gsap.set(items, { opacity: 0, y: 16 });
+    let preguntasVistas = false;
+    let disparoPreguntas: { kill: () => void } | null = null;
+    const revelarPreguntas = () => {
+      if (preguntasVistas) return;
+      preguntasVistas = true;
+      disparoPreguntas?.kill();
+      gsap.to(titulo, { yPercent: 0, duration: 0.6, stagger: 0.05, ease: "power3.out" });
+      gsap.to(items, { opacity: 1, y: 0, duration: 0.5, stagger: 0.06, ease: "power3.out", delay: 0.15 });
+    };
+    disparoPreguntas = ScrollTrigger.create({ trigger: pregs, start: "top 72%", once: true, onEnter: revelarPreguntas });
+    reveladores.preguntas = revelarPreguntas;
+    // Si el foco ya estaba adentro cuando se armó (Tab más rápido que el scroll), se revela ya.
+    if ($("#precio").contains(document.activeElement)) revelarPrecio();
+    if (pregs.contains(document.activeElement)) revelarPreguntas();
     puntos.push({ nombre: "18-precio", y: () => $("#precio").getBoundingClientRect().top + scrollY - 40 });
     puntos.push({ nombre: "19-preguntas", y: () => pregs.getBoundingClientRect().top + scrollY - 40 });
   });
@@ -672,12 +695,14 @@ export async function armarHistoria(): Promise<() => void> {
     const resto = $$(":scope > :not(h2)", frase);
     gsap.set(tamborCierre, { autoAlpha: 0 });
     gsap.set(ps, { yPercent: 115 });
-    gsap.set(resto, { autoAlpha: 0, y: 16 });
+    gsap.set(resto, { opacity: 0, y: 16 });
     const reloj = { m: 7820 };
     const tl = fijar(escena);
     tl.to(reloj, { m: 8627, duration: 1.3, ease: "power1.inOut" }, 0).to(tamborCierre, { autoAlpha: 1, duration: 0.8, ease: "power2.out" }, 0.7);
     entrarPalabras(tl, ps, 1.3, 0.55);
-    tl.to(resto, { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.1, ease: "power2.out" }, 1.55).to({}, { duration: 0.6 }, 2.0);
+    tl.to(resto, { opacity: 1, y: 0, duration: 0.45, stagger: 0.1, ease: "power2.out" }, 1.55).to({}, { duration: 0.6 }, 2.0);
+    // Los mensajes de la noche giran con el scroll, no solos.
+    tl.fromTo($(".tambor-giro-solo", escena), { "--giro": "0deg" }, { "--giro": "-72deg", ease: "none", duration: tl.duration() }, 0);
     tl.eventCallback(
       "onUpdate",
       registrarPintor(tl, () => {
@@ -686,6 +711,7 @@ export async function armarHistoria(): Promise<() => void> {
       }),
     );
     puntos.push({ nombre: "20-esta-noche", y: enTiempo(tl, 2.4) });
+    puntosFoco.cierre = enTiempo(tl, 2.4);
     puntos.push({ nombre: "21-pie", y: () => document.documentElement.scrollHeight - innerHeight });
   });
   medir("cierre");
@@ -711,8 +737,9 @@ export async function armarHistoria(): Promise<() => void> {
   const destinos: Record<string, () => number> = {
     noche: () => 0,
     "paso-1": enTiempo(tlNoche, 2.95),
-    precio: () => $("#precio").getBoundingClientRect().top + scrollY,
-    preguntas: () => $("#preguntas").getBoundingClientRect().top + scrollY,
+    // Menos la muesca (64 px y aire), para que el título no quede debajo de ella.
+    precio: () => $("#precio").getBoundingClientRect().top + scrollY - 20,
+    preguntas: () => $("#preguntas").getBoundingClientRect().top + scrollY - 84,
   };
   const alClic = (e: MouseEvent) => {
     const a = (e.target as Element | null)?.closest?.('a[href^="#"]');
@@ -726,12 +753,45 @@ export async function armarHistoria(): Promise<() => void> {
     if (seccion && (id === "precio" || id === "preguntas")) seccion.focus({ preventScroll: true });
   };
   document.addEventListener("click", alClic);
+
+  // Con teclado, el foco puede caer en algo que la historia todavía no revela (opacidad baja):
+  // se revela en el acto o se lleva el scroll a donde ya se ve. Primero se arma lo que falte.
+  const casiInvisible = (el: Element) => {
+    for (let n: Element | null = el; n && n !== document.body; n = n.parentElement) {
+      if (Number(getComputedStyle(n).opacity) < 0.5) return true;
+    }
+    return false;
+  };
+  // Y si quedó fuera de la pantalla (con Lenis en escritorio, el navegador no desplaza solo hacia
+  // lo enfocado), se lleva ahí: un tercio abajo del borde, lejos de la muesca.
+  const asegurarVista = (el: Element) => {
+    const caja = el.getBoundingClientRect();
+    if (caja.top < 72 || caja.bottom > innerHeight) irA(caja.top + scrollY - innerHeight / 3);
+  };
+  const alEnfocar = (e: FocusEvent) => {
+    const el = e.target as Element | null;
+    // La muesca y el enlace de salto van fijos arriba: siempre están a la vista.
+    if (!el || el.closest?.("header, .saltar")) return;
+    const seccion = el.closest?.("section.cap");
+    if (!seccion) return asegurarVista(el);
+    void construirHasta(seccion.getBoundingClientRect().top + scrollY + 1).then(() => {
+      if (!casiInvisible(el)) return asegurarVista(el);
+      const revelar = reveladores[seccion.id];
+      if (revelar) return revelar();
+      const punto = puntosFoco[seccion.id];
+      if (punto) irA(punto());
+    });
+  };
+  document.addEventListener("focusin", alEnfocar);
   const alIrDia = (e: Event) => irADia?.((e as CustomEvent<number>).detail);
   window.addEventListener("yc:ir-dia", alIrDia);
 
   // Si cambia el ancho entre celular y escritorio, la historia se vuelve a armar desde cero.
   const alCambiarAncho = () => location.reload();
   ancho.addEventListener("change", alCambiarAncho);
+  // Igual si la pantalla queda de menos de 500 px de alto (girar el celular): el arranque decide.
+  const bajo = matchMedia("(max-height: 499px)");
+  bajo.addEventListener("change", alCambiarAncho);
 
   const pintarEnCurso = () => enCurso()?.pintar();
   ScrollTrigger.addEventListener("refresh", pintarEnCurso);
@@ -785,14 +845,18 @@ export async function armarHistoria(): Promise<() => void> {
   window.dispatchEvent(new Event("yc:historia"));
   (window as unknown as { __historia: unknown }).__historia = {
     puntos: () => puntos.map((p) => ({ nombre: p.nombre, y: Math.round(p.y()) })),
-    construirTodo: () => construirHasta(Infinity),
+    // Resuelve cuando GSAP ya midió los disparadores nuevos (su medición va a 0.01 s en el mismo
+    // reloj de GSAP), para que puntos() ya no dé posiciones en 0.
+    construirTodo: () => construirHasta(Infinity).then(() => new Promise<void>((listo) => void gsap.delayedCall(0.05, listo))),
   };
 
   return () => {
     ScrollTrigger.removeEventListener("refresh", pintarEnCurso);
     document.removeEventListener("click", alClic);
+    document.removeEventListener("focusin", alEnfocar);
     window.removeEventListener("yc:ir-dia", alIrDia);
     ancho.removeEventListener("change", alCambiarAncho);
+    bajo.removeEventListener("change", alCambiarAncho);
     if (latido) gsap.ticker.remove(latido);
     lenis?.destroy();
     ctx.revert();
