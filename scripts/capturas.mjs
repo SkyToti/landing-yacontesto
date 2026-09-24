@@ -45,6 +45,9 @@ function revisar() {
   // y solo si la opacidad acumulada es alta. Así no cuentan las palabras escondidas en su máscara.
   const cajaVisible = (el) => {
     if (el.closest("[aria-hidden='true'], .tambor-escena, .tel, .dp-rejilla, .mini, .grafica, .solo-lectores")) return null;
+    // Una respuesta cerrada sigue maquetada en Chromium, recortada a alto 0 por ::details-content
+    // (un seudoelemento que este recorrido no ve): no se dibuja, así que no cuenta.
+    if (el.closest("details:not([open]) > :not(summary)")) return null;
     // Cada renglón cuenta solo si él y todos sus ancestros se ven (opacidad acumulada ≥ 0.6).
     const seVe = (nodo) => {
       let op = 1;
