@@ -4,7 +4,8 @@ import { useSyncExternalStore } from "react";
 import { DiagonalCarousel, type DiagonalCarouselItem } from "@/components/ui/diagonal-carousel";
 import { fijarEstado, leer, leerInicial, suscribir } from "@/lib/historia-estado";
 
-const ANGOSTO = "(max-width: 899px)";
+// El paso chico es para celular; la tableta en vertical usa el de escritorio (tableta.css).
+const ANGOSTO = "(max-width: 699px), (max-width: 899px) and (max-height: 899px)";
 const leerActiva = leer("diaActiva");
 const leerActivaInicial = leerInicial("diaActiva");
 

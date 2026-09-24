@@ -12,6 +12,7 @@
 @import "./estilos/precio.css";
 @import "./estilos/preguntas.css";
 @import "./estilos/cierre.css";
+@import "./estilos/tableta.css";
 @import "./estilos/quieto.css";
 
 /* Tokens de la marca para las utilidades de Tailwind (los componentes de Vengeance las usan). */

@@ -1,0 +1,112 @@
+/*
+ * Tableta en vertical (iPad: 744–899 px de ancho, más de 900 de alto). Usa el acomodo del
+ * celular —una columna, el teléfono abajo del texto—, pero en una pantalla del doble de alto se
+ * veía como un celular estirado: títulos chicos arriba a la izquierda, teléfono y tarjetas chicos,
+ * mucho aire y la agenda estirada a todo lo ancho. Aquí el tipo crece, cada columna se centra
+ * con ancho máximo y las piezas toman su tamaño de escritorio.
+ *
+ * Se centra con left/right 0 y margin auto, no con translate: GSAP absorbe la propiedad
+ * translate de lo que anima y el centrado en porcentaje se perdería.
+ */
+@media (min-width: 700px) and (max-width: 899px) and (min-height: 900px) {
+  .titular-1 {
+    font-size: 62px;
+  }
+
+  .titular-2 {
+    font-size: 50px;
+  }
+
+  .frase .cuerpo,
+  .portada-entrada {
+    font-size: 20px;
+  }
+
+  .cine .portada,
+  .cine .frases-pasos,
+  .cine .frase-lateral,
+  .cine .frase-arriba {
+    left: 0;
+    right: 0;
+    margin-inline: auto;
+    width: min(640px, 100% - 2 * var(--margen));
+    top: 112px;
+  }
+
+  /* La noche: el teléfono más alto y más abajo, para no encimarse con el título más grande. */
+  .escena-noche {
+    --cw: 260px;
+    --tel-h: min(680px, calc(var(--alto) - 420px));
+    --tel-w: calc(var(--tel-h) * 0.482);
+  }
+
+  .cine .tel.tel-noche {
+    top: 332px;
+  }
+
+  /* 09:00: la agenda con ancho de tarjeta, no de pantalla. */
+  .dia-escena {
+    width: min(640px, 100% - 2 * var(--margen));
+    gap: 34px;
+  }
+
+  /* Tu equipo. */
+  .escena-equipo {
+    --tel-h: min(640px, calc(var(--alto) - 470px));
+    --tel-w: calc(var(--tel-h) * 0.482);
+  }
+
+  .cine .tel.tel-equipo {
+    top: 312px;
+  }
+
+  .cine .nota {
+    left: 0;
+    right: 0;
+    margin-inline: auto;
+    max-width: min(560px, 100% - 2 * var(--margen));
+    bottom: 32px;
+  }
+
+  /* El resto del día: tarjetas del tamaño de escritorio (CarruselDia usa su paso de escritorio). */
+  .diagonal-tira {
+    top: calc(56% - 186px);
+  }
+
+  .tarjeta {
+    width: 300px;
+    height: 372px;
+    padding: 22px 22px 20px;
+  }
+
+  .tarjeta .titular-3 {
+    font-size: 26px;
+  }
+
+  .tj-hora {
+    font-size: 30px;
+  }
+
+  .tj-texto {
+    font-size: 15px;
+  }
+
+  .mini {
+    height: 168px;
+  }
+
+  /* En 7 días: una columna centrada. */
+  .escena-instala {
+    justify-items: center;
+  }
+
+  .escena-instala .frase,
+  .escena-instala .ruta {
+    width: min(640px, 100% - 2 * var(--margen));
+  }
+
+  /* El cierre. */
+  .cierre-frase .titular-2 {
+    font-size: 58px;
+  }
+}
