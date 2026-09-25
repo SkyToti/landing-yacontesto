@@ -11,9 +11,10 @@ import { cn } from "@/lib/utils";
  * - Las frases se apilan en una rejilla (no en posición absoluta): el renglón mide lo que la
  *   frase más larga y no hay brincos de layout.
  * - La primera frase ya está nítida en el primer cuadro (retraso negativo): no retrasa el LCP.
- * - Para lectores de pantalla y buscadores hay un texto fijo con la primera frase; las que rotan
+ * - Para lectores de pantalla y buscadores hay un texto fijo con la frase final; las que rotan
  *   son aria-hidden (si no, el nombre del titular cambiaría según el segundo en que se lea).
- * - Da una sola vuelta y se queda en la primera frase (ver escenas.css).
+ * - Da una sola vuelta y se queda en la última frase, la que remata (`morph-reposo`, ver
+ *   escenas.css): «a las 11 p. m.», «en domingo»… y al final «a cualquier hora».
  * - El filtro de umbral («gooey») queda opcional (`goo`): con Sofia Sans a 40–76 px aserraba los
  *   bordes en reposo.
  * - Es de servidor (no usa hooks): cero JavaScript. Con movimiento reducido, solo la primera frase.
@@ -38,15 +39,14 @@ export function MorphText({
       {words.map((word, i) => (
         <span
           key={word}
-          className="morph-palabra"
+          className={cn("morph-palabra", i === words.length - 1 && "morph-reposo")}
           aria-hidden="true"
           style={{ animationDelay: `${(i * interval) / 1000 - entrada}s` }}
         >
           {word}
         </span>
       ))}
-      {/* Al final: la primera frase sigue siendo :first-child (escenas.css y quieto.css). */}
-      <span className="solo-lectores">{words[0]}</span>
+      <span className="solo-lectores">{words[words.length - 1]}</span>
     </span>
   );
 }

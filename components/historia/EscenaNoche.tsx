@@ -62,7 +62,7 @@ export function EscenaNoche() {
         <div className="portada" data-portada>
           <h1 id="titulo-portada" className="titular-1 h1" data-h1>
             <span className="h1-linea">Tu WhatsApp contesta solo,</span>{" "}
-            <MorphText className="h1-linea h1-morph" words={["a las 11 p. m.", "en domingo", "a la hora de la comida"]} />
+            <MorphText className="h1-linea h1-morph" words={["a las 11 p. m.", "en domingo", "a la hora de la comida", "a cualquier hora"]} />
           </h1>
           <p className="entrada portada-entrada">Una recepcionista con inteligencia artificial para tu clínica dental.</p>
           <div className="acciones">
@@ -80,6 +80,7 @@ export function EscenaNoche() {
           etiqueta="Mensajes que llegan a una clínica a toda hora. Usa las flechas para girarlos."
           anuncios={ANUNCIOS_TAMBOR}
           lista={<ListaMensajes />}
+          bucle
         >
           {NOTIFICACIONES.map((n, i) => (
             <Notificacion key={n.hora} datos={n} tono={i % 5} />

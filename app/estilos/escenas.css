@@ -137,9 +137,8 @@
   justify-items: start;
 }
 
-/* Una sola vuelta: cada frase pasa una vez y la primera regresa y se queda (termina en la meseta
-   de su segunda vuelta, al 20 %). Con 1.4 s por frase, todo termina antes de 5 s: lo que se mueve
-   solo y dura más necesitaría un botón para pausarlo (WCAG 2.2.2). */
+/* Una sola vuelta: cada frase pasa una vez y la última se queda (ver .morph-reposo). Todo termina
+   antes de 5 s: lo que se mueve solo y dura más necesitaría un botón para pausarlo (WCAG 2.2.2). */
 .morph-palabra {
   grid-area: 1 / 1;
   white-space: nowrap;
@@ -147,8 +146,10 @@
   transform-origin: left 60%;
 }
 
-.morph-palabra:first-child {
-  animation-iteration-count: 1.2;
+/* La última frase entra y se queda: su animación se detiene al 20 %, en la meseta nítida. Con
+   cuatro frases de 1.4 s, todo el movimiento termina a los ~4.9 s (WCAG 2.2.2: menos de 5 s). */
+.morph-reposo {
+  animation-iteration-count: 0.2;
 }
 
 .morph-goo {

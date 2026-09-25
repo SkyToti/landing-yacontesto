@@ -172,14 +172,15 @@ html:not(.cine) .cierre-frase {
   }
 }
 
-/* En la versión quieta (sin JavaScript, ?movimiento=0 o pantalla baja) el titular tampoco rota. */
+/* En la versión quieta (sin JavaScript, ?movimiento=0 o pantalla baja) el titular tampoco rota:
+   se queda en la frase final. */
 html:not(.cine) .morph-palabra {
   animation: none;
   opacity: 0;
   visibility: hidden;
 }
 
-html:not(.cine) .morph-palabra:first-child {
+html:not(.cine) .morph-reposo {
   opacity: 1;
   visibility: visible;
 }
@@ -192,7 +193,7 @@ html:not(.cine) .morph-palabra:first-child {
     visibility: hidden;
   }
 
-  .morph-palabra:first-child {
+  .morph-reposo {
     opacity: 1;
     visibility: visible;
   }

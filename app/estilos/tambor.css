@@ -72,6 +72,75 @@
   outline-offset: 6px;
 }
 
+/* Pausa del giro en bucle (WCAG 2.2.2: lo que se mueve solo más de 5 s se puede detener).
+   Discreto, debajo del cilindro; se va con la portada cuando la historia toma el cilindro. */
+.tambor-pausa {
+  position: absolute;
+  left: var(--cx);
+  top: calc(var(--cy) + 84px);
+  translate: -50% 0;
+  z-index: 6;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 0.22);
+  border-radius: 999px;
+  background: rgb(8 45 25 / 0.55);
+  color: var(--tinta-noche);
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    opacity var(--duracion-corta) var(--curva-salida),
+    background-color var(--duracion-corta) var(--curva-salida);
+}
+
+/* 44 px de área para el dedo, sin agrandar el círculo. */
+.tambor-pausa::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+}
+
+.tambor-pausa:hover {
+  background: rgb(8 45 25 / 0.85);
+}
+
+.tambor-pausa:focus-visible {
+  outline: 2px solid var(--foco);
+  outline-offset: 3px;
+}
+
+.tambor-pausa svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* En celular el cilindro se dibuja más arriba de su centro (la perspectiva sale de más abajo): el
+   botón se acerca para no quedar suelto. */
+@media (max-width: 899px) {
+  .tambor-pausa {
+    top: calc(var(--cy) + 40px);
+  }
+}
+
+.tambor[data-guiado] .tambor-pausa {
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Quieta o con movimiento reducido, el cilindro no gira solo: no hay nada que pausar. */
+html:not(.cine) .tambor-pausa {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tambor-pausa {
+    display: none;
+  }
+}
+
 /* ── La notificación ── */
 .notif {
   --tono-fondo: #dcebe2;

@@ -1,6 +1,7 @@
 "use client";
 
-import { Children, useEffect, useRef, type CSSProperties, type ReactNode } from "react";
+import { Children, useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
+import { Pause, Play } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { registrarTambor } from "@/lib/tambor";
 
@@ -20,6 +21,9 @@ import { registrarTambor } from "@/lib/tambor";
  *   del frente, y atrapa un reflejo al pasar por él.
  * - El Director (GSAP) puede guiarlo con el scroll (`lib/tambor.ts`).
  * - Se detiene fuera de pantalla y, con movimiento reducido, no deriva solo.
+ * - Con `bucle`, gira mientras se ve (sin el tope de 2.8 s) y trae un botón para pausarlo: lo que
+ *   se mueve solo más de 5 s necesita cómo detenerse (WCAG 2.2.2). Si lo arrastran o lo mueven con
+ *   el teclado, retoma el giro a los 3.2 s, salvo que esté en pausa.
  */
 
 const RESORTE = 11; // rad/s: qué tan firme se asienta en una carta
@@ -67,6 +71,8 @@ export interface CylinderCarouselProps {
   lista?: ReactNode;
   /** Grados por segundo; negativo gira hacia la izquierda. */
   autoVelocidad?: number;
+  /** Gira en bucle mientras se ve, con botón de pausa. Sin él, deriva 2.8 s y se detiene. */
+  bucle?: boolean;
   interactivo?: boolean;
   className?: string;
 }
@@ -78,6 +84,7 @@ export function CylinderCarousel({
   children,
   lista,
   autoVelocidad = -7,
+  bucle = false,
   interactivo = true,
   className,
 }: CylinderCarouselProps) {
@@ -88,6 +95,9 @@ export function CylinderCarousel({
   const giro = useRef<HTMLDivElement>(null);
   const agarre = useRef<HTMLDivElement>(null);
   const vivo = useRef<HTMLParagraphElement>(null);
+  // El botón de pausa habla con el giro (que vive fuera de React) por este mando.
+  const [detenido, setDetenido] = useState(false);
+  const mando = useRef<((detener: boolean) => void) | null>(null);
 
   useEffect(() => {
     const el = giro.current;
@@ -119,9 +129,11 @@ export function CylinderCarousel({
       objetivo: 0,
       factorAuto: reducido ? 0 : 1,
       pausa: false,
-      // Si la visita lo arrastra o lo mueve con el teclado, toma el control: ya no gira solo
-      // (WCAG 2.2.2: lo que se mueve solo se puede detener).
+      // Si la visita lo arrastra o lo mueve con el teclado, toma el control: sin bucle ya no gira
+      // solo; con bucle, retoma a los 3.2 s (WCAG 2.2.2: lo que se mueve solo se puede detener).
       tomado: false,
+      // Pausado con el botón: no vuelve a girar hasta que se reanude con el mismo botón.
+      detenido: false,
       // Segundos que lleva girando solo: a los 2.8 s frena, vuelve a su carta y ya no gira por su
       // cuenta (WCAG 2.2.2: todo el movimiento automático termina antes de 5 s).
       autoT: 0,
@@ -194,14 +206,15 @@ export function CylinderCarousel({
         // El scroll manda: no deriva.
       } else if (s.modo === "auto") {
         s.autoT += dt * s.factorAuto;
-        if (s.autoT > 2.8 && !s.tomado) {
+        if (!bucle && s.autoT > 2.8 && !s.tomado) {
           s.tomado = true;
           s.volver = true;
         }
-        const meta = s.pausa || s.tomado ? 0 : 1;
+        const quieto = s.pausa || s.tomado || s.detenido;
+        const meta = quieto ? 0 : 1;
         s.factorAuto += (meta - s.factorAuto) * Math.min(1, dt * (s.tomado ? 5 : 2.5));
         s.angulo += autoVelocidad * s.factorAuto * dt;
-        if ((s.pausa || s.tomado) && s.factorAuto < 0.05) {
+        if (quieto && s.factorAuto < 0.05) {
           s.objetivo = s.volver ? Math.round(s.angulo / 360) * 360 : Math.round(s.angulo / paso) * paso;
           s.volver = false;
           s.vel = autoVelocidad * s.factorAuto;
@@ -239,9 +252,10 @@ export function CylinderCarousel({
 
     function programarReanudar() {
       window.clearTimeout(temporizador);
-      if (reducido || s.tomado) return;
+      if (reducido || s.detenido || (!bucle && s.tomado)) return;
       temporizador = window.setTimeout(() => {
-        if (s.pausa || s.modo !== "reposo" || s.guia > 0) return;
+        if (s.pausa || s.detenido || s.modo !== "reposo" || s.guia > 0) return;
+        s.tomado = false;
         s.factorAuto = 0;
         s.modo = "auto";
         solicitar();
@@ -354,6 +368,8 @@ export function CylinderCarousel({
         const previa = s.guia;
         s.guia = Math.max(0, Math.min(1, factor));
         s.guiaIndice = indice;
+        // Mientras la historia lo guía, el botón de pausa se va con la portada.
+        contenedor.toggleAttribute("data-guiado", s.guia > 0);
         if (s.guia > 0 && previa === 0) {
           window.clearTimeout(temporizador);
           if (s.modo === "arrastre") s.modo = "reposo";
@@ -374,8 +390,20 @@ export function CylinderCarousel({
       carta: (indice) => nodos[indice] ?? null,
     });
 
+    mando.current = (detener) => {
+      s.detenido = detener;
+      window.clearTimeout(temporizador);
+      if (!detener && !reducido && s.modo === "reposo" && s.guia === 0) {
+        s.tomado = false;
+        s.factorAuto = 0;
+        s.modo = "auto";
+      }
+      solicitar();
+    };
+
     solicitar();
     return () => {
+      mando.current = null;
       cancelAnimationFrame(raf);
       window.clearTimeout(temporizador);
       observador.disconnect();
@@ -391,7 +419,7 @@ export function CylinderCarousel({
       zona?.removeEventListener("blur", alSalir);
       zona?.removeEventListener("keydown", teclado);
     };
-  }, [id, n, paso, autoVelocidad, anuncios]);
+  }, [id, n, paso, autoVelocidad, anuncios, bucle]);
 
   return (
     <div ref={raiz} className={cn("tambor", className)} data-tambor={id}>
@@ -416,6 +444,21 @@ export function CylinderCarousel({
           {lista}
           <p ref={vivo} className="solo-lectores" aria-live="polite" />
         </div>
+      )}
+      {interactivo && bucle && (
+        <button
+          type="button"
+          className="tambor-pausa"
+          aria-label="Pausar el giro de los mensajes"
+          aria-pressed={detenido}
+          onClick={() => {
+            const detener = !detenido;
+            setDetenido(detener);
+            mando.current?.(detener);
+          }}
+        >
+          {detenido ? <Play aria-hidden="true" strokeWidth={2.2} /> : <Pause aria-hidden="true" strokeWidth={2.2} />}
+        </button>
       )}
     </div>
   );
