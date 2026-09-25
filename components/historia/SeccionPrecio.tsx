@@ -13,7 +13,7 @@ export function SeccionPrecio() {
       <div className="precio">
         <div className="precio-frase" data-precio-frase>
           <h2 id="titulo-precio" className="titular-2">
-            Claro y sin letras chiquitas.
+            Solo pagas por lo que atiendes.
           </h2>
           <p className="cuerpo">Una instalación y una mensualidad según cuántos pacientes atiende tu asistente.</p>
           <p className="garantia">
