@@ -732,12 +732,15 @@
   vector-effect: non-scaling-stroke;
 }
 
+/* Sin non-scaling-stroke: DrawSVG mide el largo en unidades del SVG (984) y el navegador aplicaba
+   ese guion en píxeles de pantalla, donde la línea estirada mide más (~1,060 px en escritorio): el
+   hueco no alcanzaba y el trazo se repetía al final (se pintaba por los dos extremos). La línea
+   solo se estira a lo largo, así que su grosor no cambia. */
 .ruta-trazo {
   fill: none;
   stroke: var(--marca);
   stroke-width: 2.5;
   stroke-linecap: round;
-  vector-effect: non-scaling-stroke;
 }
 
 .ruta-pasos {
