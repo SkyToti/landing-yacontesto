@@ -102,8 +102,8 @@ export const PASOS_INSTALACION = [
  * Precio fundador (CLAUDE.md §2, confirmado por Diego el 22-sep-2026): instalación $2,900
  * (de lista $5,900); mensualidad por escalera: $990 hasta 300 pacientes atendidos al mes,
  * $1,490 hasta 800 y $3 por paciente arriba de 800.
- * PENDIENTE DE DIEGO (se marca en la página, no se inventa): cuántos lugares fundadores
- * quedan y si la escalera aplica igual al precio de lista.
+ * Decidido por Diego el 1-oct-2026: la página no dice cuántos lugares fundadores quedan, y el
+ * precio de lista se presenta como «desde $1,490 al mes», sin escalones de lista publicados.
  */
 export const PRECIO = {
   instalacionFundador: 2900,

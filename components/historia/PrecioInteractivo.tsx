@@ -140,8 +140,8 @@ export function PrecioInteractivo() {
       </AnimatedTooltip>
 
       <p className="tp-lista">
-        Al llenarse los lugares fundadores vuelve el precio de lista: {precio(PRECIO.instalacionLista)} de instalación y{" "}
-        {precio(PRECIO.mensualidadLista)} al mes, con <span className="pendiente">escalera por confirmar</span>.
+        Al llenarse los lugares fundadores vuelve el precio de lista: {precio(PRECIO.instalacionLista)} de instalación y
+        desde {precio(PRECIO.mensualidadLista)} al mes.
       </p>
 
       <AnimatedButton href={ENLACE_FUNDADOR} className="tp-boton">

@@ -204,16 +204,6 @@ html.lenis body {
   line-height: 1;
 }
 
-/* Marcador de lo que decide Diego: se ve a propósito, no se esconde. */
-.pendiente {
-  display: inline-block;
-  padding: 0 6px;
-  border: 1.5px dashed currentColor;
-  border-radius: 4px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
 
 /* La 404 (app/not-found.tsx). */
 .no-encontrada {

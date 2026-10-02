@@ -65,8 +65,8 @@ paciente atendido: $990 hasta 300 pacientes al mes, $1,490 hasta 800 y $3 por pa
 Mes a mes, sin plazo forzoso. Garantía: si a los 14 días la clínica decide no seguir, se le devuelve
 el 100 %.
 
-Decisiones abiertas, marcadas en la página y nunca inventadas: cuántos lugares fundadores quedan
-(«[N] lugares») y si la escalera de pacientes aplica igual al precio de lista.
+Decidido por Diego el 1-oct-2026: la página no dice cuántos lugares fundadores quedan, y el precio
+de lista aparece como «$5,900 de instalación y desde $1,490 al mes», sin escalones de lista publicados.
 
 ## Brand Commitments
 

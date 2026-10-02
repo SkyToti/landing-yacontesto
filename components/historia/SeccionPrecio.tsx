@@ -4,8 +4,8 @@ import { PrecioPerezoso } from "./Perezosos";
 
 /**
  * Precio. Modelo de cobro estándar (CLAUDE.md §2): la instalación se paga el día que se hace y,
- * si a los 14 días la clínica no sigue, se devuelve el 100 %. «[N] lugares» queda marcado: lo
- * decide Diego.
+ * si a los 14 días la clínica no sigue, se devuelve el 100 %. Sin número de lugares fundadores:
+ * decisión de Diego del 1-oct-2026 (es cierto, no hay que actualizarlo y no inventa escasez).
  */
 export function SeccionPrecio() {
   return (
@@ -21,7 +21,7 @@ export function SeccionPrecio() {
             <span>Pagas la instalación el día que la hacemos. Si a los 14 días decides no seguir, te devolvemos el 100&nbsp;%.</span>
           </p>
           <p className="fundador">
-            Precio fundador para las primeras clínicas: quedan <span className="pendiente">[N]</span> lugares.
+            Precio fundador para las primeras clínicas.
           </p>
         </div>
         <GlowBorderCard className="precio-tarjeta" data-precio-tarjeta>

@@ -41,11 +41,6 @@
   color: var(--tinta-suave);
 }
 
-.fundador .pendiente,
-.tp-lista .pendiente {
-  color: var(--tinta);
-}
-
 /* Glow Border Card: el ángulo de la luz lo mueve el control del precio. */
 @property --glow-angle {
   syntax: "<angle>";
