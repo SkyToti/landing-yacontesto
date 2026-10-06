@@ -136,6 +136,55 @@ export function manoSenala(largo = 92) {
     <path d="M110 -26C102 -52 134 -60 142 -34" fill="${C}" stroke="${T}" stroke-width="7" stroke-linejoin="round"/>`;
 }
 
+/** Puño, renglones de los dedos y manga: las piezas de la mano con letrero de la hoja, tal cual. */
+const PUNO = `
+    <path d="M-30 -10C-34 -34 30 -38 34 -12C40 22 30 44 0 46C-30 46 -36 22 -30 -10Z" fill="${C}" stroke="${T}" stroke-width="7" stroke-linejoin="round"/>
+    <path d="M-26 6h52M-26 24h50" stroke="${T}" stroke-width="5" stroke-linecap="round"/>
+    <path d="M-30 42H30V104H-30Z" fill="${C}" stroke="${T}" stroke-width="7" stroke-linejoin="round"/>`;
+/** El palo del letrero. */
+const PALO = `<path d="M-7 -96H7V60H-7Z" fill="${C}" stroke="${T}" stroke-width="6"/>`;
+
+/** La mano con letrero de la hoja (para el cierre: «¡ESCRÍBENOS!»). */
+export function manoLetrero(texto = "¡ESCRÍBEME!") {
+  return `${PALO}
+    <path d="M-86 -208C-86 -222 -76 -230 -62 -230H62C78 -230 86 -222 86 -208V-112C86 -100 78 -94 64 -94H-64C-78 -94 -86 -100 -86 -112Z" fill="${C}" stroke="${T}" stroke-width="8" stroke-linejoin="round"/>
+    <text x="0" y="-150" text-anchor="middle" font-family="var(--f-mano), cursive" font-size="34" fill="${T}">${texto}</text>
+    <path d="M-40 -126q40 10 80 0" fill="none" stroke="${V}" stroke-width="7" stroke-linecap="round"/>
+    ${PUNO}`;
+}
+
+/**
+ * La mano con lupa: el puño y el palo del letrero, con una lente en lugar del letrero (pieza nueva,
+ * dibujada con las reglas de la hoja). Va inclinada para que la manga quede del lado de Moli.
+ * `.lente` marca el vidrio: ahí se ve la agenda aumentada.
+ * Caja: -130 -206 212 326.
+ */
+export function manoLupa() {
+  return `<g transform="rotate(-24)">
+    ${PALO}
+    <circle cx="0" cy="-150" r="56" fill="none" stroke="${T}" stroke-width="12"/>
+    <path d="M-30 -178q10-17 30-20" fill="none" stroke="${T}" stroke-width="4" stroke-linecap="round" opacity=".4"/>
+    <circle class="lente" cx="0" cy="-150" r="50" fill="none"/>
+    ${PUNO}
+  </g>`;
+}
+
+/**
+ * La mano con lápiz: el mismo puño, con un lápiz de punta verde (pieza nueva) en lugar del palo.
+ * Inclinada para escribir de derecha a izquierda, con la manga hacia Moli. `.punta` marca la punta.
+ * Caja: -200 -90 326 190.
+ */
+export function manoLapiz() {
+  return `<g transform="rotate(-115)">
+    <path d="M-11 -30V-170H11V-30Z" fill="${C}" stroke="${T}" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M-3.5 -36V-166M3.5 -36V-166" stroke="${T}" stroke-width="2.5" opacity=".45"/>
+    <path d="M-11 -170L0 -207L11 -170Z" fill="${C}" stroke="${T}" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M-4.6 -192L0 -207L4.6 -192Z" fill="${V}" stroke="${T}" stroke-width="3" stroke-linejoin="round"/>
+    <circle class="punta" cx="0" cy="-207" r="1" fill="none"/>
+    ${PUNO}
+  </g>`;
+}
+
 /** El filtro de tinta de la hoja: desplaza el trazo para que no haya ninguna curva perfecta. */
 export function filtroTinta(id: string, semilla = 3) {
   return `<filter id="${id}" x="-10%" y="-10%" width="120%" height="120%">

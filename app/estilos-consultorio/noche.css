@@ -42,17 +42,49 @@
   position: absolute;
 }
 
-/* ── La mano de guante ── */
-.mano {
+/* ── La mano de Moli con su herramienta: la lupa (revisa) y el lápiz (agenda) ── */
+.mano-herramienta {
   position: absolute;
+  z-index: 5;
   left: 0;
   top: 0;
-  width: 250px;
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
 }
+.mano-lupa {
+  width: 176px;
+  /* Sale de la manga, del lado de Moli. */
+  transform-origin: 82% 92%;
+}
+.mano-lapiz {
+  width: 220px;
+  transform-origin: 88% 22%;
+}
+/* El vidrio de la lupa: la agenda aumentada, debajo del aro (el director lo mide y lo acomoda). */
+.lupa-vidrio {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--papel);
+}
+.lupa-copia {
+  position: absolute;
+  left: 0;
+  top: 0;
+  /* Vive fuera de .hoja: sin esto heredaría el crema de la página. */
+  color: var(--tinta);
+}
+.lupa-copia > .hoja-rejilla {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  transform-origin: 0 0;
+}
 .mano-svg {
+  /* Posicionado para pintarse encima del vidrio (que es absolute). */
+  position: relative;
   display: block;
   width: 100%;
   height: auto;
@@ -359,6 +391,10 @@
   justify-content: flex-end;
   border-style: dashed;
 }
+/* «10:00 / pedida» en dos renglones: así cabe entero dentro de la lupa. */
+.blq-pedida span {
+  max-width: 4.6em;
+}
 /* Lo libre: lima. */
 .blq-libre {
   background: var(--lima);
@@ -490,9 +526,6 @@
   right: -2px;
   bottom: calc(var(--zona-pastilla) - 8px);
   width: min(40cqw, 170px);
-}
-.cine .mano-cerca {
-  z-index: 5;
 }
 .cine .nota-yo,
 .cine .nota-listo {
@@ -656,8 +689,11 @@
     bottom: 9svh;
     width: 160px;
   }
-  .cine .mano-cerca {
-    width: 300px;
+  .mano-lupa {
+    width: 250px;
+  }
+  .mano-lapiz {
+    width: 270px;
   }
   .cine .nota-yo,
   .cine .nota-listo {

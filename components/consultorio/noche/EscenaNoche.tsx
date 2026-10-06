@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { ManoSenala, Moli } from "../moli/Moli";
+import { ManoHerramienta, Moli } from "../moli/Moli";
 import { FILTRO_FONDO, LIENZO, PUNTOS, dibujoApagado, dibujoEncendido, mancha } from "./dibujo";
 import { AGENDA, CHAT_NOCHE, ROTULOS_NOCHE, franja } from "./textos";
 
@@ -182,7 +182,8 @@ export function EscenaNoche() {
           </svg>
           <Telefono />
           <Agenda />
-          <ManoSenala id="mano" className="mano-cerca" />
+          <ManoHerramienta id="lupa" herramienta="lupa" className="lupa-cerca" />
+          <ManoHerramienta id="lapiz" herramienta="lapiz" className="lapiz-cerca" />
           <Moli id="mc" className="moli-cerca" caraCine="dormita" caraQuieta="feliz" />
           <span className="nota nota-yo">¡yo!</span>
           <span className="nota nota-listo">¡listo!</span>

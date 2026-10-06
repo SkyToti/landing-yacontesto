@@ -10,6 +10,9 @@ const SALIDA = process.argv[3] ?? "investigacion/r1-capturas";
 // Las mismas pausas que components/consultorio/noche/director.ts (en pantallas de scroll).
 const PANTALLAS = 4.75;
 const PAUSAS = [0, 1.0, 1.7, 2.35, 3.05, 3.7, 4.5];
+// Lo que pasa a media pausa y no queda en el reposo: la lupa sobre las 10:00 (P2) y el lápiz escribiendo (P4).
+const ACCION = { 2: 1700, 4: 1750 };
+const ESPERA = { 0: 900, 2: 4300, 4: 3700 };
 
 const PERFILES = [
   { nombre: "movil-844", viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true },
@@ -43,7 +46,11 @@ for (const perfil of PERFILES) {
       },
       { p: PAUSAS[k], total: PANTALLAS },
     );
-    await pagina.waitForTimeout(k === 0 ? 900 : 3400);
+    if (ACCION[k]) {
+      await pagina.waitForTimeout(ACCION[k]);
+      await pagina.screenshot({ path: `${SALIDA}/${perfil.nombre}-P${k}-accion.png` });
+    }
+    await pagina.waitForTimeout((ESPERA[k] ?? 3400) - (ACCION[k] ?? 0));
     const estado = await pagina.evaluate(() => ({
       pausa: document.getElementById("noche").dataset.pausa,
       ancho: document.documentElement.scrollWidth,

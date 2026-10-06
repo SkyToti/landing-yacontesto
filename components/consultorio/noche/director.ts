@@ -1,6 +1,6 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { dedo, rasgos, type Boca, type Cara } from "../moli/partes";
+import { rasgos, type Boca, type Cara } from "../moli/partes";
 
 /**
  * El director de la escena de las 23:47. Dos relojes, como en la hoja de Moli:
@@ -86,13 +86,25 @@ export function armarNoche(raiz: HTMLElement): () => void {
   const chat = q(".chat");
   const chatCaja = q(".tel-chat");
   const hoja = q(".hoja");
-  const equis = q<SVGPathElement>(".equis path");
-  const pedida = q('[data-blq="pedida"]');
-  const libres = qq('[data-blq^="libre"]');
-  const cita = q(".blq-cita");
-  const palomita = q(".palomita");
-  const mano = q(".mano-cerca");
-  const dedoPath = q<SVGPathElement>(".mano-cerca .dedo");
+  const rejilla = q(".hoja .hoja-rejilla");
+  const lupa = q(".lupa-cerca");
+  const vidrio = q(".lupa-vidrio");
+  const copia = q(".lupa-copia");
+  const lente = q<SVGCircleElement>(".lupa-cerca .lente");
+  const lapiz = q(".lapiz-cerca");
+  const punta = q<SVGCircleElement>(".lapiz-cerca .punta");
+  // La agenda aumentada dentro de la lupa es una copia de la rejilla: las animaciones tocan las dos.
+  copia.replaceChildren(rejilla.cloneNode(true));
+  const rejillaCopia = copia.firstElementChild as HTMLElement;
+  const equis = qq<SVGPathElement>(".equis path");
+  // En las 10:00 la lente abarca el bloque entero: la ✗ y el texto.
+  const pedida = q('.hoja [data-blq="pedida"]');
+  const libre1030 = q('.hoja [data-blq="libre-1030"] span');
+  const libre1100 = q('.hoja [data-blq="libre-1100"] span');
+  const libres = qq(".blq-libre");
+  const citaHoja = q(".hoja .blq-cita");
+  const citas = qq(".blq-cita");
+  const palomitas = qq(".palomita");
   const notaYo = q(".nota-yo");
   const notaListo = q(".nota-listo");
   const notif = q(".notif");
@@ -167,20 +179,78 @@ export function armarNoche(raiz: HTMLElement): () => void {
       return disponible - (ultima.offsetTop + ultima.offsetHeight);
     }
 
-    /** La mano sale del pecho de Moli; el dedo mide lo que haga falta para tocar el bloque. */
-    const largo = { l: 92 };
-    const pintaDedo = () => dedoPath.setAttribute("d", dedo(largo.l));
-    function apunte(objetivo: HTMLElement) {
+    /* ── La mano de Moli con su herramienta ── */
+    // Medidas en el sistema del primer plano: la cámara lo escala (0.92 → 1) y eso se deshace aquí.
+    const escalaCerca = () => Number(gsap.getProperty(cerca, "scale")) || 1;
+    function enPantalla(el: Element) {
       const e = escenario.getBoundingClientRect();
-      const m = moliC.el.getBoundingClientRect();
-      const r = objetivo.getBoundingClientRect();
-      const k = mano.offsetWidth / 500;
-      // La base del dedo (x = 100 en la mano) queda frente a la panza de Moli: así el dedo tiene
-      // largo para estirarse aunque Moli esté pegado a la hoja.
-      const izquierda = m.left - e.left + m.width * 0.45 - 350 * k;
-      const tx = r.right - e.left + 2;
-      const ty = r.top - e.top + r.height / 2;
-      return { x: izquierda, y: ty - 70 * k, l: gsap.utils.clamp(92, 330, 344 - (tx - izquierda) / k) };
+      const r = el.getBoundingClientRect();
+      return { x: r.left - e.left, y: r.top - e.top, w: r.width, h: r.height, cx: r.left - e.left + r.width / 2, cy: r.top - e.top + r.height / 2 };
+    }
+    function aLocal(px: number, py: number) {
+      const s = escalaCerca();
+      const ox = escenario.clientWidth / 2;
+      const oy = escenario.clientHeight / 2;
+      return { x: ox + (px - ox) / s, y: oy + (py - oy) / s };
+    }
+
+    /** Dónde queda el centro del vidrio dentro de la mano, y la punta del lápiz: medidos con las manos quietas. */
+    // En escritorio la etiqueta es más grande: con 1.3 «✗ 10:00 / pedida» cabe entera en la lente.
+    const aumento = () => (escritorio.matches ? 1.3 : 1.4);
+    let centroLente = { x: 0, y: 0 };
+    let puntaLapiz = { x: 0, y: 0 };
+    // Se miden la primera vez que hacen falta (P2 o P4), no al arrancar: así el arranque es más corto.
+    let medidas = false;
+    const asegura = () => {
+      if (!medidas) mideManos();
+    };
+    function mideManos() {
+      medidas = true;
+      const s = escalaCerca();
+      gsap.set([lupa, lapiz], { x: 0, y: 0, scale: 1, rotation: 0 });
+      const m = enPantalla(lupa);
+      const l = enPantalla(lente);
+      centroLente = { x: (l.cx - m.x) / s, y: (l.cy - m.y) / s };
+      gsap.set(vidrio, { left: centroLente.x - l.w / s / 2, top: centroLente.y - l.h / s / 2, width: l.w / s, height: l.h / s });
+      const ml = enPantalla(lapiz);
+      const p = enPantalla(punta);
+      puntaLapiz = { x: (p.cx - ml.x) / s, y: (p.cy - ml.y) / s };
+    }
+    /** Dónde poner la mano para que el centro de la lente quede sobre un texto de la agenda. */
+    function lupaSobre(objetivo: Element) {
+      asegura();
+      const r = enPantalla(objetivo);
+      const p = aLocal(r.cx, r.cy);
+      return { x: p.x - centroLente.x, y: p.y - centroLente.y };
+    }
+    /** Dónde poner la mano para que la punta del lápiz quede en un punto de la pantalla. */
+    function lapizEn(px: number, py: number) {
+      asegura();
+      const p = aLocal(px, py);
+      return { x: p.x - puntaLapiz.x, y: p.y - puntaLapiz.y };
+    }
+    /**
+     * Lo que se ve dentro del vidrio: el punto de la agenda que está bajo el centro de la lente,
+     * aumentado. Se deshace la matriz de la hoja (GSAP la mueve y está girada −1.2°) y el giro de la
+     * mano, para que el mundo dentro de la lupa no gire con ella.
+     */
+    function actualizaVidrio() {
+      const l = lente.getBoundingClientRect();
+      const h = hoja.getBoundingClientRect();
+      const estilo = getComputedStyle(hoja).transform;
+      const m = new DOMMatrix(estilo === "none" ? undefined : estilo);
+      const inv = m.inverse();
+      const dx = l.left + l.width / 2 - (h.left + h.width / 2);
+      const dy = l.top + l.height / 2 - (h.top + h.height / 2);
+      const ux = inv.a * dx + inv.c * dy;
+      const uy = inv.b * dx + inv.d * dy;
+      const gx = hoja.offsetWidth / 2 + ux - hoja.clientLeft - rejilla.offsetLeft;
+      const gy = hoja.offsetHeight / 2 + uy - hoja.clientTop - rejilla.offsetTop;
+      const giro = (Math.atan2(m.b, m.a) * 180) / Math.PI - Number(gsap.getProperty(lupa, "rotation"));
+      const d = vidrio.offsetWidth / 2;
+      rejillaCopia.style.width = `${rejilla.offsetWidth}px`;
+      rejillaCopia.style.height = `${rejilla.offsetHeight}px`;
+      rejillaCopia.style.transform = `translate(${d}px, ${d}px) rotate(${giro}deg) scale(${aumento()}) translate(${-gx}px, ${-gy}px)`;
     }
 
     function estado(k: number) {
@@ -191,17 +261,14 @@ export function armarNoche(raiz: HTMLElement): () => void {
       gsap.set(equis, { strokeDashoffset: k >= 2 ? 0 : 40 });
       // Con la cita puesta, las 11:00 ya chocan con ella: lo libre se apaga.
       gsap.set(libres, { scale: 1, autoAlpha: k >= 4 ? 0 : 1 });
-      gsap.set(cita, { clipPath: k >= 4 ? DESTAPADA : TAPADA });
-      gsap.set(palomita, { autoAlpha: k >= 4 ? 1 : 0, scale: 1 });
+      gsap.set(citas, { clipPath: k >= 4 ? DESTAPADA : TAPADA });
+      gsap.set(palomitas, { autoAlpha: k >= 4 ? 1 : 0, scale: 1 });
+      // En P2 la lupa se queda sobre las 10:30, la primera hora libre que va a ofrecer.
       if (k === 2 && hojaArriba(2)) {
-        const a = apunte(libres[0]);
-        gsap.set(mano, { x: a.x, y: a.y, autoAlpha: 1, scale: 1 });
-        largo.l = a.l;
-      } else {
-        gsap.set(mano, { autoAlpha: 0 });
-        largo.l = 92;
-      }
-      pintaDedo();
+        gsap.set(lupa, { ...lupaSobre(libre1030), autoAlpha: 1, scale: 1, rotation: 0 });
+        actualizaVidrio();
+      } else gsap.set(lupa, { autoAlpha: 0 });
+      gsap.set(lapiz, { autoAlpha: 0 });
       gsap.set(notaYo, { autoAlpha: k === 1 ? 1 : 0, clipPath: DESTAPADA });
       gsap.set(notaListo, { autoAlpha: k === 4 || k === 5 ? 1 : 0, clipPath: DESTAPADA });
       moliC.quieto(CARAS[k]);
@@ -212,6 +279,7 @@ export function armarNoche(raiz: HTMLElement): () => void {
       moliG.quieto("dormita");
     }
     reponer = () => {
+      medidas = false;
       if (pausa >= 0) estado(pausa);
     };
 
@@ -236,9 +304,9 @@ export function armarNoche(raiz: HTMLElement): () => void {
     function bajaHoja(tl: gsap.core.Timeline, t: number) {
       if (!hojaArriba(pausa)) tl.to(hoja, { ...hojaFuera(), duration: 0.42, ease: "power2.in" }, t);
     }
-    function senala(tl: gsap.core.Timeline, objetivo: HTMLElement, t: number) {
-      tl.to(mano, { x: () => apunte(objetivo).x, y: () => apunte(objetivo).y, duration: 0.3, ease: "power2.inOut" }, t);
-      tl.to(largo, { l: () => apunte(objetivo).l, duration: 0.42, ease: "back.out(1.6)", onUpdate: pintaDedo }, t + 0.08);
+    /** La lupa se desliza a otra hora de la agenda; el vidrio se actualiza en cada cuadro. */
+    function recorre(tl: gsap.core.Timeline, objetivo: Element, t: number) {
+      tl.to(lupa, { x: () => lupaSobre(objetivo).x, y: () => lupaSobre(objetivo).y, duration: 0.5, ease: "power2.inOut", onUpdate: actualizaVidrio }, t);
     }
 
     const ENTRADAS: Record<number, (tl: gsap.core.Timeline) => void> = {
@@ -252,43 +320,59 @@ export function armarNoche(raiz: HTMLElement): () => void {
         llega(tl, 1, 0.75);
         tl.call(() => moliC.cara("normal"), undefined, 1.9);
       },
-      // P2: llega «mañana a las 10», sube la agenda y Moli señala lo ocupado y lo libre.
+      // P2: llega «mañana a las 10», sube la agenda y Moli la revisa con la lupa, hora por hora.
       2: (tl) => {
         tl.to(notaYo, { autoAlpha: 0, duration: 0.2 }, 0);
         llega(tl, 2, 0);
         tl.call(() => moliC.cara("concentra"), undefined, 0.2);
         subeHoja(tl, 0.35);
-        tl.set(mano, { autoAlpha: 1, x: () => apunte(pedida).x, y: () => apunte(pedida).y, scale: 0.3, transformOrigin: "75% 50%" }, 0.95);
-        tl.call(() => {
-          largo.l = 92;
-          pintaDedo();
-        }, undefined, 0.95);
-        tl.to(mano, { scale: 1, duration: 0.35, ease: "back.out(2.2)" }, 0.95);
-        tl.to(largo, { l: () => apunte(pedida).l, duration: 0.45, ease: "back.out(1.6)", onUpdate: pintaDedo }, 1.15);
-        tl.to(equis, { strokeDashoffset: 0, duration: 0.32, ease: "steps(4)" }, 1.55);
-        senala(tl, libres[0], 2.1);
-        tl.to(libres, { scale: 1.06, duration: 0.16, yoyo: true, repeat: 3, ease: "power1.inOut", stagger: 0.08 }, 2.45);
+        // Sale del lado de Moli y se para sobre las 10:00 pedidas: ahí está ocupado.
+        tl.set(lupa, { x: () => lupaSobre(pedida).x, y: () => lupaSobre(pedida).y, rotation: 0 }, 0.92);
+        tl.fromTo(lupa, { autoAlpha: 0, scale: 0.3 }, { autoAlpha: 1, scale: 1, duration: 0.42, ease: "back.out(2)", immediateRender: false, onUpdate: actualizaVidrio }, 0.92);
+        tl.to(lupa, { rotation: -5, duration: 0.13, yoyo: true, repeat: 3, ease: "sine.inOut", onUpdate: actualizaVidrio }, 1.32);
+        tl.to(equis, { strokeDashoffset: 0, duration: 0.32, ease: "steps(4)" }, 1.42);
+        // Luego baja a lo libre: las 10:30 y las 11:00 se encienden bajo el vidrio.
+        recorre(tl, libre1030, 2.0);
+        tl.to(libres, { scale: 1.06, duration: 0.16, yoyo: true, repeat: 1, ease: "power1.inOut" }, 2.4);
+        recorre(tl, libre1100, 2.75);
+        recorre(tl, libre1030, 3.4);
       },
-      // P3: guarda la mano, baja la agenda y ofrece lo libre.
+      // P3: guarda la lupa, baja la agenda y ofrece lo libre.
       3: (tl) => {
-        tl.to(largo, { l: 92, duration: 0.18, ease: "power2.in", onUpdate: pintaDedo }, 0);
-        tl.to(mano, { scale: 0.3, autoAlpha: 0, duration: 0.2, ease: "power2.in" }, 0.12);
+        tl.to(lupa, { scale: 0.3, autoAlpha: 0, duration: 0.22, ease: "power2.in", onUpdate: actualizaVidrio }, 0);
         bajaHoja(tl, 0.1);
         moliC.habla(tl, 0.45, "guino");
         llega(tl, 3, 0.6);
       },
-      // P4: llega el nombre, sube la agenda y la cita se pinta de verde desde el lado de Moli.
+      // P4: llega el nombre, sube la agenda y Moli escribe la cita con su lápiz: el verde sale detrás
+      // de la punta, de derecha a izquierda (desde su lado).
       4: (tl) => {
         llega(tl, 4, 0);
         tl.call(() => moliC.cara("concentra"), undefined, 0.15);
         if (!escritorio.matches) subeHoja(tl, 0.4);
-        moliC.ondear(tl, 0.95);
-        tl.fromTo(cita, { clipPath: TAPADA }, { clipPath: DESTAPADA, duration: 0.7, ease: "power2.out" }, 1.0);
-        tl.to(libres, { autoAlpha: 0, duration: 0.3, ease: "steps(3)" }, 1.3);
-        tl.fromTo(palomita, { autoAlpha: 0, scale: 0.2 }, { autoAlpha: 1, scale: 1, duration: 0.35, ease: "back.out(3)" }, 1.55);
-        tl.call(() => moliC.cara("feliz"), undefined, 1.6);
-        moliC.salto(tl, 1.6);
-        escribe(tl, notaListo, 1.9);
+        const trazo = { p: 0 };
+        const escribeCita = () => {
+          const r = enPantalla(citaHoja);
+          const x = r.x + r.w - 6 - (r.w - 14) * trazo.p;
+          const y = r.cy + Math.sin(trazo.p * Math.PI * 6) * 2.5;
+          gsap.set(lapiz, lapizEn(x, y));
+          gsap.set(citas, { clipPath: `inset(0% 0% 0% ${((1 - trazo.p) * 100).toFixed(2)}%)` });
+        };
+        tl.call(() => {
+          trazo.p = 0;
+          escribeCita();
+        }, undefined, 0.95);
+        tl.fromTo(lapiz, { autoAlpha: 0, scale: 0.4 }, { autoAlpha: 1, scale: 1, duration: 0.3, ease: "back.out(2)", immediateRender: false }, 0.95);
+        moliC.ondear(tl, 1.15);
+        tl.to(trazo, { p: 1, duration: 0.95, ease: "power1.inOut", onUpdate: escribeCita }, 1.25);
+        tl.to(libres, { autoAlpha: 0, duration: 0.3, ease: "steps(3)" }, 1.7);
+        // La palomita: un toquecito del lápiz.
+        tl.to(lapiz, { y: "-=12", duration: 0.09, yoyo: true, repeat: 1, ease: "power1.inOut" }, 2.25);
+        tl.fromTo(palomitas, { autoAlpha: 0, scale: 0.2 }, { autoAlpha: 1, scale: 1, duration: 0.35, ease: "back.out(3)" }, 2.32);
+        tl.to(lapiz, { autoAlpha: 0, scale: 0.4, duration: 0.25, ease: "power2.in" }, 2.65);
+        tl.call(() => moliC.cara("feliz"), undefined, 2.45);
+        moliC.salto(tl, 2.45);
+        escribe(tl, notaListo, 2.75);
       },
       // P5: baja la agenda y le confirma a Mariana.
       5: (tl) => {
@@ -358,6 +442,7 @@ export function armarNoche(raiz: HTMLElement): () => void {
   escritorio.addEventListener("change", alCambiarTamano);
 
   return () => {
+    copia.replaceChildren();
     window.clearInterval(linea);
     escritorio.removeEventListener("change", alCambiarTamano);
     actuacion?.kill();

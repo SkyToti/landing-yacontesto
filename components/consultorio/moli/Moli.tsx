@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { cuerpo, diademaCompleta, filtroTinta, manoSenala, rasgos, type Cara } from "./partes";
+import { cuerpo, diademaCompleta, filtroTinta, manoLapiz, manoLupa, rasgos, type Cara } from "./partes";
 
 type Props = {
   /** Único por Moli en la página: prefija el filtro de tinta y los recortes de la boca. */
@@ -39,13 +39,28 @@ export function Moli({ id, className = "", caraCine, caraQuieta, style }: Props)
   );
 }
 
-/** La mano de guante que señala (a la izquierda). El dedo se estira desde el director. */
-export function ManoSenala({ id, className = "" }: { id: string; className?: string }) {
+const HERRAMIENTAS = {
+  lupa: { caja: "-130 -206 212 326", dibujo: manoLupa },
+  lapiz: { caja: "-200 -90 326 190", dibujo: manoLapiz },
+};
+
+/**
+ * La mano de Moli con la herramienta de cada capacidad: la lupa para revisar tu agenda y el lápiz para
+ * dejar la cita (Diego, 5-oct: «la mano está bien, pero el dedo que se estira se ve raro»). La lupa
+ * trae su vidrio en HTML, debajo del aro dibujado: ahí el director pone la agenda aumentada.
+ */
+export function ManoHerramienta({ id, herramienta, className = "" }: { id: string; herramienta: keyof typeof HERRAMIENTAS; className?: string }) {
+  const { caja, dibujo } = HERRAMIENTAS[herramienta];
   return (
-    <div className={`mano ${className}`} data-mano={id} aria-hidden="true">
-      <svg viewBox="-250 -70 500 140" className="mano-svg" focusable="false">
+    <div className={`mano-herramienta mano-${herramienta} ${className}`} data-mano={id} aria-hidden="true">
+      {herramienta === "lupa" && (
+        <div className="lupa-vidrio">
+          <div className="lupa-copia" />
+        </div>
+      )}
+      <svg viewBox={caja} className="mano-svg" focusable="false">
         <defs dangerouslySetInnerHTML={{ __html: filtroTinta(`tinta-${id}`, 9) }} />
-        <g filter={`url(#tinta-${id})`} dangerouslySetInnerHTML={{ __html: manoSenala() }} />
+        <g filter={`url(#tinta-${id})`} dangerouslySetInnerHTML={{ __html: dibujo() }} />
       </svg>
     </div>
   );

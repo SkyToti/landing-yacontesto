@@ -46,7 +46,7 @@
 :root:not(.cine) .nota-z,
 :root:not(.cine) .desliza,
 :root:not(.cine) .luz-cerca,
-:root:not(.cine) .mano-cerca,
+:root:not(.cine) .mano-herramienta,
 :root:not(.cine) .nota-yo,
 :root:not(.cine) .nota-listo {
   display: none;
