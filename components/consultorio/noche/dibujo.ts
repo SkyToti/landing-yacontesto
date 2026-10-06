@@ -17,6 +17,11 @@ export const PUNTOS = {
   moli: { x: 146, y: 500, ancho: 140 },
   luzGrande: { x: 318, y: 600, r: 196 },
   luzChica: { x: 222, y: 592, r: 112 },
+  /**
+   * El iris del cierre (P6): un círculo centrado en la luz chica que, abierto (r0), contiene toda la
+   * luz grande (su punto más lejano queda a ~306) y se cierra hasta r1, apenas fuera de la luz chica.
+   */
+  iris: { x: 222, y: 592, r0: 320, r1: 118 },
 };
 
 type Estilo = { trazo: string; relleno: string; pantalla: string; burbujas: boolean };

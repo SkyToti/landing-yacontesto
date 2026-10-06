@@ -103,9 +103,29 @@
   position: absolute;
   inset: 0;
 }
+/* Las luces y el plano general se ocultan solo con opacidad y en capa propia: quedan rasterizados
+   desde la carga y aparecer ya no cuesta un cuadro (medido en scripts/r1-cierre.mjs). */
 .luz-chica {
   opacity: 0;
-  visibility: hidden;
+}
+.cine .luz,
+.cine .plano-general {
+  will-change: opacity;
+}
+/* El iris del cierre: una ventana redonda que el director encoge (ver PUNTOS.iris en dibujo.ts). */
+.iris {
+  position: absolute;
+  overflow: hidden;
+  border-radius: 50%;
+}
+.iris-contenido {
+  position: absolute;
+}
+/* Con capa propia cada uno, cerrar el iris solo recompone texturas: el dibujo (con su filtro de tinta)
+   no se vuelve a rasterizar en cada cuadro. Medido: sin esto, 2 a 5 cuadros de 40 a 51 ms. */
+.cine .iris,
+.cine .iris-contenido {
+  will-change: transform;
 }
 
 .notif {
@@ -550,7 +570,7 @@
 
 /* Lo que pasa solo al abrir, sin esperar a JavaScript: el celular se enciende y llega el mensaje. */
 @media (prefers-reduced-motion: no-preference) {
-  .cine .luz-grande > svg {
+  .cine .luz-grande .dib {
     animation: enciende 0.9s steps(1, end) 0.5s both;
   }
   .cine .notif-tarjeta {

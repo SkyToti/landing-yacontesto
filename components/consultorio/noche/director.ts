@@ -1,6 +1,7 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { rasgos, type Boca, type Cara } from "../moli/partes";
+import { PUNTOS } from "./dibujo";
 
 /**
  * El director de la escena de las 23:47. Dos relojes, como en la hoja de Moli:
@@ -110,6 +111,8 @@ export function armarNoche(raiz: HTMLElement): () => void {
   const notif = q(".notif");
   const notaQuien = q(".nota-quien");
   const luzGrande = q(".luz-grande");
+  const iris = q(".iris");
+  const irisContenido = q(".iris-contenido");
   const luzChica = q(".luz-chica");
   const moliG = crearMoli(q('[data-moli="mg"]'), "mg-c", "dormita");
   const moliC = crearMoli(q('[data-moli="mc"]'), "mc-c", "dormita");
@@ -121,18 +124,31 @@ export function armarNoche(raiz: HTMLElement): () => void {
   let reponer = () => {};
 
   const ctx = gsap.context(() => {
+    /**
+     * El iris del cierre: la ventana se encoge (s) y el contenido crece (1/s), los dos alrededor del
+     * mismo punto. El producto es 1: en pantalla el dibujo se queda quieto y nada se redibuja.
+     */
+    const { r0, r1 } = PUNTOS.iris;
+    const cierre = { s: 1 };
+    const pintaIris = () => {
+      gsap.set(iris, { scale: cierre.s });
+      gsap.set(irisContenido, { scale: 1 / cierre.s });
+    };
+
     /* ── La cámara, atada al scroll ── */
     const camara = gsap.timeline({ defaults: { ease: "none" } });
     camara
       .set({}, {}, PANTALLAS)
       // Empujón al celular: el plano general crece hacia él y se funde con el primer plano.
       .fromTo(lamina, { scale: 1 }, { scale: 2.3, ease: "power2.in", duration: 0.72 }, 0.18)
-      .fromTo(general, { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.28 }, 0.62)
+      // Solo opacidad, sin visibility: oculto, el plano tendría que volver a rasterizarse al regresar
+      // (medido: un cuadro de ~40 ms justo al iniciar el regreso de la cámara).
+      .fromTo(general, { opacity: 1 }, { opacity: 0, duration: 0.28 }, 0.62)
       .fromTo(cerca, { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, ease: "power2.out", duration: 0.4 }, 0.58)
       // De regreso al plano general: la noche sigue y Moli vuelve a su guardia.
       .to(cerca, { autoAlpha: 0, scale: 0.92, ease: "power2.in", duration: 0.32 }, 3.86)
       .fromTo(lamina, { scale: 2.3 }, { scale: 1, ease: "power2.out", duration: 0.55, immediateRender: false }, 3.9)
-      .to(general, { autoAlpha: 1, duration: 0.3 }, 3.9);
+      .to(general, { opacity: 1, duration: 0.3 }, 3.9);
 
     const mitades = PAUSAS.slice(1).map((p, i) => (PAUSAS[i] + p) / 2);
     const pausaEn = (progreso: number) => {
@@ -274,8 +290,10 @@ export function armarNoche(raiz: HTMLElement): () => void {
       moliC.quieto(CARAS[k]);
       // El plano general: de ida, el mensaje espera; de vuelta (P6) ya se contestó y la luz se cierra.
       gsap.set([notif, notaQuien], { autoAlpha: k <= 1 ? 1 : 0 });
-      gsap.set(luzGrande, { autoAlpha: k === 6 ? 0 : 1 });
-      gsap.set(luzChica, { autoAlpha: k === 6 ? 1 : 0 });
+      gsap.set(luzGrande, { opacity: k === 6 ? 0 : 1 });
+      cierre.s = 1;
+      pintaIris();
+      gsap.set(luzChica, { opacity: k === 6 ? 1 : 0 });
       moliG.quieto("dormita");
     }
     reponer = () => {
@@ -380,12 +398,20 @@ export function armarNoche(raiz: HTMLElement): () => void {
         moliC.habla(tl, 0.35, "feliz");
         llega(tl, 5, 0.5);
       },
-      // P6: de vuelta al plano general, Moli bosteza, la luz se cierra y vuelve a dormitar de guardia.
+      // P6: termina la plática. Cuando la cámara ya regresó, Moli bosteza, la luz se cierra a su
+      // alrededor como el iris de las caricaturas y él se acomoda para dormitar de guardia.
       6: (tl) => {
-        tl.call(() => moliG.cara("bosteza"), undefined, 0.45)
-          .to(luzGrande, { autoAlpha: 0, duration: 0.5, ease: "steps(3)" }, 0.6)
-          .to(luzChica, { autoAlpha: 1, duration: 0.5, ease: "steps(3)" }, 0.6)
-          .call(() => moliG.cara("dormita"), undefined, 1.3);
+        tl.call(() => moliG.cara("bosteza"), undefined, 0.6)
+          .to(moliG.el, { scaleY: 1.05, scaleX: 0.97, duration: 0.5, ease: "sine.out" }, 0.6)
+          .to(cierre, { s: r1 / r0, duration: 1.3, ease: "power3.inOut", onUpdate: pintaIris }, 0.85)
+          .call(() => moliG.cara("dormita"), undefined, 1.35)
+          .to(moliG.el, { scaleY: 0.97, scaleX: 1.015, duration: 0.55, ease: "sine.inOut" }, 1.35)
+          .to(moliG.el, { scaleY: 1, scaleX: 1, duration: 0.9, ease: "sine.out" }, 1.9)
+          // Al final, el círculo perfecto le pasa la estafeta a la luz chica, de borde dibujado a mano.
+          // En orden y no cruzadas: dos capas a media opacidad dejan ver la noche y sale un disco gris.
+          // La chica (encima) entra completa y hasta entonces se apaga la grande.
+          .to(luzChica, { opacity: 1, duration: 0.45, ease: "sine.inOut" }, 1.85)
+          .to(luzGrande, { opacity: 0, duration: 0.3, ease: "sine.out" }, 2.3);
       },
     };
 

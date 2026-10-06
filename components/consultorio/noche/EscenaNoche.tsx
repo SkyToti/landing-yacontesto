@@ -4,6 +4,27 @@ import { FILTRO_FONDO, LIENZO, PUNTOS, dibujoApagado, dibujoEncendido, mancha } 
 import { AGENDA, CHAT_NOCHE, ROTULOS_NOCHE, franja } from "./textos";
 
 const caja = `0 0 ${LIENZO.ancho} ${LIENZO.alto}`;
+
+/**
+ * El iris: una ventana redonda sobre la luz grande, y adentro el dibujo, contrapuesto para que quede
+ * en su lugar. Para cerrarlo, el director encoge la ventana y agranda el contenido en la misma
+ * proporción: en pantalla el dibujo no se mueve y solo cambia el círculo (todo con transform).
+ */
+const { iris } = PUNTOS;
+const pct = (v: number) => `${v * 100}%`;
+const IRIS_CAJA: CSSProperties = {
+  left: pct((iris.x - iris.r0) / LIENZO.ancho),
+  top: pct((iris.y - iris.r0) / LIENZO.alto),
+  width: pct((2 * iris.r0) / LIENZO.ancho),
+  height: pct((2 * iris.r0) / LIENZO.alto),
+};
+const IRIS_CONTENIDO: CSSProperties = {
+  left: pct(-(iris.x - iris.r0) / (2 * iris.r0)),
+  top: pct(-(iris.y - iris.r0) / (2 * iris.r0)),
+  width: pct(LIENZO.ancho / (2 * iris.r0)),
+  height: pct(LIENZO.alto / (2 * iris.r0)),
+  transformOrigin: `${pct(iris.x / LIENZO.ancho)} ${pct(iris.y / LIENZO.alto)}`,
+};
 /** Un punto del lienzo como porcentaje de la lámina (la lámina tiene la proporción del lienzo). */
 const enLamina = (x: number, y: number): CSSProperties => ({
   left: `${(x / LIENZO.ancho) * 100}%`,
@@ -133,9 +154,13 @@ export function EscenaNoche() {
               <g filter="url(#tinta-fondo)" dangerouslySetInnerHTML={{ __html: dibujoApagado() }} />
             </svg>
             <div className="luz luz-grande">
-              <svg className="dib" viewBox={caja} preserveAspectRatio="none" focusable="false">
-                <g filter="url(#tinta-fondo)" dangerouslySetInnerHTML={{ __html: dibujoEncendido("recorte-luz-grande", lg.x, lg.y, lg.r, 11) }} />
-              </svg>
+              <div className="iris" style={IRIS_CAJA}>
+                <div className="iris-contenido" style={IRIS_CONTENIDO}>
+                  <svg className="dib" viewBox={caja} preserveAspectRatio="none" focusable="false">
+                    <g filter="url(#tinta-fondo)" dangerouslySetInnerHTML={{ __html: dibujoEncendido("recorte-luz-grande", lg.x, lg.y, lg.r, 11) }} />
+                  </svg>
+                </div>
+              </div>
             </div>
             <div className="luz luz-chica">
               <svg className="dib" viewBox={caja} preserveAspectRatio="none" focusable="false">
