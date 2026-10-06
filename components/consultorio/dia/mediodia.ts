@@ -173,7 +173,8 @@ export function armarMediodia(raiz: HTMLElement, { escenario }: Opciones) {
    */
   let ultimo = 9;
   function estado(pausa: number) {
-    const k = Math.max(pausa, 9);
+    // Desde las 16:05 esta capa ya se fue: se queda como en P12, sin medir nada (la estafeta mide).
+    const k = Math.min(Math.max(pausa, 9), 12);
     if (k === ultimo) return;
     ultimo = k;
     const n = BURBUJAS[k] ?? 0;

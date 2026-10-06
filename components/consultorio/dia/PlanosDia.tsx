@@ -4,7 +4,20 @@ import { LIENZO, PUNTOS } from "../noche/dibujo";
 import { AGENDA } from "../noche/textos";
 import { Rejilla, Telefono } from "../piezas";
 import { CAJA_ANA, PUNTOS_DIA, ana, bolita, caraLetrero, diaFondo, diaFrente, luna, manecilla, sol } from "./dibujo";
-import { AGENDA_COMPU, CHAT_MEDIODIA, CONTACTO_MEDIODIA, NOTA_CITA, ROTULOS_DIA, ROTULOS_MEDIODIA } from "./textos";
+import { CAJA_CONSULTORIO, RECORTE_FONDO, consultorio } from "./sillon";
+import {
+  AGENDA_COMPU,
+  CHAT_MEDIODIA,
+  CHAT_TARDE,
+  CONTACTO_MEDIODIA,
+  CONTACTO_TARDE,
+  NOTA_CITA,
+  ROTULOS_DIA,
+  ROTULOS_MEDIODIA,
+  ROTULOS_TARDE,
+  TIRA,
+  type Rotulo,
+} from "./textos";
 
 const caja = `0 0 ${LIENZO.ancho} ${LIENZO.alto}`;
 
@@ -31,14 +44,18 @@ function Ana({ className, style }: { className: string; style?: CSSProperties })
   );
 }
 
-/** Los rótulos de día (las 09:00 y las 11:20): en la misma columna que los de la noche, en tinta sobre el papel. */
-export function RotulosDia({ rotulos = ROTULOS_DIA, desde = 7, className = "pasos-dia" }) {
+/**
+ * Los rótulos de día (las 09:00, las 11:20 y las 16:05): en la misma columna que los de la noche, en
+ * tinta sobre el papel. Algunos llevan letra chica debajo.
+ */
+export function RotulosDia({ rotulos = ROTULOS_DIA, desde = 7, className = "pasos-dia" }: { rotulos?: readonly Rotulo[]; desde?: number; className?: string }) {
   return (
     <ol className={`pasos ${className}`}>
       {rotulos.map((r, i) => (
         <li key={r.titulo} className="rotulo rotulo-dia" data-rotulo={i + desde}>
           <h2 className="titulo-paso">{r.titulo}</h2>
           <p className="texto-paso">{r.texto}</p>
+          {r.chica && <p className="letra-chica">{r.chica}</p>}
         </li>
       ))}
     </ol>
@@ -79,6 +96,15 @@ export function PlanoDia() {
           <Ana className="ana-general" style={CAJA_ANA_LAMINA} />
           <svg className="dib" viewBox={caja} preserveAspectRatio="none" focusable="false">
             <g filter="url(#tinta-fondo)" dangerouslySetInnerHTML={{ __html: diaFrente() }} />
+          </svg>
+          {/* El consultorio sigue a la derecha de la recepción: la cámara llega ahí en la T3. */}
+          <svg
+            className="dib-consultorio"
+            viewBox={`${CAJA_CONSULTORIO.x} 0 ${CAJA_CONSULTORIO.ancho} ${LIENZO.alto}`}
+            preserveAspectRatio="none"
+            focusable="false"
+          >
+            <g filter="url(#tinta-fondo)" dangerouslySetInnerHTML={{ __html: consultorio() }} />
           </svg>
           <Moli
             id="md"
@@ -161,6 +187,80 @@ export function CercaMediodia() {
       <ManoHerramienta id="estafeta" herramienta="estafeta" className="estafeta-cerca" />
       <ManoHerramienta id="puno" herramienta="puno" className="puno-cerca" />
       <Moli id="mm" className="moli-cerca moli-mediodia" caraCine="normal" caraQuieta="feliz" />
+    </div>
+  );
+}
+
+/** Los rótulos de las 16:05 (P13 a P15). */
+export function RotulosTarde() {
+  return <RotulosDia rotulos={ROTULOS_TARDE} desde={13} className="pasos-tarde" />;
+}
+
+/**
+ * La tira de la semana: los días arriba (hoy es el jueves) y, abiertos, el viernes y el sábado hora por
+ * hora. La cita de Jorge es un bloque aparte, encima de las 17:00 del viernes: el director lo carga al
+ * hueco de las 10:00 del sábado. Su lugar lo dicen dos variables (`--c` columna, `--f` fila): sin
+ * JavaScript ya está en el sábado y pintada (tarde.css).
+ */
+function Tira() {
+  return (
+    <div className="tira">
+      <div className="tira-cabeza">
+        <b>{TIRA.semana}</b>
+        <span>Tu calendario</span>
+      </div>
+      <ol className="tira-dias">
+        {TIRA.dias.map((d) => (
+          <li key={d.num} className={"hoy" in d ? "es-hoy" : "abierto" in d ? "es-abierto" : undefined}>
+            <small>{d.corto}</small>
+            {d.num}
+          </li>
+        ))}
+      </ol>
+      <div className="tira-cols">
+        {TIRA.columnas.map((c, i) => (
+          <div key={c.dia} className="tira-col" data-col={i}>
+            <b className="tira-dia">{c.dia}</b>
+            <ol className="tira-filas">
+              {c.filas.map((f) => (
+                <li key={f.hora} className={`fila fila-${f.tipo}`} data-fila={`${i}-${f.hora}`}>
+                  <span className="fila-hora">{f.hora}</span>
+                  <span className="fila-caja">{f.texto}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        ))}
+        <div className="blq-jorge">
+          <span className="pinta" />
+          <span className="jorge-texto">
+            {TIRA.cita.servicio}
+            <small>{TIRA.cita.nombre}</small>
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * El primer plano de las 16:05: el celular de la clínica con el chat de Jorge, la tira de la semana y
+ * Moli con la lupa (revisa) y las pinzas (carga la cita). Al fondo, recortado del mismo dibujo, el
+ * doctor atiende en el sillón con las manos ocupadas.
+ */
+export function CercaTarde() {
+  return (
+    <div className="plano tarde-cerca" aria-hidden="true">
+      <div className="tarde-fondo">
+        <svg viewBox={RECORTE_FONDO} focusable="false">
+          <g filter="url(#tinta-fondo)" dangerouslySetInnerHTML={{ __html: consultorio() }} />
+        </svg>
+      </div>
+      <Telefono dia="Hoy" className="tel-tarde" chat={CHAT_TARDE} contacto={CONTACTO_TARDE} />
+      <Tira />
+      <ManoHerramienta id="lupa-t" herramienta="lupa" className="lupa-tarde" />
+      <ManoHerramienta id="pinzas" herramienta="pinzas" className="pinzas-tarde" />
+      <Moli id="mt" className="moli-cerca moli-tarde" caraCine="normal" caraQuieta="feliz" />
     </div>
   );
 }

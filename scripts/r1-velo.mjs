@@ -1,12 +1,12 @@
-// ¿Se asoma el fondo de tinta entre las capas de día? Recorre de día con el scroll (de P7 a P12) y, en
+// ¿Se asoma el fondo de tinta entre las capas de día? Recorre de día con el scroll (de P7 a P15) y, en
 // cada cuadro, multiplica lo transparente de las capas que están prendidas (plano general de día y los
-// primeros planos de las 09:00 y las 11:20). Si dos capas se cruzan a media opacidad, el producto pasa
+// primeros planos de las 09:00, las 11:20 y las 16:05). Si dos capas se cruzan a media opacidad, el producto pasa
 // de 0 y se ve un velo gris con doble imagen (lo que vio Diego el 5-oct al salir de P9).
 // Uso (con el servidor de out/ en marcha): node scripts/r1-velo.mjs [URL]
 import { chromium } from "playwright";
 
 const URL = process.argv[2] ?? "http://localhost:3200/";
-const PANTALLAS = 9.0;
+const PANTALLAS = 11.25;
 const navegador = await chromium.launch();
 let falla = false;
 for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 800 }]) {
@@ -18,7 +18,7 @@ for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 800 
   const r = await pagina.evaluate(async (total) => {
     const s = document.getElementById("noche");
     const ir = (p) => window.scrollTo(0, s.offsetTop + (p / total) * (s.offsetHeight - innerHeight));
-    const capas = [".plano-dia", ".dia-cerca", ".mediodia-cerca"].map((q) => s.querySelector(q));
+    const capas = [".plano-dia", ".dia-cerca", ".mediodia-cerca", ".tarde-cerca"].map((q) => s.querySelector(q));
     const opaca = (el) => {
       const c = getComputedStyle(el);
       return c.display === "none" || c.visibility === "hidden" ? 0 : Number(c.opacity);

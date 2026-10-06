@@ -128,7 +128,8 @@ export function armarManana(raiz: HTMLElement, { escenario, escritorio }: Opcion
    */
   let ultimo = 6;
   function estado(pausa: number) {
-    const k = Math.max(pausa, 6);
+    // Desde las 11:20 esta capa ya se fue: se queda como en P9, sin volver a medir el chat.
+    const k = Math.min(Math.max(pausa, 6), 9);
     if (k === ultimo) return;
     ultimo = k;
     // Plano general: antes de las 09:00 Ana no ha llegado, el letrero dice CERRADO y Moli dormita.

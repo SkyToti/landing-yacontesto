@@ -208,6 +208,28 @@ export function punoEstafeta() {
 }
 
 /** El filtro de tinta de la hoja: desplaza el trazo para que no haya ninguna curva perfecta. */
+/**
+ * A las 16:05, las pinzas de dentista con las que Moli carga la cita del viernes al sábado (paso 4,
+ * propuesta de Claude: la herramienta de un dentista, en la mano de una muela). Dos estados por
+ * cuadros, como las caras: abiertas y cerradas, sin girar nada con GSAP. Salen del puño hacia la
+ * izquierda y abajo, como el lápiz; `.punta` es donde pellizcan.
+ */
+function brazoPinza(lado: 1 | -1, abierta: boolean) {
+  // Cada brazo es una línea de marcador con su contorno: sale de la unión, se abre a media pinza y
+  // regresa a la punta (cerrada) o se queda abierto (abierta).
+  const d = `M${2 * lado} -34L${17 * lado} -116L${(abierta ? 18 : 3) * lado} -204`;
+  return `<path d="${d}" fill="none" stroke="${T}" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="${d}" fill="none" stroke="${C}" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
+export function manoPinzas() {
+  return `<g transform="rotate(-120)">
+    <g class="pinzas-abiertas">${brazoPinza(-1, true)}${brazoPinza(1, true)}</g>
+    <g class="pinzas-cerradas">${brazoPinza(-1, false)}${brazoPinza(1, false)}</g>
+    <circle class="punta" cx="0" cy="-204" r="1" fill="none"/>
+    ${PUNO}
+  </g>`;
+}
+
 export function filtroTinta(id: string, semilla = 3) {
   return `<filter id="${id}" x="-10%" y="-10%" width="120%" height="120%">
     <feTurbulence type="fractalNoise" baseFrequency="0.032" numOctaves="2" seed="${semilla}"/>

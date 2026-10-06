@@ -73,3 +73,97 @@ export const CHAT_MEDIODIA = [
   { de: "paciente", texto: "Es sobre mi ortodoncia", hora: "11:21" },
   { de: "equipo", texto: "Hola, Luis, soy Ana, de recepción. Ya le comento al doctor. ¿Te puede llamar hoy en la tarde?", hora: "11:26" },
 ] as const;
+
+/**
+ * Las 16:05 (`GUION-LANDING.md`, escena 4): Jorge mueve su cita del viernes al sábado mientras el
+ * doctor atiende. Textos nuevos del paso 4 (6-oct-2026), PROPUESTOS: falta que Diego los apruebe.
+ *
+ * Cotejado el 6-oct-2026 contra `recepcionista-ia-whatsapp` (`main` = 7e6ef5a):
+ * - P13 busca la cita del paciente ............... src/brain.ts (herramienta `buscar_mis_citas`: «las
+ *                                                   próximas citas del paciente (por su número de
+ *                                                   WhatsApp)»). Devuelve id, servicio y fecha, sin el
+ *                                                   nombre (`textoBuscarMisCitas`): por eso Moli no lo dice.
+ *       y revisa el día nuevo antes de ofrecerlo .. `ver_horarios_ocupados`: el horario del día y las
+ *                                                   HORAS LIBRES ya calculadas («ofrece SOLO horas que la
+ *                                                   respuesta marque como libres»). El demo abre el sábado
+ *                                                   de 9:00 a 14:00 y la consulta de seguimiento dura 30 min
+ *                                                   (`config/config.example.json`).
+ *   letra chica: solo las que agendó el asistente  `getCitasFuturas` lee la tabla `citas` de Supabase, que
+ *                                                   solo tiene las que agendó el asistente. Si el paciente
+ *                                                   dice que sí tiene cita y no sale, «la hizo el personal»:
+ *                                                   `pasar_a_humano` (`textoBuscarMisCitas`, 29b).
+ * - P14 la cambia en tu calendario ............... `reagendar_cita` → `reagendarEvento` (src/calendar.ts):
+ *                                                   mueve el evento donde esté (`localizarEvento`) y, si
+ *                                                   el horario nuevo choca, no lo mueve («ocupado»).
+ *       la hora del viernes queda libre .......... el evento se mueve, no se copia: el viernes 17:00 ya no
+ *                                                   tiene nada en el calendario.
+ * - P15 confirma la fecha nueva .................. el resultado trae «Confírmale al paciente exactamente
+ *                                                   eso» (`textoCitaReagendada`) y `nuevo_dia_semana` se
+ *                                                   coteja con la fecha antes de mover (hallazgo 36).
+ * Lo que NO se dice: que avisa al doctor o a Ana del cambio (no existe, regla 2). Se enteran por el
+ * calendario.
+ */
+export type Rotulo = { titulo: string; texto: string; chica?: string };
+
+export const ROTULOS_TARDE: Rotulo[] = [
+  {
+    titulo: "Mueve o cancela una cita por mensaje.",
+    texto: "Busca la cita del paciente y revisa el día nuevo.",
+    chica: "Solo mueve las que agendó el asistente; las que hizo tu equipo, se las pasa a tu equipo.",
+  },
+  { titulo: "Y la cambia en tu calendario mientras tú atiendes.", texto: "La hora del viernes queda libre para otro paciente." },
+  { titulo: "Le confirma la fecha nueva.", texto: "Con el día de la semana revisado antes de mandarlo." },
+];
+
+/** El paciente de las 16:05, en la cabecera del chat (clínica ficticia, regla 6). */
+export const CONTACTO_TARDE = { iniciales: "JM", nombre: "Jorge M." };
+
+/** El chat de las 16:05: la petición, las horas libres del sábado, la elección y la confirmación (verde). */
+export const CHAT_TARDE = [
+  { de: "paciente", texto: "Hola, ¿puedo cambiar mi cita del viernes para el sábado?", hora: "16:05" },
+  {
+    de: "clinica",
+    texto: "Claro. Veo tu consulta de seguimiento del viernes 16 a las 5:00 p. m. El sábado tengo libre 10:00 o 12:30, ¿cuál prefieres?",
+    hora: "16:05",
+  },
+  { de: "paciente", texto: "A las 10", hora: "16:06" },
+  { de: "clinica", texto: "Listo: tu consulta quedó el sábado 17 de octubre a las 10:00 a. m. 👍", hora: "16:06" },
+] as const;
+
+/**
+ * La tira de la semana del 12 de octubre (hoy es el jueves 15): el viernes 16 y el sábado 17, hora por
+ * hora. La cita de Jorge (17:00 del viernes, la agendó el asistente días antes) va aparte: es la que
+ * se mueve al hueco de las 10:00 del sábado. Lo que queda debajo de ella es lo libre del viernes.
+ */
+export const TIRA = {
+  semana: "Semana del 12 de octubre",
+  dias: [
+    { corto: "L", num: 12 },
+    { corto: "M", num: 13 },
+    { corto: "M", num: 14 },
+    { corto: "J", num: 15, hoy: true },
+    { corto: "V", num: 16, abierto: true },
+    { corto: "S", num: 17, abierto: true },
+  ],
+  columnas: [
+    {
+      dia: "Vie 16",
+      filas: [
+        { hora: "15:00", tipo: "ocupado", texto: "Ocupado" },
+        { hora: "16:00", tipo: "ocupado", texto: "Ocupado" },
+        { hora: "17:00", tipo: "libre", texto: "libre" },
+        { hora: "18:00", tipo: "ocupado", texto: "Ocupado" },
+      ],
+    },
+    {
+      dia: "Sáb 17",
+      filas: [
+        { hora: "09:00", tipo: "ocupado", texto: "Ocupado" },
+        { hora: "10:00", tipo: "libre", texto: "libre" },
+        { hora: "11:00", tipo: "ocupado", texto: "Ocupado" },
+        { hora: "12:30", tipo: "libre", texto: "libre" },
+      ],
+    },
+  ],
+  cita: { servicio: "Consulta de seguimiento", nombre: "Jorge M." },
+} as const;

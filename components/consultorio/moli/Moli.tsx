@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { cuerpo, diademaCompleta, estafeta, filtroTinta, manoLapiz, manoLupa, manoSenala, punoEstafeta, rasgos, type Cara } from "./partes";
+import { cuerpo, diademaCompleta, estafeta, filtroTinta, manoLapiz, manoLupa, manoPinzas, manoSenala, punoEstafeta, rasgos, type Cara } from "./partes";
 
 type Props = {
   /** Único por Moli en la página: prefija el filtro de tinta y los recortes de la boca. */
@@ -47,12 +47,15 @@ const HERRAMIENTAS = {
   // A las 11:20, la estafeta y el puño que la carga: dos capas con la misma caja, para que el puño la suelte.
   estafeta: { caja: "-160 -46 272 90", dibujo: estafeta },
   puno: { caja: "-160 -46 272 90", dibujo: punoEstafeta },
+  // A las 16:05, las pinzas que cargan la cita del viernes al sábado.
+  pinzas: { caja: "-200 -108 310 226", dibujo: manoPinzas },
 };
 
 /**
  * La mano de Moli con la herramienta de cada capacidad: la lupa para revisar tu agenda, el lápiz para
  * dejar la cita, a las 09:00 la mano que señala para enseñarle la cita a Ana (Diego, 5-oct: «la mano
- * está bien, pero el dedo que se estira se ve raro») y a las 11:20 la estafeta con su puño. La lupa
+ * está bien, pero el dedo que se estira se ve raro»), a las 11:20 la estafeta con su puño y a las 16:05
+ * las pinzas de dentista. La lupa
  * trae su vidrio en HTML, debajo del aro dibujado: ahí el director pone la agenda aumentada.
  */
 export function ManoHerramienta({ id, herramienta, className = "" }: { id: string; herramienta: keyof typeof HERRAMIENTAS; className?: string }) {

@@ -2,6 +2,7 @@ import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { armarManana } from "../dia/manana";
 import { armarMediodia } from "../dia/mediodia";
+import { armarTarde } from "../dia/tarde";
 import { type Cara } from "../moli/partes";
 import { crearMoli } from "../moli/titere";
 import { PANTALLAS, PAUSAS, T1 } from "../pausas";
@@ -9,7 +10,8 @@ import { PUNTOS } from "./dibujo";
 
 /**
  * El director de la escena fija: las 23:47 (aquí) y, con el mismo sistema, los actos de día: la
- * transición T1 y las 09:00 (`../dia/manana.ts`), y la T2 y las 11:20 (`../dia/mediodia.ts`).
+ * transición T1 y las 09:00 (`../dia/manana.ts`), la T2 y las 11:20 (`../dia/mediodia.ts`) y la T3
+ * y las 16:05 (`../dia/tarde.ts`).
  * Dos relojes, como en la hoja de Moli:
  * - el SCROLL mueve la cámara (plano general ↔ primer plano), atado al pulgar;
  * - cada PAUSA dispara una actuación con su propio tiempo (Moli salta, habla, señala; llegan
@@ -33,6 +35,7 @@ type Acto = {
 const ARMADORES = [
   { nombre: "dia", armar: armarManana },
   { nombre: "mediodia", armar: armarMediodia },
+  { nombre: "tarde", armar: armarTarde },
 ];
 
 /** Lo de la noche se indexa por pausa de P0 a P6; de P7 en adelante la noche se queda como en P6. */
@@ -405,7 +408,7 @@ export function armarNoche(raiz: HTMLElement): () => void {
           .to(luzChica, { opacity: 1, duration: 0.45, ease: "sine.inOut" }, 1.85)
           .to(luzGrande, { opacity: 0, duration: 0.3, ease: "sine.out" }, 2.3);
       },
-      // P7 a P12 (las 09:00 y las 11:20) los agregan los actos de día.
+      // P7 a P15 (las 09:00, las 11:20 y las 16:05) los agregan los actos de día.
     };
 
     function irA(k: number) {

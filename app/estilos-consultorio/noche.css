@@ -470,7 +470,7 @@
 /* 9 pantallas de scroll: la noche, el arrancón del calendario, las 09:00 y las 11:20 (las pausas viven en pausas.ts). */
 .cine .noche {
   position: relative;
-  height: calc(10 * 100svh);
+  height: calc(12.25 * 100svh);
 }
 .cine .escenario {
   position: sticky;

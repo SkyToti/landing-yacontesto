@@ -1,0 +1,366 @@
+/*
+ * Las 16:05 y la transición T3 (el reloj gira y la cámara va al consultorio). Como en las 23:47: el
+ * celular a la izquierda, Moli abajo a la derecha y la tira de la semana, que en el celular sube y tapa
+ * el chat solo mientras Moli revisa (P13) y mueve la cita (P14); en escritorio va a la derecha. Al
+ * fondo, recortado, el doctor atiende en el sillón.
+ */
+
+/* ── El consultorio en el plano general: a la derecha de la recepción, en la misma lámina ── */
+.lamina .dib-consultorio {
+  position: absolute;
+  left: 100%;
+  top: 0;
+  display: block;
+  /* 420 de ancho en un lienzo de 480. */
+  width: 87.5%;
+  height: 100%;
+}
+
+/* ── Letra chica bajo un rótulo ── */
+.letra-chica {
+  margin-top: 10px;
+  max-width: 40ch;
+  font-size: 13px;
+  line-height: 1.35;
+  color: var(--crema-suave);
+}
+
+/* ── La tira de la semana ── */
+.tira {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 12px 14px;
+  border: 2.5px solid var(--tinta);
+  border-radius: 16px;
+  background: var(--papel);
+  box-shadow: 5px 5px 0 var(--tinta);
+  color: var(--tinta);
+  rotate: -1deg;
+}
+.tira-cabeza b {
+  display: block;
+  font-family: var(--f-titular);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+.tira-cabeza span {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--tinta-suave);
+}
+.tira-dias {
+  display: flex;
+  gap: 4px;
+  margin-top: 10px;
+}
+.tira-dias li {
+  flex: 1;
+  padding: 3px 0 4px;
+  border: 1.5px solid transparent;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.05;
+  text-align: center;
+  color: var(--tinta-suave);
+}
+.tira-dias small {
+  display: block;
+  font-size: 10px;
+  font-weight: 600;
+}
+.tira-dias .es-hoy {
+  background: var(--tinta);
+  color: var(--crema);
+}
+.tira-dias .es-abierto {
+  border: 2px solid var(--tinta);
+  color: var(--tinta);
+}
+/*
+ * Las dos columnas: un encabezado y cuatro filas que se reparten el alto. El bloque de la cita se
+ * ubica con las mismas medidas (--c es la columna, --f la fila), así que su lugar no se mide.
+ */
+.tira-cols {
+  --cab: 24px;
+  --gc: 10px;
+  --gf: 6px;
+  --canal: 31px;
+  --fila: calc((100% - var(--cab) - 3 * var(--gf)) / 4);
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: var(--gc);
+  margin-top: 12px;
+}
+.tira-col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.tira-dia {
+  height: var(--cab);
+  font-family: var(--f-titular);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+}
+.tira-filas {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-rows: repeat(4, 1fr);
+  gap: var(--gf);
+}
+.fila {
+  display: grid;
+  grid-template-columns: var(--canal) minmax(0, 1fr);
+  min-height: 0;
+}
+.fila-hora {
+  padding-top: 5px;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--tinta-suave);
+}
+.fila-caja {
+  padding: 4px 5px;
+  overflow: hidden;
+  border: 2px solid var(--tinta);
+  border-radius: 7px;
+  background: var(--papel);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.fila-ocupado .fila-caja {
+  background: repeating-linear-gradient(135deg, var(--rayado) 0 2px, transparent 2px 7px), var(--papel);
+}
+/* Lo libre: lima. */
+.fila-libre .fila-caja {
+  background: var(--lima);
+}
+/* La cita de Jorge, en su lugar final (el sábado a las 10:00, en verde): así se ve sin JavaScript. */
+.blq-jorge {
+  --c: 1;
+  --f: 1;
+  position: absolute;
+  z-index: 2;
+  left: calc(var(--c) * (50% + var(--gc) / 2) + var(--canal));
+  top: calc(var(--cab) + var(--f) * (var(--fila) + var(--gf)));
+  width: calc(50% - var(--gc) / 2 - var(--canal));
+  height: var(--fila);
+  display: flex;
+  padding: 4px 5px;
+  overflow: hidden;
+  border: 2px solid var(--tinta);
+  border-radius: 7px;
+  background: var(--papel);
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+/* El verde sale de la derecha, del lado de Moli, como la cita de la noche. */
+.blq-jorge .pinta {
+  position: absolute;
+  inset: 0;
+  background: var(--verde);
+  transform-origin: 100% 50%;
+}
+.jorge-texto {
+  position: relative;
+}
+.jorge-texto small {
+  display: block;
+  font-size: 10.5px;
+  font-weight: 500;
+}
+
+/* La copia de la tira dentro de la lupa (el director la clona al revisar). */
+.lupa-copia > .tira-cols {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  transform-origin: 0 0;
+}
+
+/* ── Las pinzas: dos estados por cuadros ── */
+.mano-pinzas {
+  width: 190px;
+  /* Salen del puño, del lado de Moli. */
+  transform-origin: 90% 30%;
+}
+.mano-pinzas.cerradas .pinzas-abiertas,
+.mano-pinzas:not(.cerradas) .pinzas-cerradas {
+  visibility: hidden;
+}
+
+/* El doctor al fondo: el mismo dibujo, recortado y apagado. */
+.tarde-fondo svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ════════════ Modo cine ════════════ */
+
+/* Como las otras capas de día: display: none hasta que la cámara las pide en la T3. */
+.cine .dib-consultorio {
+  display: none;
+}
+.cine .tarde-cerca {
+  /* El rótulo de P13 lleva letra chica: el contenido baja un poco para no pisarla. */
+  --arriba-contenido: 190px;
+  z-index: 2;
+  display: none;
+  background: var(--crema);
+  opacity: 0;
+  visibility: hidden;
+}
+/* El reposo de antes de las 16:05 vive aquí y no en el director (tarde.ts): el chat vacío, la tira
+   guardada, la cita en el viernes sin pintar y lo del sábado sin revisar. */
+.cine .tel-tarde .burbuja {
+  opacity: 0;
+  visibility: hidden;
+}
+/* La tira y las manos se prenden un poco después que el resto del primer plano (tarde.ts). */
+.cine .lupa-tarde,
+.cine .pinzas-tarde {
+  display: none;
+}
+.cine .tira {
+  display: none;
+  position: absolute;
+  z-index: 3;
+  left: 10px;
+  top: calc(var(--arriba-contenido) - 4px);
+  bottom: calc(var(--zona-pastilla) + 4px);
+  width: min(62%, 270px);
+  opacity: 0;
+  visibility: hidden;
+}
+.cine .blq-jorge:not(.movida) {
+  --c: 0;
+  --f: 2;
+}
+.cine .blq-jorge:not(.movida) .pinta {
+  transform: scaleX(0);
+}
+.cine .tira-cols:not(.revisada) [data-col="1"] .fila-libre .fila-caja {
+  background: var(--papel);
+}
+.cine .tarde-fondo {
+  position: absolute;
+  left: calc(min(60%, 260px) + 22px);
+  right: 8px;
+  top: var(--arriba-contenido);
+  opacity: 0.6;
+}
+.cine .rotulo-dia .letra-chica {
+  color: var(--tinta-suave);
+}
+
+/* Con las barras de Safari a la vista (~664 px) la tira se aprieta: el subtítulo cede su renglón. */
+@media (max-height: 760px) and (max-width: 899px) {
+  .cine .tira-cabeza span {
+    display: none;
+  }
+  .cine .letra-chica {
+    margin-top: 6px;
+    font-size: 12px;
+  }
+}
+
+@media (min-width: 900px) {
+  .cine .tarde-cerca {
+    --arriba-contenido: 172px;
+  }
+  .letra-chica {
+    font-size: 14px;
+  }
+  .cine .tira {
+    left: calc(40% + 316px);
+    top: 9svh;
+    bottom: auto;
+    width: 290px;
+    height: min(400px, 52svh);
+  }
+  .cine .tarde-fondo {
+    left: calc(40% + 326px);
+    right: auto;
+    top: calc(9svh + min(400px, 52svh) + 22px);
+    width: 250px;
+  }
+  .tira-dia {
+    font-size: 15px;
+  }
+  .fila-caja,
+  .blq-jorge {
+    font-size: 12px;
+  }
+  .mano-pinzas {
+    width: 250px;
+  }
+}
+
+/* ════════════ Versión quieta: el cuadro final de las 16:05 ════════════ */
+
+/* La cita ya está en el sábado y pintada; el viernes a las 17:00 quedó libre. */
+:root:not(.cine) .pasos-tarde {
+  order: 10;
+  counter-reset: none;
+}
+:root:not(.cine) .tarde-cerca {
+  order: 11;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  /* .tel ya trae grid-area: tel y Moli, grid-area: moli (quieto.css). */
+  grid-template-areas:
+    "fondo fondo"
+    "tel moli"
+    "tira tira";
+  align-items: end;
+  gap: 24px 8px;
+  margin: 0 12px;
+  padding: 22px 14px 30px;
+  border-radius: 28px;
+  background: var(--crema);
+}
+:root:not(.cine) .tarde-fondo {
+  grid-area: fondo;
+  width: min(100%, 300px);
+  opacity: 0.6;
+}
+:root:not(.cine) .tira {
+  grid-area: tira;
+  height: 400px;
+  max-width: 360px;
+}
+
+@media (min-width: 900px) {
+  :root:not(.cine) .tarde-cerca {
+    grid-template-columns: 320px 320px 150px;
+    grid-template-areas:
+      "tel tira moli"
+      "tel fondo moli";
+    align-items: start;
+    justify-content: center;
+    margin: 0 var(--margen);
+    padding: 36px;
+  }
+  :root:not(.cine) .tira {
+    height: 400px;
+  }
+  :root:not(.cine) .tarde-fondo {
+    align-self: end;
+  }
+}

@@ -1,6 +1,7 @@
 // Recorre la escena fija (rama r1-moli) pausa por pausa y toma una captura de cada una: las 23:47
 // (P0 a P6), el arrancón del calendario (T1, en cuadros sueltos), las 09:00 (P7 a P9), el recorrido del
-// mostrador (T2, en cuadros sueltos) y las 11:20 (P10 a P12).
+// mostrador (T2, en cuadros sueltos), las 11:20 (P10 a P12), el viaje al consultorio (T3, en cuadros
+// sueltos) y las 16:05 (P13 a P15).
 // Perfiles: iPhone 13 con y sin barras de Safari (390 × 844 y 390 × 664) y escritorio (1280 × 800),
 // más la versión quieta (prefers-reduced-motion) en celular y escritorio.
 // Uso: node scripts/r1-escena.mjs [URL] [carpeta]   (por omisión http://localhost:3100/ y investigacion/r1-capturas)
@@ -10,17 +11,22 @@ import { chromium } from "playwright";
 const URL = process.argv[2] ?? "http://localhost:3100/";
 const SALIDA = process.argv[3] ?? "investigacion/r1-capturas";
 // Las mismas pausas que components/consultorio/pausas.ts (en pantallas de scroll).
-const PANTALLAS = 9.0;
-const PAUSAS = [0, 1.0, 1.7, 2.35, 3.05, 3.7, 4.5, 5.3, 6.0, 6.65, 7.45, 8.1, 8.75];
+const PANTALLAS = 11.25;
+const PAUSAS = [0, 1.0, 1.7, 2.35, 3.05, 3.7, 4.5, 5.3, 6.0, 6.65, 7.45, 8.1, 8.75, 9.65, 10.3, 11.0];
 // Lo que pasa a media pausa y no queda en el reposo: la lupa sobre las 10:00 (P2), el lápiz escribiendo
 // (P4), Ana volteando el letrero (P7), la mano sobre la cita (P8), Ana caminando al celular (P9), Moli
-// hablando (P10), la estafeta en el aire y Moli a saltitos (P11) y Ana tecleando (P12).
-const ACCION = { 2: 1700, 4: 1750, 7: 1750, 8: 1000, 9: 1000, 10: 1700, 11: 900, 12: 700 };
-const ACCION2 = { 11: 2300 };
-const ESPERA = { 0: 900, 2: 4300, 4: 3700, 7: 4000, 8: 3000, 9: 2800, 10: 3300, 11: 4200, 12: 3000 };
+// hablando (P10), la estafeta en el aire y Moli a saltitos (P11), Ana tecleando (P12), la lupa sobre la
+// cita y sobre el sábado (P13), las pinzas cargando la cita y la cita ya pintada (P14) y Moli hablando (P15).
+const ACCION = { 2: 1700, 4: 1750, 7: 1750, 8: 1000, 9: 1000, 10: 1700, 11: 900, 12: 700, 13: 1500, 14: 2050, 15: 700 };
+const ACCION2 = { 11: 2300, 13: 2900, 14: 3250 };
+const ESPERA = { 0: 900, 2: 4300, 4: 3700, 7: 4000, 8: 3000, 9: 2800, 10: 3300, 11: 4200, 12: 3000, 13: 5200, 14: 4000, 15: 2600 };
 // Las transiciones: el pulgar baja parejo y se toman cuadros en el camino (sin pararse, para que no se
-// asiente). T1 entre P6 y P7 y T2 entre P9 y P10.
-const TRANSICIONES = { 7: { nombre: "T1", cuadros: [4.66, 4.78, 4.9, 5.02, 5.14] }, 10: { nombre: "T2", cuadros: [6.8, 6.9, 7.0, 7.1, 7.2, 7.3] } };
+// asiente). T1 entre P6 y P7, T2 entre P9 y P10 y T3 entre P12 y P13.
+const TRANSICIONES = {
+  7: { nombre: "T1", cuadros: [4.66, 4.78, 4.9, 5.02, 5.14] },
+  10: { nombre: "T2", cuadros: [6.8, 6.9, 7.0, 7.1, 7.2, 7.3] },
+  13: { nombre: "T3", cuadros: [8.86, 8.94, 9.02, 9.1, 9.18, 9.26, 9.36] },
+};
 
 const PERFILES = [
   { nombre: "movil-844", viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true },

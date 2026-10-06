@@ -1,6 +1,6 @@
 import type { CSSProperties } from "react";
-import { Bolita, CercaDia, CercaMediodia, PlanoDia, RotulosDia, RotulosMediodia } from "../dia/PlanosDia";
-import { CHAT_MEDIODIA } from "../dia/textos";
+import { Bolita, CercaDia, CercaMediodia, CercaTarde, PlanoDia, RotulosDia, RotulosMediodia, RotulosTarde } from "../dia/PlanosDia";
+import { CHAT_MEDIODIA, CHAT_TARDE } from "../dia/textos";
 import { ManoHerramienta, Moli } from "../moli/Moli";
 import { Rejilla, Telefono } from "../piezas";
 import { FILTRO_FONDO, LIENZO, PUNTOS, dibujoApagado, dibujoEncendido, mancha } from "./dibujo";
@@ -71,6 +71,19 @@ function Transcripcion() {
           </li>
         ))}
       </ol>
+      <p>
+        A las 16:05 el doctor atiende a un paciente en el sillón y otro paciente, Jorge, pide mover su cita del viernes
+        al sábado. El asistente busca su cita (una consulta de seguimiento que él mismo agendó, el viernes 16 a las 17:00),
+        revisa qué horas siguen libres el sábado 17 (las 10:00 y las 12:30) y, cuando Jorge elige, la mueve en el
+        calendario: el viernes a las 17:00 queda libre.
+      </p>
+      <ol>
+        {CHAT_TARDE.map((b, i) => (
+          <li key={i}>
+            {b.de === "paciente" ? "Paciente" : "Asistente"}, {b.hora}: «{b.texto}»
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }
@@ -89,7 +102,7 @@ function Agenda() {
 
 /**
  * El día en el consultorio, en una sola escena fija: 23:47 (la portada y la noche), el arrancón del
- * calendario (T1) y las 09:00 (`../dia/`).
+ * calendario (T1), las 09:00, las 11:20 y las 16:05 (`../dia/`).
  * 23:47: la portada y la noche. Plano general (el consultorio cerrado, la luz del celular y Moli
  * dormitando) y primer plano (el chat, la agenda y Moli actuando cada capacidad).
  * Sin JavaScript o con movimiento reducido, todo se ve quieto y completo (clase `cine` ausente).
@@ -117,6 +130,7 @@ export function EscenaNoche() {
           </ol>
           <RotulosDia />
           <RotulosMediodia />
+          <RotulosTarde />
         </div>
 
         <PlanoDia />
@@ -191,6 +205,7 @@ export function EscenaNoche() {
 
         <CercaDia />
         <CercaMediodia />
+        <CercaTarde />
         <Bolita />
 
         <p className="desliza" aria-hidden="true">
