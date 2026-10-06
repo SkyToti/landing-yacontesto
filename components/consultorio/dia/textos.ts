@@ -35,7 +35,7 @@ export const AGENDA_COMPU = [
 
 /**
  * Las 11:20 (`GUION-LANDING.md`, escena 3): un paciente pide hablar con el doctor y el chat pasa a tu
- * equipo. PROPUESTA del paso 3 (5-oct-2026), pendiente de que Diego la apruebe.
+ * equipo. Textos nuevos del paso 3: Diego los aprobó tal cual el 5-oct-2026 (~23:50).
  *
  * Cotejado el 5-oct-2026 contra `recepcionista-ia-whatsapp` (`main` = 7e6ef5a):
  * - P10 le pasa el chat a tu equipo ............... src/brain.ts (herramienta `pasar_a_humano`: «Úsala
