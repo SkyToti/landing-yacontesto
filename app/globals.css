@@ -1,26 +1,11 @@
-@import "tailwindcss";
-@source not "../investigacion";
-@import "./estilos/tokens.css";
-@import "./estilos/base.css";
-@import "./estilos/cielo.css";
-@import "./estilos/muesca.css";
-@import "./estilos/boton.css";
-@import "./estilos/escenas.css";
-@import "./estilos/tambor.css";
-@import "./estilos/telefono.css";
-@import "./estilos/dia.css";
-@import "./estilos/precio.css";
-@import "./estilos/preguntas.css";
-@import "./estilos/cierre.css";
-@import "./estilos/tableta.css";
-@import "./estilos/quieto.css";
-
-/* Tokens de la marca para las utilidades de Tailwind (los componentes de Vengeance las usan). */
-@theme inline {
-  --color-pino: #0c3d22;
-  --color-menta: #91d5b8;
-  --color-porcelana: #f7f9f8;
-  --color-tinta: var(--tinta);
-  --color-marca: var(--marca);
-  --font-sans: var(--f-texto);
-}
+/*
+ * Identidad nueva (rebranding del 5-oct-2026, rama r1-moli). La paleta de gsap.com aplicada como
+ * gsap.com: tinta y crema dominan, y el verde es solo acento (lo que Moli resolvió).
+ * Guion: proyecto/ventas/rebranding/GUION-LANDING.md.
+ */
+@import "./estilos-consultorio/tokens.css";
+@import "./estilos-consultorio/base.css";
+@import "./estilos-consultorio/noche.css";
+@import "./estilos-consultorio/quieto.css";
+@import "./estilos-consultorio/pastilla.css";
+@import "./estilos-consultorio/obra.css";

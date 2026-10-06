@@ -1,28 +1,27 @@
 import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
-import { Sofia_Sans, Sofia_Sans_Condensed, Sofia_Sans_Extra_Condensed } from "next/font/google";
+import { Bricolage_Grotesque, Instrument_Sans, Patrick_Hand_SC } from "next/font/google";
 import "./globals.css";
 
-// Sofia Sans (Latinotype) en tres anchos del mismo esqueleto: texto, titulares y horas.
-// Pesos estáticos (no el archivo variable): se dibujan igual en todos los motores y solo se baja
-// lo que se usa. Se precarga solo el titular, que es el LCP; lo demás entra con swap.
-const texto = Sofia_Sans({
+// Identidad nueva (rebranding del 5-oct-2026): Bricolage Grotesque en titulares, con su tamaño óptico
+// (en grande se vuelve de cartel), e Instrument Sans en el texto. Patrick Hand SC solo para las notas a
+// mano de Moli, como en su hoja de personaje. Se precarga solo el titular, que es el LCP.
+const titular = Bricolage_Grotesque({
   subsets: ["latin"],
-  weight: ["400", "600", "700"],
+  axes: ["opsz"],
+  variable: "--font-titular",
+  display: "swap",
+});
+const texto = Instrument_Sans({
+  subsets: ["latin"],
   variable: "--font-texto",
   display: "swap",
   preload: false,
 });
-const titular = Sofia_Sans_Condensed({
+const mano = Patrick_Hand_SC({
   subsets: ["latin"],
-  weight: ["700", "800"],
-  variable: "--font-titular",
-  display: "swap",
-});
-const hora = Sofia_Sans_Extra_Condensed({
-  subsets: ["latin"],
-  weight: ["700", "800"],
-  variable: "--font-hora",
+  weight: "400",
+  variable: "--font-mano",
   display: "swap",
   preload: false,
 });
@@ -66,22 +65,24 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#0C3D22",
-  colorScheme: "dark light",
+  // Sin viewportFit "cover", env(safe-area-inset-*) vale 0 y la pastilla no libra la barra de inicio.
+  viewportFit: "cover",
+  themeColor: "#0E100F",
+  colorScheme: "dark",
 };
 
 // Antes de pintar: con movimiento permitido, la historia se cuenta con scroll («cine»).
 // Con prefers-reduced-motion, sin JavaScript, con ?movimiento=0 o en pantallas de menos de 500 px
-// de alto (celular acostado, zoom de 200 %), se ve quieta y completa: ahí el teléfono no cabe.
+// de alto (celular acostado, zoom de 200 %), se ve quieta y completa.
 // Si en 20 s no llegó el JavaScript que la cuenta (red rota, error), se vuelve a la versión quieta.
 const arranque = `(function(){var d=document.documentElement;try{var q=new URLSearchParams(location.search).get('movimiento')==='0';if(q||matchMedia('(prefers-reduced-motion: reduce)').matches||matchMedia('(max-height: 499px)').matches)return;d.classList.add('cine');setTimeout(function(){if(!window.__directorVivo)d.classList.remove('cine')},20000)}catch(e){d.classList.remove('cine')}})();`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     // suppressHydrationWarning: el guion de arranque agrega la clase «cine» antes de hidratar.
-    <html lang="es-MX" className={`${texto.variable} ${titular.variable} ${hora.variable}`} suppressHydrationWarning>
+    <html lang="es-MX" className={`${titular.variable} ${texto.variable} ${mano.variable}`} suppressHydrationWarning>
       <head>
-        {/* En línea y en el <head>: corre antes de pintar (next/script lo encolaba para después). */}
+        {/* En línea y en el <head>: corre antes de pintar. */}
         <script dangerouslySetInnerHTML={{ __html: arranque }} />
       </head>
       <body>{children}</body>

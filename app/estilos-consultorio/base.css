@@ -1,0 +1,146 @@
+/* Base: la noche es el fondo, la tipografía con oficio y el foco siempre visible. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--tinta);
+  color: var(--crema);
+  color-scheme: dark;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--f-texto);
+  font-size: 17px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-kerning: normal;
+  overflow-x: clip;
+}
+
+h1,
+h2,
+h3,
+p,
+dl,
+dd {
+  margin: 0;
+}
+
+ol,
+ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--lima);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+::selection {
+  background: var(--lima);
+  color: var(--tinta);
+}
+
+.solo-lectores {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.sin-corte {
+  white-space: nowrap;
+}
+
+/* Titulares: Bricolage con su tamaño óptico, que en grande se vuelve de cartel. */
+.titular,
+.titulo-paso {
+  font-family: var(--f-titular);
+  font-optical-sizing: auto;
+  font-weight: 800;
+  text-wrap: balance;
+}
+
+.titular {
+  font-size: clamp(34px, 9.6vw, 78px);
+  line-height: 0.98;
+  letter-spacing: -0.03em;
+}
+
+.bajada {
+  margin-top: 12px;
+  max-width: 30ch;
+  font-size: 17px;
+  line-height: 1.4;
+  color: var(--crema-suave);
+}
+
+.titulo-paso {
+  font-size: clamp(23px, 6.3vw, 42px);
+  line-height: 1.04;
+  letter-spacing: -0.025em;
+}
+
+.texto-paso {
+  margin-top: 6px;
+  max-width: 36ch;
+  font-size: 16px;
+  line-height: 1.4;
+  color: var(--crema-suave);
+}
+
+@media (min-width: 900px) {
+  .bajada {
+    font-size: 20px;
+  }
+  .texto-paso {
+    font-size: 19px;
+  }
+}
+
+/* La marca, mientras se decide el logo (ruta A, B o C): el nombre escrito en Bricolage. */
+.cabecera {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  height: 52px;
+  padding: 0 var(--margen);
+  pointer-events: none;
+}
+
+.marca {
+  pointer-events: auto;
+  font: 800 21px/1 var(--f-titular);
+  letter-spacing: -0.02em;
+  color: var(--crema);
+  text-decoration: none;
+}
+
+/* Las notas a mano de Moli: letra de su hoja, un poco chuecas. */
+.nota {
+  font-family: var(--f-mano);
+  font-size: 26px;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+}

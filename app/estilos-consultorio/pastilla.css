@@ -1,0 +1,68 @@
+/*
+ * La pastilla de abajo: Precio · Escríbenos por WhatsApp. Siempre en el mismo lugar, crema con borde
+ * de tinta (se lee igual sobre la noche y sobre la luz del celular), con la sombra dura de las tarjetas
+ * de la hoja de Moli. Nunca tapa nada: la escena reserva --zona-pastilla.
+ */
+.pastilla {
+  position: fixed;
+  z-index: 40;
+  left: 50%;
+  bottom: var(--pastilla-abajo);
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: var(--pastilla-alto);
+  padding: 6px;
+  border-radius: 999px;
+  background: var(--crema);
+  color: var(--tinta);
+  box-shadow:
+    0 0 0 2.5px var(--tinta),
+    4px 4px 0 2.5px var(--tinta);
+}
+.pastilla a {
+  display: inline-flex;
+  align-items: center;
+  height: 46px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.pastilla :focus-visible {
+  outline-color: var(--tinta);
+}
+.p-precio {
+  padding: 0 14px 0 16px;
+}
+.p-whatsapp {
+  gap: 8px;
+  padding: 0 16px 0 18px;
+  background: var(--tinta);
+  color: var(--crema);
+}
+.p-whatsapp svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: translate 0.2s ease;
+}
+@media (hover: hover) {
+  .p-precio:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .p-whatsapp:hover svg {
+    translate: 3px 0;
+  }
+}
+.p-whatsapp:active {
+  scale: 0.97;
+}

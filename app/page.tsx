@@ -1,15 +1,7 @@
-import { Cielo } from "@/components/historia/Cielo";
-import { Director } from "@/components/historia/Director";
-import { EscenaAmanece } from "@/components/historia/EscenaAmanece";
-import { EscenaCierre } from "@/components/historia/EscenaCierre";
-import { EscenaDia } from "@/components/historia/EscenaDia";
-import { EscenaEquipo } from "@/components/historia/EscenaEquipo";
-import { EscenaInstala } from "@/components/historia/EscenaInstala";
-import { EscenaNoche } from "@/components/historia/EscenaNoche";
-import { Muesca } from "@/components/historia/Muesca";
-import { Pie } from "@/components/historia/Pie";
-import { SeccionPrecio } from "@/components/historia/SeccionPrecio";
-import { SeccionPreguntas } from "@/components/historia/SeccionPreguntas";
+import { PRECIO } from "@/components/historia/datos";
+import { DirectorNoche } from "@/components/consultorio/noche/DirectorNoche";
+import { EscenaNoche } from "@/components/consultorio/noche/EscenaNoche";
+import { ENLACE_ESCRIBENOS, Pastilla } from "@/components/consultorio/Pastilla";
 
 const datosEstructurados = {
   "@context": "https://schema.org",
@@ -23,32 +15,54 @@ const datosEstructurados = {
     "Asistente con inteligencia artificial para el WhatsApp de clínicas dentales: contesta al instante, revisa la agenda y deja la cita en el calendario de la clínica.",
 };
 
+const pesos = (n: number) => `$${n.toLocaleString("es-MX")}`;
+
 /**
- * «Un día en tu consultorio»: el scroll es el reloj de un día. Cada escena es una hora y una
- * capacidad real del asistente. Sin JavaScript o con movimiento reducido, todo se ve quieto y
- * completo; con movimiento, el Director (GSAP) lo cuenta con el scroll.
+ * «Un día en tu consultorio», rediseño con Moli (R-1, rama r1-moli). Paso 1: solo está construida
+ * la escena de las 23:47; lo que sigue del día está anunciado abajo, en obra.
+ * Guion: proyecto/ventas/rebranding/GUION-LANDING.md.
  */
 export default function Inicio() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datosEstructurados) }} />
-      <a className="saltar" href="#precio">
-        Saltar la historia e ir al precio
-      </a>
-      <Cielo />
-      <Muesca />
+      <header className="cabecera">
+        <a className="marca" href="#noche" aria-label="YaContesto, inicio">
+          YaContesto
+        </a>
+      </header>
       <main>
         <EscenaNoche />
-        <EscenaAmanece />
-        <EscenaEquipo />
-        <EscenaDia />
-        <EscenaInstala />
-        <SeccionPrecio />
-        <SeccionPreguntas />
-        <EscenaCierre />
+        <section className="en-obra" id="precio" aria-labelledby="titulo-obra">
+          <p className="ceja">Prototipo · paso 1 de varios</p>
+          <h2 id="titulo-obra" className="titulo-paso">
+            El día sigue: 09:00, 11:20, 16:05 y 19:00.
+          </h2>
+          <p className="texto-paso">
+            Aquí van las otras cuatro escenas, el precio y las preguntas. Por ahora solo está construida la de las 23:47.
+          </p>
+          <dl className="precio-corto">
+            <div>
+              <dt>Precio fundador</dt>
+              <dd>
+                {pesos(PRECIO.instalacionFundador)} de instalación + {pesos(PRECIO.escalones.base)} al mes, hasta{" "}
+                {PRECIO.escalones.hasta} pacientes atendidos.
+              </dd>
+            </div>
+            <div>
+              <dt>Precio de lista</dt>
+              <dd>
+                {pesos(PRECIO.instalacionLista)} + desde {pesos(PRECIO.mensualidadLista)} al mes.
+              </dd>
+            </div>
+          </dl>
+          <a className="boton-obra" href={ENLACE_ESCRIBENOS} target="_blank" rel="noopener">
+            Escríbenos por WhatsApp
+          </a>
+        </section>
       </main>
-      <Pie />
-      <Director />
+      <Pastilla />
+      <DirectorNoche />
     </>
   );
 }

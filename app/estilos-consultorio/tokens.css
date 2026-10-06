@@ -1,0 +1,36 @@
+/*
+ * Tokens de la identidad nueva. La regla de lectura del guion:
+ * verde = lo hizo Moli · lima = está libre · crema = lo hizo tu equipo · tinta rayada = ocupado.
+ */
+:root {
+  --tinta: #0e100f;
+  --crema: #fffce1;
+  /* Solo lo que Moli resolvió. Está a 0.061 del verde de WhatsApp: nunca fondo de pantalla ni texto sobre crema. */
+  --verde: #0ae448;
+  /* Lo libre o posible. */
+  --lima: #abff84;
+  /* #3CED5B queda reservado: se asigna con el logo. */
+  --papel: #ffffff;
+  /* El consultorio fuera de la luz: un tono plano, no un degradado. */
+  --apagado: #57584f;
+  --crema-suave: rgb(255 252 225 / 0.74);
+  --tinta-suave: rgb(14 16 15 / 0.72);
+  --rayado: rgb(14 16 15 / 0.2);
+
+  --f-titular: var(--font-titular), "Arial Narrow", system-ui, sans-serif;
+  --f-texto: var(--font-texto), system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --f-mano: var(--font-mano), "Comic Sans MS", "Chalkboard SE", cursive;
+
+  --margen: 20px;
+  --pastilla-alto: 58px;
+  --pastilla-abajo: max(12px, env(safe-area-inset-bottom));
+  /* Todo lo que la escena pone abajo vive arriba de esta línea: la pastilla nunca tapa nada. */
+  --zona-pastilla: calc(var(--pastilla-alto) + var(--pastilla-abajo) + 14px);
+  --arriba-contenido: 172px;
+}
+
+@media (min-width: 900px) {
+  :root {
+    --margen: 6vw;
+  }
+}

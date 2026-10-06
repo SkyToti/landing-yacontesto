@@ -1,0 +1,677 @@
+/*
+ * La escena de las 23:47. Piezas comunes a los dos modos y, abajo, el modo «cine» (la escena se
+ * cuenta con scroll). El modo quieto está en quieto.css.
+ */
+
+/* ── Moli ── */
+.moli {
+  position: relative;
+  transform-origin: 50% 92%;
+}
+.moli-respira {
+  transform-origin: 50% 90%;
+}
+.moli-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+/* La onda sale del micrófono (296, 262 en el lienzo de Moli). */
+.moli-onda {
+  position: absolute;
+  left: 72.6%;
+  top: 65.5%;
+  width: 64%;
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border: 4px solid var(--tinta);
+  border-radius: 50%;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+/* En el primer plano Moli está a la derecha del celular: se voltea para mirarlo, con el micrófono de su lado. */
+.moli-cerca .moli-svg {
+  scale: -1 1;
+}
+.moli-cerca .moli-onda {
+  left: 27.4%;
+}
+.moli-general {
+  position: absolute;
+}
+
+/* ── La mano de guante ── */
+.mano {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 250px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.mano-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+/* ── El plano general: el consultorio, la luz del celular y la notificación ── */
+.lamina .dib {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.luz {
+  position: absolute;
+  inset: 0;
+}
+.luz-chica {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.notif {
+  position: absolute;
+  z-index: 3;
+  width: min(296px, 80vw);
+  translate: -50% -100%;
+}
+.notif-tarjeta {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px 11px;
+  border: 2.5px solid var(--tinta);
+  border-radius: 16px;
+  background: var(--crema);
+  color: var(--tinta);
+}
+.notif-av,
+.tel-av {
+  flex: none;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--lima);
+  color: var(--tinta);
+  font-family: var(--f-texto);
+  font-weight: 700;
+}
+.notif-av {
+  width: 34px;
+  height: 34px;
+  border: 2px solid var(--tinta);
+  font-size: 13px;
+}
+.notif-cuerpo {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+.notif-cabeza {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11.5px;
+  line-height: 1.3;
+  color: var(--tinta-suave);
+}
+.notif-cuerpo b {
+  font-size: 14.5px;
+  line-height: 1.2;
+}
+.notif-texto {
+  font-size: 14.5px;
+  line-height: 1.3;
+}
+
+.plano-general .nota {
+  position: absolute;
+  z-index: 2;
+  color: var(--crema);
+}
+/* Cae dentro de la luz del celular: tinta sobre crema, como en la hoja de Moli. */
+.plano-general .nota-quien,
+.plano-general .nota-z {
+  color: var(--tinta);
+  font-size: 22px;
+  rotate: 5deg;
+}
+.nota-quien > span {
+  display: inline-block;
+}
+.nota-z {
+  font-size: 30px;
+  translate: 0 -100%;
+}
+.nota-z > span {
+  display: inline-block;
+}
+.nota-z > span + span {
+  font-size: 0.72em;
+  margin-left: 3px;
+}
+
+/* ── El primer plano: el celular, la hoja de la agenda y Moli ── */
+.luz-cerca {
+  position: absolute;
+  fill: var(--crema);
+}
+.primer-plano .nota {
+  position: absolute;
+  z-index: 6;
+  color: var(--tinta);
+  rotate: -7deg;
+}
+
+.tel {
+  padding: 6px;
+  border: 3px solid var(--tinta);
+  border-radius: 30px;
+  background: var(--tinta);
+}
+.tel-pantalla {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 24px;
+  background: var(--papel);
+}
+.tel-cabeza {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 9px 12px;
+  background: var(--tinta);
+  color: var(--crema);
+}
+.tel-av {
+  width: 30px;
+  height: 30px;
+  font-size: 12px;
+}
+.tel-quien {
+  display: grid;
+  min-width: 0;
+  line-height: 1.2;
+}
+.tel-quien b {
+  font-size: 14px;
+  font-weight: 600;
+}
+.tel-quien small {
+  font-size: 10.5px;
+  color: var(--crema-suave);
+}
+.tel-chat {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  padding: 10px 9px;
+  background: var(--crema);
+}
+.chat {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.burbuja {
+  max-width: 88%;
+  padding: 7px 10px 5px;
+  border: 2.2px solid var(--tinta);
+  color: var(--tinta);
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.36;
+}
+.burbuja time {
+  display: block;
+  margin-top: 2px;
+  font-size: 10.5px;
+  line-height: 1;
+  text-align: right;
+  color: rgb(14 16 15 / 0.7);
+}
+.de-paciente {
+  align-self: flex-start;
+  border-radius: 15px 15px 15px 4px;
+  background: var(--papel);
+}
+.chat-dia {
+  align-self: center;
+  margin-bottom: 2px;
+  padding: 3px 10px;
+  border: 1.5px solid var(--tinta);
+  border-radius: 999px;
+  background: var(--papel);
+  color: var(--tinta);
+  font-size: 10.5px;
+  font-weight: 600;
+}
+/* Lo que contestó Moli: verde. */
+.de-clinica {
+  align-self: flex-end;
+  border-radius: 15px 15px 4px 15px;
+  background: var(--verde);
+}
+
+.hoja {
+  display: flex;
+  flex-direction: column;
+  padding: 12px 12px 16px;
+  border: 2.5px solid var(--tinta);
+  border-radius: 16px;
+  background: var(--papel);
+  box-shadow: 5px 5px 0 var(--tinta);
+  color: var(--tinta);
+  rotate: -1.2deg;
+}
+.hoja-cabeza b {
+  display: block;
+  font-family: var(--f-titular);
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+.hoja-cabeza span {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--tinta-suave);
+}
+.hoja-rejilla {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  margin-top: 16px;
+}
+.hoja-hora {
+  position: absolute;
+  left: 0;
+  right: 0;
+  translate: 0 -50%;
+  font-size: 10.5px;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--tinta-suave);
+}
+.hoja-hora::after {
+  content: "";
+  position: absolute;
+  left: 40px;
+  right: 0;
+  top: 50%;
+  border-top: 1.5px dashed var(--rayado);
+}
+.hoja-columna {
+  position: absolute;
+  inset: 0 0 0 42px;
+}
+.blq {
+  position: absolute;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 4px 6px;
+  overflow: hidden;
+  border: 2px solid var(--tinta);
+  border-radius: 7px;
+  background: var(--papel);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+.lado-izq {
+  right: calc(50% + 2px);
+}
+.lado-der {
+  left: calc(50% + 2px);
+}
+.blq-ocupado {
+  background: repeating-linear-gradient(135deg, var(--rayado) 0 2px, transparent 2px 7px), var(--papel);
+}
+.blq-otro {
+  border-style: dashed;
+  background: repeating-linear-gradient(45deg, var(--rayado) 0 2px, transparent 2px 7px), var(--papel);
+}
+.blq-ocupado span,
+.blq-otro span {
+  padding: 0 3px;
+  border-radius: 3px;
+  background: var(--papel);
+}
+.blq-pedida {
+  flex-direction: row-reverse;
+  justify-content: flex-end;
+  border-style: dashed;
+}
+/* Lo libre: lima. */
+.blq-libre {
+  background: var(--lima);
+}
+/* La cita que dejó Moli: verde. */
+.blq-cita {
+  z-index: 2;
+  background: var(--verde);
+}
+.equis,
+.palomita {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  fill: none;
+  stroke: var(--tinta);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.equis path {
+  stroke-dasharray: 40;
+}
+
+/* «desliza»: un monito, como las instrucciones de Adrien Lamy, en una pastillita que se lee sobre todo. */
+.desliza {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px 5px 10px;
+  border: 2px solid var(--crema);
+  border-radius: 999px;
+  background: var(--tinta);
+  font: 19px/1 var(--f-mano);
+  color: var(--crema);
+}
+.desliza svg {
+  width: 16px;
+  height: 29px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ════════════ Modo cine: la escena fija y el scroll como reloj ════════════ */
+
+/* 4.75 pantallas de scroll (las pausas viven en director.ts). */
+.cine .noche {
+  position: relative;
+  height: calc(5.75 * 100svh);
+}
+.cine .escenario {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+.cine .plano {
+  position: absolute;
+  inset: 0;
+  container-type: size;
+}
+/*
+ * La lámina llena el ancho (o el alto, si la pantalla es muy alta) y se centra en el espacio libre:
+ * el punto y = 540 del lienzo (la mitad de lo que importa, de la ventana al mostrador) cae a la mitad
+ * entre el titular (~144 px de alto en el celular) y la pastilla. Debajo del mostrador solo hay piso.
+ */
+.cine .lamina {
+  /* En el celular, la pared (y = 412) empieza justo abajo del titular; debajo del mostrador solo hay piso. */
+  --tope-lamina: calc(68px + 46vw - max(100cqw, 100cqh * 0.5334) * 0.8583);
+  position: absolute;
+  left: 50%;
+  top: var(--tope-lamina);
+  width: max(100cqw, 100cqh * 0.5334);
+  aspect-ratio: 480 / 900;
+  translate: -50% 0;
+  transform-origin: 67.3% 66%;
+}
+.cine .primer-plano {
+  z-index: 2;
+  opacity: 0;
+  visibility: hidden;
+}
+.cine .rotulos {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+}
+.cine .rotulo {
+  position: absolute;
+  top: 62px;
+  left: var(--margen);
+  right: var(--margen);
+  opacity: 0;
+}
+.cine .rotulo-portada {
+  opacity: 1;
+}
+
+.cine .luz-cerca {
+  left: -26%;
+  width: 152%;
+  top: 19%;
+  height: 102%;
+}
+.cine .tel {
+  position: absolute;
+  left: 12px;
+  top: var(--arriba-contenido);
+  bottom: var(--zona-pastilla);
+  width: min(60%, 260px);
+}
+.cine .hoja {
+  position: absolute;
+  z-index: 3;
+  left: 10px;
+  top: calc(var(--arriba-contenido) - 4px);
+  bottom: calc(var(--zona-pastilla) + 4px);
+  width: min(62%, 270px);
+  opacity: 0;
+  visibility: hidden;
+}
+.cine .moli-cerca {
+  position: absolute;
+  z-index: 4;
+  right: -2px;
+  bottom: calc(var(--zona-pastilla) - 8px);
+  width: min(40cqw, 170px);
+}
+.cine .mano-cerca {
+  z-index: 5;
+}
+.cine .nota-yo,
+.cine .nota-listo {
+  right: 9%;
+  bottom: calc(var(--zona-pastilla) + min(40cqw, 170px) * 1.19 - 4px);
+  font-size: 30px;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.cine .desliza {
+  position: absolute;
+  z-index: 5;
+  left: 50%;
+  bottom: calc(var(--zona-pastilla) + 6px);
+  translate: -50% 0;
+  transition: opacity 0.3s;
+}
+.cine .noche:not([data-pausa="0"]) .desliza {
+  opacity: 0 !important;
+}
+
+/* Lo que pasa solo al abrir, sin esperar a JavaScript: el celular se enciende y llega el mensaje. */
+@media (prefers-reduced-motion: no-preference) {
+  .cine .luz-grande > svg {
+    animation: enciende 0.9s steps(1, end) 0.5s both;
+  }
+  .cine .notif-tarjeta {
+    animation: notif-entra 0.55s cubic-bezier(0.2, 1.5, 0.35, 1) 1s both;
+  }
+  .cine .nota-quien > span {
+    animation: escribe 0.5s steps(6) 1.6s both;
+  }
+  .cine .desliza {
+    animation: aparece 0.4s steps(3) 2.4s both;
+  }
+  .cine .moli-respira {
+    animation: respira 3.6s ease-in-out infinite;
+  }
+  .cine .nota-z > span {
+    animation: zeta 2.6s steps(10) infinite;
+  }
+  .cine .nota-z > span + span {
+    animation-delay: 1.3s;
+  }
+}
+
+@keyframes enciende {
+  0% {
+    opacity: 0;
+  }
+  16% {
+    opacity: 0.65;
+  }
+  28% {
+    opacity: 0.1;
+  }
+  44% {
+    opacity: 0.9;
+  }
+  56% {
+    opacity: 0.4;
+  }
+  70%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes notif-entra {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes escribe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes aparece {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes respira {
+  50% {
+    transform: scale(0.994, 1.014);
+  }
+}
+@keyframes zeta {
+  0% {
+    opacity: 0;
+    transform: translate(0, 4px);
+  }
+  25%,
+  75% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(10px, -22px);
+  }
+}
+
+/* ── Escritorio: el texto a la izquierda y la escena a la derecha, como Illoca ── */
+@media (min-width: 900px) {
+  .cine .rotulo {
+    top: 50%;
+    right: auto;
+    width: min(26vw, 400px);
+    translate: 0 -50%;
+  }
+  .cine .rotulo-portada {
+    width: min(40vw, 560px);
+  }
+  .cine .desliza {
+    left: var(--margen);
+    bottom: 12svh;
+    translate: none;
+  }
+  .cine .plano-general {
+    left: 44%;
+  }
+  /* En escritorio, lo que importa (de la ventana al mostrador, y = 540) queda a media pantalla. */
+  .cine .lamina {
+    --tope-lamina: calc(50cqh - max(100cqw, 100cqh * 0.5334) * 1.125);
+  }
+  .cine .luz-cerca {
+    left: 32%;
+    width: 74%;
+    top: 3%;
+    height: 100%;
+  }
+  .cine .tel {
+    left: 40%;
+    top: calc(50% - min(600px, 78svh) / 2);
+    bottom: auto;
+    width: 296px;
+    height: min(600px, 78svh);
+  }
+  /* La hoja va arriba: así la mano de Moli flota sobre su cabeza y nunca le tapa la cara. */
+  .cine .hoja {
+    left: calc(40% + 316px);
+    top: 9svh;
+    bottom: auto;
+    width: 290px;
+    height: min(500px, 64svh);
+  }
+  .cine .moli-cerca {
+    right: 1vw;
+    bottom: 9svh;
+    width: 160px;
+  }
+  .cine .mano-cerca {
+    width: 300px;
+  }
+  .cine .nota-yo,
+  .cine .nota-listo {
+    right: 3.4vw;
+    bottom: calc(9svh + 196px);
+    font-size: 34px;
+  }
+  .burbuja {
+    font-size: 14.5px;
+  }
+  .hoja-cabeza b {
+    font-size: 21px;
+  }
+  .blq {
+    font-size: 12px;
+  }
+}

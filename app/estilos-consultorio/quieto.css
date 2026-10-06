@@ -1,0 +1,140 @@
+/*
+ * La versión quieta: sin JavaScript, con prefers-reduced-motion o en pantallas bajas (sin la clase
+ * «cine»). Es la página por defecto. Cada parte se ve en su estado final y en el orden del día:
+ * el titular, el consultorio con el celular encendido, los cinco pasos y el chat completo con la
+ * cita ya pintada. Sin línea viva, sin saltos y sin cuadros.
+ */
+
+:root:not(.cine) .rasgos-cine,
+.cine .rasgos-quieta {
+  display: none;
+}
+
+:root:not(.cine) .escenario {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 80px 0 calc(var(--zona-pastilla) + 24px);
+}
+:root:not(.cine) .rotulos {
+  display: contents;
+}
+:root:not(.cine) .rotulo-portada {
+  order: 1;
+  padding: 0 var(--margen);
+}
+
+/* El consultorio: se ve la parte de abajo de la lámina (de la pared al mostrador). */
+:root:not(.cine) .plano-general {
+  order: 2;
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  aspect-ratio: 480 / 560;
+  margin: 0 auto;
+  overflow: hidden;
+}
+:root:not(.cine) .lamina {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  aspect-ratio: 480 / 900;
+}
+/* El estado final: la cita ya está puesta y las 11:00 chocan con ella; lo libre ya no aplica. */
+:root:not(.cine) .blq-libre,
+:root:not(.cine) .nota-z,
+:root:not(.cine) .desliza,
+:root:not(.cine) .luz-cerca,
+:root:not(.cine) .mano-cerca,
+:root:not(.cine) .nota-yo,
+:root:not(.cine) .nota-listo {
+  display: none;
+}
+
+/* Los cinco pasos, numerados. */
+:root:not(.cine) .pasos {
+  order: 3;
+  display: grid;
+  gap: 22px;
+  padding: 0 var(--margen);
+  counter-reset: paso;
+}
+:root:not(.cine) .pasos .rotulo {
+  position: relative;
+  padding-left: 46px;
+}
+:root:not(.cine) .pasos .rotulo::before {
+  counter-increment: paso;
+  content: counter(paso);
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--crema);
+  color: var(--tinta);
+  font: 800 16px/1 var(--f-titular);
+}
+
+/* El chat completo y la agenda con la cita, sobre papel crema, con Moli feliz al lado. */
+:root:not(.cine) .primer-plano {
+  order: 4;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 96px;
+  grid-template-areas:
+    "tel moli"
+    "hoja hoja";
+  align-items: end;
+  gap: 24px 8px;
+  margin: 0 12px;
+  padding: 22px 14px 30px;
+  border-radius: 28px;
+  background: var(--crema);
+}
+:root:not(.cine) .tel {
+  grid-area: tel;
+  max-width: 330px;
+}
+:root:not(.cine) .tel-chat {
+  overflow: visible;
+}
+:root:not(.cine) .moli-cerca {
+  grid-area: moli;
+  width: 96px;
+}
+:root:not(.cine) .hoja {
+  grid-area: hoja;
+  height: 440px;
+  max-width: 360px;
+}
+
+@media (min-width: 900px) {
+  :root:not(.cine) .escenario {
+    padding-top: 120px;
+  }
+  :root:not(.cine) .titular {
+    max-width: 14ch;
+  }
+  :root:not(.cine) .pasos {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 28px 40px;
+  }
+  :root:not(.cine) .primer-plano {
+    grid-template-columns: 320px 320px 150px;
+    grid-template-areas: "tel hoja moli";
+    justify-content: center;
+    margin: 0 var(--margen);
+    padding: 36px;
+  }
+  :root:not(.cine) .moli-cerca {
+    width: 150px;
+  }
+  :root:not(.cine) .hoja {
+    height: 480px;
+  }
+}
