@@ -1,7 +1,9 @@
 import type { CSSProperties } from "react";
+import { Bolita, CercaDia, PlanoDia, RotulosDia } from "../dia/PlanosDia";
 import { ManoHerramienta, Moli } from "../moli/Moli";
+import { Rejilla, Telefono } from "../piezas";
 import { FILTRO_FONDO, LIENZO, PUNTOS, dibujoApagado, dibujoEncendido, mancha } from "./dibujo";
-import { AGENDA, CHAT_NOCHE, ROTULOS_NOCHE, franja } from "./textos";
+import { AGENDA, CHAT_NOCHE, ROTULOS_NOCHE } from "./textos";
 
 const caja = `0 0 ${LIENZO.ancho} ${LIENZO.alto}`;
 
@@ -52,6 +54,11 @@ function Transcripcion() {
         ocupado, a las 10:30 y a las 11:00 hay lugar, y de 12:00 a 13:30 hay un bloque de otro calendario. La cita de las
         10:30 queda en tu Google Calendar a las 23:49.
       </p>
+      <p>
+        A las 9:00 del jueves llega Ana, la recepcionista, y voltea el letrero a «Abierto». La cita de las 10:30 ya está
+        en la agenda de la computadora, con el servicio y el nombre de la paciente, y la conversación de anoche está en
+        el WhatsApp de la clínica.
+      </p>
     </div>
   );
 }
@@ -63,63 +70,14 @@ function Agenda() {
         <b>{AGENDA.dia}</b>
         <span>Tu agenda: lo que revisa antes de contestar</span>
       </div>
-      <div className="hoja-rejilla">
-        {AGENDA.horas.map((h, i) => (
-          <span key={h} className="hoja-hora" style={{ top: `${i * 20}%` }}>
-            {h}
-          </span>
-        ))}
-        <div className="hoja-columna">
-          {AGENDA.bloques.map((b) => (
-            <div key={b.id} className={`blq blq-${b.tipo} lado-${b.lado}`} data-blq={b.id} style={franja(b.desde, b.hasta)}>
-              <span>{b.texto}</span>
-              {b.tipo === "pedida" && (
-                <svg className="equis" viewBox="0 0 24 24" aria-hidden="true">
-                  <path d="M5 5L19 19M19 5L5 19" />
-                </svg>
-              )}
-            </div>
-          ))}
-          <div className="blq blq-cita" style={franja(AGENDA.cita.desde, AGENDA.cita.hasta)}>
-            <svg className="palomita" viewBox="0 0 24 24" aria-hidden="true">
-              <path d="M4 12.5L9.5 18L20 6" />
-            </svg>
-            <span>{AGENDA.cita.texto}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Telefono() {
-  return (
-    <div className="tel">
-      <div className="tel-pantalla">
-        <div className="tel-cabeza">
-          <span className="tel-av">ML</span>
-          <span className="tel-quien">
-            <b>Mariana L.</b>
-            <small>Ejemplo con una clínica ficticia</small>
-          </span>
-        </div>
-        <div className="tel-chat">
-          <ol className="chat">
-            <li className="chat-dia">Hoy</li>
-            {CHAT_NOCHE.map((b, i) => (
-              <li key={i} className={`burbuja de-${b.de}`} data-burbuja={i}>
-                {b.texto}
-                <time>{b.hora}</time>
-              </li>
-            ))}
-          </ol>
-        </div>
-      </div>
+      <Rejilla bloques={AGENDA.bloques} />
     </div>
   );
 }
 
 /**
+ * El día en el consultorio, en una sola escena fija: 23:47 (la portada y la noche), el arrancón del
+ * calendario (T1) y las 09:00 (`../dia/`).
  * 23:47: la portada y la noche. Plano general (el consultorio cerrado, la luz del celular y Moli
  * dormitando) y primer plano (el chat, la agenda y Moli actuando cada capacidad).
  * Sin JavaScript o con movimiento reducido, todo se ve quieto y completo (clase `cine` ausente).
@@ -145,59 +103,63 @@ export function EscenaNoche() {
               </li>
             ))}
           </ol>
+          <RotulosDia />
         </div>
 
+        <PlanoDia />
         <div className="plano plano-general" aria-hidden="true">
-          <div className="lamina">
-            <svg className="dib" viewBox={caja} preserveAspectRatio="none" focusable="false">
-              <defs dangerouslySetInnerHTML={{ __html: FILTRO_FONDO }} />
-              <g filter="url(#tinta-fondo)" dangerouslySetInnerHTML={{ __html: dibujoApagado() }} />
-            </svg>
-            <div className="luz luz-grande">
-              <div className="iris" style={IRIS_CAJA}>
-                <div className="iris-contenido" style={IRIS_CONTENIDO}>
-                  <svg className="dib" viewBox={caja} preserveAspectRatio="none" focusable="false">
-                    <g filter="url(#tinta-fondo)" dangerouslySetInnerHTML={{ __html: dibujoEncendido("recorte-luz-grande", lg.x, lg.y, lg.r, 11) }} />
-                  </svg>
+          <div className="encuadre">
+            <div className="lamina">
+              <svg className="dib" viewBox={caja} preserveAspectRatio="none" focusable="false">
+                <defs dangerouslySetInnerHTML={{ __html: FILTRO_FONDO }} />
+                <g filter="url(#tinta-fondo)" dangerouslySetInnerHTML={{ __html: dibujoApagado() }} />
+              </svg>
+              <div className="luz luz-grande">
+                <div className="iris" style={IRIS_CAJA}>
+                  <div className="iris-contenido" style={IRIS_CONTENIDO}>
+                    <svg className="dib" viewBox={caja} preserveAspectRatio="none" focusable="false">
+                      <g filter="url(#tinta-fondo)" dangerouslySetInnerHTML={{ __html: dibujoEncendido("recorte-luz-grande", lg.x, lg.y, lg.r, 11) }} />
+                    </svg>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="luz luz-chica">
-              <svg className="dib" viewBox={caja} preserveAspectRatio="none" focusable="false">
-                <g filter="url(#tinta-fondo)" dangerouslySetInnerHTML={{ __html: dibujoEncendido("recorte-luz-chica", lc.x, lc.y, lc.r, 29, false) }} />
-              </svg>
-            </div>
-            <Moli
-              id="mg"
-              className="moli-general"
-              caraCine="dormita"
-              caraQuieta="feliz"
-              style={{ ...enLamina(PUNTOS.moli.x, PUNTOS.moli.y), width: `${(PUNTOS.moli.ancho / LIENZO.ancho) * 100}%` }}
-            />
-            <div className="notif" style={enLamina(282, 492)}>
-              <div className="notif-tarjeta">
-                <span className="notif-av">ML</span>
-                <span className="notif-cuerpo">
-                  <span className="notif-cabeza">
-                    <span>WhatsApp Business</span>
-                    <time>23:47</time>
-                  </span>
-                  <b>Mariana L.</b>
-                  <span className="notif-texto">{CHAT_NOCHE[0].texto}</span>
-                </span>
+              <div className="luz luz-chica">
+                <svg className="dib" viewBox={caja} preserveAspectRatio="none" focusable="false">
+                  <g filter="url(#tinta-fondo)" dangerouslySetInnerHTML={{ __html: dibujoEncendido("recorte-luz-chica", lc.x, lc.y, lc.r, 29, false) }} />
+                </svg>
               </div>
-            </div>
-            <span className="nota nota-quien" style={enLamina(352, 508)}>
-              <span>
-                ¿quién
-                <br />
-                contesta?
+              <Moli
+                id="mg"
+                className="moli-general"
+                caraCine="dormita"
+                caraQuieta="feliz"
+                style={{ ...enLamina(PUNTOS.moli.x, PUNTOS.moli.y), width: `${(PUNTOS.moli.ancho / LIENZO.ancho) * 100}%` }}
+              />
+              <div className="notif" style={enLamina(282, 492)}>
+                <div className="notif-tarjeta">
+                  <span className="notif-av">ML</span>
+                  <span className="notif-cuerpo">
+                    <span className="notif-cabeza">
+                      <span>WhatsApp Business</span>
+                      <time>23:47</time>
+                    </span>
+                    <b>Mariana L.</b>
+                    <span className="notif-texto">{CHAT_NOCHE[0].texto}</span>
+                  </span>
+                </div>
+              </div>
+              <span className="nota nota-quien" style={enLamina(352, 508)}>
+                <span>
+                  ¿quién
+                  <br />
+                  contesta?
+                </span>
               </span>
-            </span>
-            <span className="nota nota-z" style={enLamina(279, 538)}>
-              <span>z</span>
-              <span>z</span>
-            </span>
+              <span className="nota nota-z" style={enLamina(279, 538)}>
+                <span>z</span>
+                <span>z</span>
+              </span>
+            </div>
           </div>
         </div>
 
@@ -213,6 +175,9 @@ export function EscenaNoche() {
           <span className="nota nota-yo">¡yo!</span>
           <span className="nota nota-listo">¡listo!</span>
         </div>
+
+        <CercaDia />
+        <Bolita />
 
         <p className="desliza" aria-hidden="true">
           <svg viewBox="-16 -14 32 58" focusable="false">

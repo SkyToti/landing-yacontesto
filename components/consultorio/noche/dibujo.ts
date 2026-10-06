@@ -24,10 +24,10 @@ export const PUNTOS = {
   iris: { x: 222, y: 592, r0: 320, r1: 118 },
 };
 
-type Estilo = { trazo: string; relleno: string; pantalla: string; burbujas: boolean };
+export type Estilo = { trazo: string; relleno: string; pantalla: string; burbujas: boolean };
 
 const APAGADO: Estilo = { trazo: "#57584F", relleno: "#0E100F", pantalla: "#0E100F", burbujas: false };
-const ENCENDIDO: Estilo = { trazo: "#0E100F", relleno: "#FFFCE1", pantalla: "#FFFFFF", burbujas: true };
+export const ENCENDIDO: Estilo = { trazo: "#0E100F", relleno: "#FFFCE1", pantalla: "#FFFFFF", burbujas: true };
 
 /** Una mancha irregular cerrada (la luz), determinista: misma semilla, mismo dibujo. */
 export function mancha(cx: number, cy: number, rx: number, ry: number, semilla: number, n = 16, variacion = 0.07) {
@@ -48,21 +48,24 @@ export function mancha(cx: number, cy: number, rx: number, ry: number, semilla: 
   return `${d}Z`;
 }
 
-const linea = (d: string, color: string, ancho = 6, extra = "") =>
+export const linea = (d: string, color: string, ancho = 6, extra = "") =>
   `<path d="${d}" fill="none" stroke="${color}" stroke-width="${ancho}" stroke-linecap="round" stroke-linejoin="round"${extra}/>`;
-const forma = (d: string, e: Estilo, ancho = 6, relleno = e.relleno) =>
+export const forma = (d: string, e: Estilo, ancho = 6, relleno = e.relleno) =>
   `<path d="${d}" fill="${relleno}" stroke="${e.trazo}" stroke-width="${ancho}" stroke-linecap="round" stroke-linejoin="round"/>`;
 
-/** La ventana con la luna y el letrero de CERRADO (la luna y el letrero alumbran solos). */
-function ventana(e: Estilo) {
+/**
+ * La ventana con la luna y el letrero de CERRADO (la luna y el letrero alumbran solos). De día
+ * (`conLuna` en falso) el vidrio es blanco y el cielo lo pone el director, para que la luna se meta.
+ */
+export function ventana(e: Estilo, conLuna = true, vidrio = e.relleno) {
   return [
-    forma("M27 412Q100 408 176 411L178 560Q102 563 25 561Z", e, 6),
+    forma("M27 412Q100 408 176 411L178 560Q102 563 25 561Z", e, 6, vidrio),
     linea("M101 413Q99 486 102 560M27 486Q101 489 177 485", e.trazo, 4.5),
     linea("M16 566Q100 561 188 566", e.trazo, 6),
     // Luna en cuarto y dos estrellas: son luz propia, siempre crema.
-    `<path d="M151 424C138 424 128 435 129 448C130 461 141 470 154 469C147 465 142 457 142 447C142 437 146 429 151 424Z" fill="#FFFCE1"/>`,
-    linea("M51 428v13M44.5 434.5h13", "#FFFCE1", 3),
-    linea("M78 456v9M73.5 460.5h9", "#FFFCE1", 2.6),
+    !conLuna ? "" : `<path d="M151 424C138 424 128 435 129 448C130 461 141 470 154 469C147 465 142 457 142 447C142 437 146 429 151 424Z" fill="#FFFCE1"/>`,
+    conLuna ? linea("M51 428v13M44.5 434.5h13", "#FFFCE1", 3) : "",
+    conLuna ? linea("M78 456v9M73.5 460.5h9", "#FFFCE1", 2.6) : "",
   ].join("");
 }
 
@@ -76,7 +79,7 @@ function letrero() {
 }
 
 /** El calendario de taco: la hoja de hoy se arranca para pasar al día siguiente. */
-function calendario(e: Estilo, dia = "14", semana = "MIÉ") {
+export function calendario(e: Estilo, dia = "14", semana = "MIÉ") {
   const papel = e.relleno === "#0E100F" ? e.relleno : "#FFFFFF";
   const letra = e.relleno === "#0E100F" ? e.trazo : "#0E100F";
   return [
@@ -89,8 +92,8 @@ function calendario(e: Estilo, dia = "14", semana = "MIÉ") {
   ].join("");
 }
 
-/** El reloj de pared en 23:47: la hora en 353.5° y el minutero en 282°. */
-function reloj(e: Estilo) {
+/** El reloj de pared en 23:47: la hora en 353.5° y el minutero en 282°. De día las manecillas giran aparte. */
+export function reloj(e: Estilo, conManecillas = true) {
   const cx = 392;
   const cy = 452;
   const punta = (grados: number, largo: number) => {
@@ -100,14 +103,14 @@ function reloj(e: Estilo) {
   return [
     forma(`M${cx} ${cy - 37}C${cx + 21} ${cy - 37} ${cx + 37} ${cy - 20} ${cx + 36} ${cy + 1}C${cx + 36} ${cy + 22} ${cx + 20} ${cy + 37} ${cx - 1} ${cy + 36}C${cx - 22} ${cy + 36} ${cx - 37} ${cy + 20} ${cx - 36} ${cy}C${cx - 36} ${cy - 21} ${cx - 21} ${cy - 37} ${cx} ${cy - 37}Z`, e, 6),
     linea(`M${cx} ${cy - 30}v7M${cx + 30} ${cy}h-7M${cx} ${cy + 30}v-7M${cx - 30} ${cy}h7`, e.trazo, 4),
-    linea(`M${cx} ${cy}L${punta(353.5, 17)}`, e.trazo, 6),
-    linea(`M${cx} ${cy}L${punta(282, 25)}`, e.trazo, 4.5),
-    `<circle cx="${cx}" cy="${cy}" r="4" fill="${e.trazo}"/>`,
+    conManecillas ? linea(`M${cx} ${cy}L${punta(353.5, 17)}`, e.trazo, 6) : "",
+    conManecillas ? linea(`M${cx} ${cy}L${punta(282, 25)}`, e.trazo, 4.5) : "",
+    conManecillas ? `<circle cx="${cx}" cy="${cy}" r="4" fill="${e.trazo}"/>` : "",
   ].join("");
 }
 
 /** El mostrador de la recepción, con su maceta. */
-function mostrador(e: Estilo) {
+export function mostrador(e: Estilo) {
   return [
     forma("M36 668L41 834Q240 842 444 834L450 666Z", e, 6),
     linea("M150 676Q148 752 152 830M262 678Q264 754 260 832M360 676Q358 752 362 830", e.trazo, 4, ' opacity=".7"'),
@@ -123,7 +126,7 @@ function mostrador(e: Estilo) {
 }
 
 /** El celular de la clínica en su base. Encendido, la pantalla alumbra y se ven dos burbujitas. */
-function telefono(e: Estilo) {
+export function telefono(e: Estilo) {
   return [
     forma("M292 652L306 622H342L356 652Z", e, 5),
     forma("M309 548Q323 546 338 548Q347 549 347 559L346 632Q346 641 337 641L310 642Q300 642 300 632L299 559Q299 548 309 548Z", e, 5.5),
@@ -134,13 +137,30 @@ function telefono(e: Estilo) {
 }
 
 /** El piso, apenas una línea. */
-function piso(e: Estilo) {
+export function piso(e: Estilo) {
   return linea("M0 846Q120 841 240 846T480 843", e.trazo, 5);
+}
+
+/**
+ * La computadora de la recepción, apaisada para no confundirse con el celular en su base. De noche está
+ * apagada; de día enseña la agenda en chiquito, con la cita de las 10:30 ya en verde (la puso Moli).
+ */
+export function compu(e: Estilo, encendida = false) {
+  return [
+    forma("M397 629L395 644H409L407 629Z", e, 4.5),
+    linea("M380 648Q402 643 424 647", e.trazo, 5.5),
+    forma("M364 566Q403 563 443 566L442 630Q403 633 365 630Z", e, 5.5),
+    `<path d="M371 572Q403 570 436 572L435 624Q403 626 372 624Z" fill="${encendida ? "#FFFFFF" : "#0E100F"}"/>`,
+    encendida
+      ? linea("M377 580h52M377 591h52M377 602h52M377 613h52", e.trazo, 1.6, ' opacity=".3"') +
+        `<path d="M386 582h40v8h-40z" fill="rgb(14 16 15 / .2)"/><path d="M386 595.5h40v8h-40z" fill="#0AE448" stroke="#0E100F" stroke-width="1.8" stroke-linejoin="round"/>`
+      : "",
+  ].join("");
 }
 
 /** El consultorio completo en un estilo. */
 function consultorio(e: Estilo, conLetrero: boolean) {
-  return piso(e) + ventana(e) + (conLetrero ? letrero() : "") + calendario(e) + reloj(e) + mostrador(e) + telefono(e);
+  return piso(e) + ventana(e) + (conLetrero ? letrero() : "") + calendario(e) + reloj(e) + mostrador(e) + telefono(e) + compu(e);
 }
 
 export const FILTRO_FONDO = `<filter id="tinta-fondo" x="-5%" y="-5%" width="110%" height="110%">

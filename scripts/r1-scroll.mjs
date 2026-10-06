@@ -1,6 +1,6 @@
-// Recorre la escena de las 23:47 con el scroll, con la CPU 4× más lenta, y cuenta las tareas largas
-// del hilo principal (> 50 ms). Sin GPU en Chromium sin ventana: los cuadros no representan un
-// celular, pero las tareas largas (lo que traba el pulgar) sí.
+// Recorre la escena fija entera (23:47, el arrancón del calendario y las 09:00) con el scroll, con la
+// CPU 4× más lenta, y cuenta las tareas largas del hilo principal (> 50 ms). Sin GPU en Chromium sin
+// ventana: los cuadros no representan un celular, pero las tareas largas (lo que traba el pulgar) sí.
 // Uso (con `npm run start` o el servidor de out/ en marcha): node scripts/r1-scroll.mjs [URL]
 import { chromium } from "playwright";
 

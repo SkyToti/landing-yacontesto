@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { cuerpo, diademaCompleta, filtroTinta, manoLapiz, manoLupa, rasgos, type Cara } from "./partes";
+import { cuerpo, diademaCompleta, filtroTinta, manoLapiz, manoLupa, manoSenala, rasgos, type Cara } from "./partes";
 
 type Props = {
   /** Único por Moli en la página: prefija el filtro de tinta y los recortes de la boca. */
@@ -42,11 +42,13 @@ export function Moli({ id, className = "", caraCine, caraQuieta, style }: Props)
 const HERRAMIENTAS = {
   lupa: { caja: "-130 -206 212 326", dibujo: manoLupa },
   lapiz: { caja: "-200 -90 326 190", dibujo: manoLapiz },
+  // La mano que señala de la hoja, con el dedo a su largo de siempre: no se estira.
+  senala: { caja: "-2 -66 240 126", dibujo: () => manoSenala() },
 };
 
 /**
- * La mano de Moli con la herramienta de cada capacidad: la lupa para revisar tu agenda y el lápiz para
- * dejar la cita (Diego, 5-oct: «la mano está bien, pero el dedo que se estira se ve raro»). La lupa
+ * La mano de Moli con la herramienta de cada capacidad: la lupa para revisar tu agenda, el lápiz para
+ * dejar la cita y, a las 09:00, la mano que señala para enseñarle la cita a Ana (Diego, 5-oct: «la mano está bien, pero el dedo que se estira se ve raro»). La lupa
  * trae su vidrio en HTML, debajo del aro dibujado: ahí el director pone la agenda aumentada.
  */
 export function ManoHerramienta({ id, herramienta, className = "" }: { id: string; herramienta: keyof typeof HERRAMIENTAS; className?: string }) {

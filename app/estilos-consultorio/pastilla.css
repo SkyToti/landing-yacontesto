@@ -20,6 +20,26 @@
   box-shadow:
     0 0 0 2.5px var(--tinta),
     4px 4px 0 2.5px var(--tinta);
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    box-shadow 0.3s;
+}
+/* De día se invierte: tinta sobre el papel. El anillo crema la deja leerse también mientras la hoja
+   de la noche todavía tapa la parte de abajo (transición T1). */
+.dia .pastilla {
+  background: var(--tinta);
+  color: var(--crema);
+  box-shadow:
+    0 0 0 2.5px var(--crema),
+    4px 4px 0 2.5px var(--tinta);
+}
+.dia .p-whatsapp {
+  background: var(--crema);
+  color: var(--tinta);
+}
+.dia .pastilla :focus-visible {
+  outline-color: var(--crema);
 }
 .pastilla a {
   display: inline-flex;
@@ -39,6 +59,9 @@
   padding: 0 14px 0 16px;
 }
 .p-whatsapp {
+  transition:
+    background-color 0.3s,
+    color 0.3s;
   gap: 8px;
   padding: 0 16px 0 18px;
   background: var(--tinta);

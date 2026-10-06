@@ -1,10 +1,14 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { rasgos, type Boca, type Cara } from "../moli/partes";
+import { armarManana } from "../dia/manana";
+import { type Cara } from "../moli/partes";
+import { crearMoli } from "../moli/titere";
+import { PANTALLAS, PAUSAS, T1 } from "../pausas";
 import { PUNTOS } from "./dibujo";
 
 /**
- * El director de la escena de las 23:47. Dos relojes, como en la hoja de Moli:
+ * El director de la escena fija: las 23:47 (aquí) y, con el mismo sistema, la transición T1 y las
+ * 09:00 (`../dia/manana.ts`). Dos relojes, como en la hoja de Moli:
  * - el SCROLL mueve la cámara (plano general ↔ primer plano), atado al pulgar;
  * - cada PAUSA dispara una actuación con su propio tiempo (Moli salta, habla, señala; llegan
  *   los mensajes; la cita se pinta). Una actuación a medio scroll se ve de títere.
@@ -14,9 +18,8 @@ import { PUNTOS } from "./dibujo";
  * y `.primer-plano`; las actuaciones mueven todo lo de adentro.
  */
 
-/** Alto de la escena en pantallas de scroll, y dónde se asienta cada pausa (P0 a P6). */
-const PANTALLAS = 4.75;
-const PAUSAS = [0, 1.0, 1.7, 2.35, 3.05, 3.7, 4.5];
+/** Lo de la noche se indexa por pausa de P0 a P6; de P7 en adelante la noche se queda como en P6. */
+const ULTIMA_NOCHE = 6;
 /** Cuántos mensajes del chat se ven en cada pausa. */
 const BURBUJAS = [0, 2, 3, 4, 5, 6, 6];
 /** En el celular la hoja tapa el chat: solo sube cuando Moli revisa (P2) y cuando agenda (P4). */
@@ -27,50 +30,6 @@ const CARAS: Cara[] = ["dormita", "normal", "concentra", "guino", "feliz", "feli
 const TAPADA = "inset(0% 0% 0% 100%)";
 const DESTAPADA = "inset(0% 0% 0% 0%)";
 
-function crearMoli(el: HTMLElement, prefijo: string, inicial: Cara) {
-  const g = el.querySelector<SVGGElement>(".rasgos-cine")!;
-  const onda = el.querySelector<HTMLElement>(".moli-onda")!;
-  const ruido = el.querySelector<SVGFETurbulenceElement>("feTurbulence")!;
-  let cara = inicial;
-  const pintar = (c: Cara, boca?: Boca) => {
-    g.innerHTML = rasgos(prefijo, c, boca);
-  };
-  const ondear = (tl: gsap.core.Timeline, t: number) =>
-    tl.fromTo(onda, { scale: 0.25, autoAlpha: 1 }, { scale: 1.9, autoAlpha: 0, duration: 0.65, ease: "power2.out" }, t);
-  return {
-    el,
-    ruido,
-    ondear,
-    /** Cambia de cara solo si es otra (cada cambio redibuja la cara, no a Moli). */
-    cara(c: Cara) {
-      if (c === cara) return;
-      cara = c;
-      pintar(c);
-    },
-    /** Salto de caricatura: anticipa, se estira, aterriza y rebota. Solo `transform`. */
-    salto(tl: gsap.core.Timeline, t: number) {
-      tl.to(el, { scaleY: 0.86, scaleX: 1.08, duration: 0.12, ease: "power2.out" }, t)
-        .to(el, { scaleY: 1.1, scaleX: 0.94, yPercent: -13, duration: 0.16, ease: "power2.out" })
-        .to(el, { scaleY: 0.94, scaleX: 1.05, yPercent: 0, duration: 0.14, ease: "power2.in" })
-        .to(el, { scaleY: 1, scaleX: 1, duration: 0.55, ease: "elastic.out(1, 0.4)" });
-    },
-    /** Habla por cuadros (la boca cambia cada 0.11 s) y del micrófono sale la onda. */
-    habla(tl: gsap.core.Timeline, t: number, final: Cara, cuadros = 7) {
-      const bocas: Boca[] = ["abierta", "o", "linea", "abierta", "sonrisa", "o"];
-      for (let i = 0; i < cuadros; i++) tl.call(() => pintar("normal", bocas[i % bocas.length]), undefined, t + i * 0.11);
-      tl.call(() => ((cara = final), pintar(final)), undefined, t + cuadros * 0.11);
-      ondear(tl, t + 0.05);
-    },
-    /** Quita lo que haya quedado a medias de una actuación. */
-    quieto(c: Cara) {
-      gsap.set(el, { scaleX: 1, scaleY: 1, yPercent: 0 });
-      gsap.set(onda, { autoAlpha: 0 });
-      cara = c;
-      pintar(c);
-    },
-  };
-}
-
 export function armarNoche(raiz: HTMLElement): () => void {
   gsap.registerPlugin(ScrollTrigger);
   ScrollTrigger.config({ ignoreMobileResize: true });
@@ -80,14 +39,17 @@ export function armarNoche(raiz: HTMLElement): () => void {
 
   const escenario = q(".escenario");
   const general = q(".plano-general");
-  const lamina = q(".lamina");
+  const lamina = general.querySelector<HTMLElement>(".lamina")!;
   const cerca = q(".primer-plano");
+  // Lo del primer plano de la noche se busca solo ahí: el de día tiene su propio chat, agenda y cita.
+  const qc = <T extends Element = HTMLElement>(s: string) => cerca.querySelector<T>(s)!;
+  const qqc = <T extends Element = HTMLElement>(s: string) => Array.from(cerca.querySelectorAll<T>(s));
   const rotulos = qq(".rotulo");
-  const burbujas = qq(".burbuja");
-  const chat = q(".chat");
-  const chatCaja = q(".tel-chat");
-  const hoja = q(".hoja");
-  const rejilla = q(".hoja .hoja-rejilla");
+  const burbujas = qqc(".burbuja");
+  const chat = qc(".chat");
+  const chatCaja = qc(".tel-chat");
+  const hoja = qc(".hoja");
+  const rejilla = qc(".hoja .hoja-rejilla");
   const lupa = q(".lupa-cerca");
   const vidrio = q(".lupa-vidrio");
   const copia = q(".lupa-copia");
@@ -97,15 +59,15 @@ export function armarNoche(raiz: HTMLElement): () => void {
   // La agenda aumentada dentro de la lupa es una copia de la rejilla: las animaciones tocan las dos.
   copia.replaceChildren(rejilla.cloneNode(true));
   const rejillaCopia = copia.firstElementChild as HTMLElement;
-  const equis = qq<SVGPathElement>(".equis path");
+  const equis = qqc<SVGPathElement>(".equis path");
   // En las 10:00 la lente abarca el bloque entero: la ✗ y el texto.
   const pedida = q('.hoja [data-blq="pedida"]');
   const libre1030 = q('.hoja [data-blq="libre-1030"] span');
   const libre1100 = q('.hoja [data-blq="libre-1100"] span');
-  const libres = qq(".blq-libre");
-  const citaHoja = q(".hoja .blq-cita");
-  const citas = qq(".blq-cita");
-  const palomitas = qq(".palomita");
+  const libres = qqc(".blq-libre");
+  const citaHoja = qc(".hoja .blq-cita");
+  const citas = qqc(".blq-cita");
+  const palomitas = qqc(".palomita");
   const notaYo = q(".nota-yo");
   const notaListo = q(".nota-listo");
   const notif = q(".notif");
@@ -118,10 +80,16 @@ export function armarNoche(raiz: HTMLElement): () => void {
   const moliC = crearMoli(q('[data-moli="mc"]'), "mc-c", "dormita");
 
   const escritorio = matchMedia("(min-width: 900px)");
+  /** De día la marca y la pastilla se invierten (tinta sobre el papel). */
+  const amanecer = (si: boolean) => document.documentElement.classList.toggle("dia", si);
   let pausa = -1;
   let activa = false;
   let actuacion: gsap.core.Timeline | null = null;
   let reponer = () => {};
+
+  /** El acto de la mañana (T1 y las 09:00): llega en una segunda tarea, un instante después. */
+  let manana: ReturnType<typeof armarManana> | null = null;
+  let diferido = 0;
 
   const ctx = gsap.context(() => {
     /**
@@ -174,9 +142,13 @@ export function armarNoche(raiz: HTMLElement): () => void {
         delay: 0.12,
         ease: "power2.inOut",
       },
-      onUpdate: (self) => irA(pausaEn(self.progress)),
+      onUpdate: (self) => {
+        irA(pausaEn(self.progress));
+        amanecer(self.isActive && self.progress * PANTALLAS >= T1.amanece);
+      },
       onToggle: (self) => {
         activa = self.isActive;
+        amanecer(self.isActive && self.progress * PANTALLAS >= T1.amanece);
       },
     });
 
@@ -269,7 +241,9 @@ export function armarNoche(raiz: HTMLElement): () => void {
       rejillaCopia.style.transform = `translate(${d}px, ${d}px) rotate(${giro}deg) scale(${aumento()}) translate(${-gx}px, ${-gy}px)`;
     }
 
-    function estado(k: number) {
+    function estado(pausaDelDia: number) {
+      manana?.estado(pausaDelDia);
+      const k = Math.min(pausaDelDia, ULTIMA_NOCHE);
       const n = BURBUJAS[k];
       burbujas.forEach((b, i) => gsap.set(b, { autoAlpha: i < n ? 1 : 0, scale: 1, y: 0 }));
       gsap.set(chat, { y: desplazamiento(n) });
@@ -298,6 +272,7 @@ export function armarNoche(raiz: HTMLElement): () => void {
     }
     reponer = () => {
       medidas = false;
+      manana?.reponer();
       if (pausa >= 0) estado(pausa);
     };
 
@@ -413,6 +388,7 @@ export function armarNoche(raiz: HTMLElement): () => void {
           .to(luzChica, { opacity: 1, duration: 0.45, ease: "sine.inOut" }, 1.85)
           .to(luzGrande, { opacity: 0, duration: 0.3, ease: "sine.out" }, 2.3);
       },
+      // P7 a P9 (las 09:00) los agrega el acto de la mañana.
     };
 
     function irA(k: number) {
@@ -446,6 +422,22 @@ export function armarNoche(raiz: HTMLElement): () => void {
     // Arranque: la pausa donde ya esté el scroll (al recargar a media escena), sin actuar.
     activa = st.isActive;
     irA(pausaEn(st.progress));
+
+    // Segunda tarea: el acto de la mañana. Armado junto con la noche, la tarea pasaba de 70 ms con la
+    // CPU 4× más lenta (scripts/medir-carga.mjs); separado, ninguna de las dos llega a ser larga.
+    diferido = window.setTimeout(() =>
+      ctx.add(() => {
+        performance.mark("historia:dia");
+        manana = armarManana(raiz, { escenario, escritorio });
+        manana.camara(camara);
+        Object.assign(ENTRADAS, manana.entradas);
+        // Si la página abrió a media escena, la cámara se vuelve a pintar con lo que se le agregó.
+        const t = camara.time();
+        if (t > 0) camara.time(0).time(t);
+        manana.estado(pausa);
+        performance.measure("historia:dia", "historia:dia");
+      }),
+    );
   }, raiz);
 
   /* ── Línea viva: el trazo de Moli tiembla a 12 cuadros por segundo, solo el que está a cuadro ── */
@@ -454,7 +446,7 @@ export function armarNoche(raiz: HTMLElement): () => void {
   const linea = window.setInterval(() => {
     if (!activa || document.hidden) return;
     cuadro = (cuadro + 1) % 3;
-    const visible = pausa >= 1 && pausa <= 5 ? moliC : moliG;
+    const visible = manana?.moliEn(pausa) ?? (pausa >= 1 && pausa <= 5 ? moliC : moliG);
     visible.ruido.setAttribute("seed", String(semillas[cuadro]));
   }, 1000 / 12);
 
@@ -470,8 +462,10 @@ export function armarNoche(raiz: HTMLElement): () => void {
   return () => {
     copia.replaceChildren();
     window.clearInterval(linea);
+    window.clearTimeout(diferido);
     escritorio.removeEventListener("change", alCambiarTamano);
     actuacion?.kill();
     ctx.revert();
+    amanecer(false);
   };
 }

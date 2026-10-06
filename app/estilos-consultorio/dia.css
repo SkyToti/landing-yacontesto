@@ -1,0 +1,343 @@
+/*
+ * Las 09:00 y la transición T1 (el calendario se arranca). Piezas comunes a los dos modos y, abajo,
+ * el modo «cine» y la versión quieta. De día el papel es crema y el trazo, tinta.
+ */
+
+/* ── Piezas del plano general de día ── */
+.plano-dia {
+  background: var(--crema);
+}
+.lamina .cielo,
+.lamina .manecilla,
+.lamina .letrero,
+.lamina .ana {
+  position: absolute;
+}
+/* El vidrio de la ventana donde estaba la luna: la luna se mete y sale el sol, recortados por él. */
+.cielo {
+  overflow: hidden;
+}
+.astro {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.ana svg,
+.manecilla svg,
+.letrero svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+/* Las manecillas en su estado final (09:00); en el cine el director las pone en 23:49 y las gira. */
+.manecilla-hora {
+  transform: rotate(270deg);
+}
+.letrero {
+  /* Cuelga de sus cordones: se mece desde arriba. */
+  transform-origin: 50% -40%;
+}
+.letrero-cara {
+  position: absolute;
+  inset: 0;
+}
+
+/* ── El primer plano de día: la computadora, el celular, Ana y Moli ── */
+.compu {
+  display: flex;
+  flex-direction: column;
+  padding: 7px;
+  border: 3px solid var(--tinta);
+  border-radius: 16px;
+  background: var(--tinta);
+}
+/* El pie del monitor, dibujado con las reglas de Moli. */
+.compu::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 120px;
+  height: 24px;
+  translate: -50% 0;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 24'%3E%3Cpath d='M50 0L47 14H73L70 0Z' fill='%23FFFCE1' stroke='%230E100F' stroke-width='3.5' stroke-linejoin='round'/%3E%3Cpath d='M24 21Q60 14 96 20' fill='none' stroke='%230E100F' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E")
+    no-repeat center / 100% 100%;
+}
+.compu-pantalla {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 10px 12px 14px;
+  border-radius: 9px;
+  background: var(--papel);
+  color: var(--tinta);
+}
+.compu-cabeza b {
+  display: block;
+  font-family: var(--f-titular);
+  font-size: 19px;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+.compu-cabeza span {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--tinta-suave);
+}
+.compu-agenda {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+.compu .hoja-rejilla {
+  margin-top: 12px;
+}
+/* La nota de Moli, justo abajo de la cita (de las 11:10 a las 12:00 no hay nada). */
+.nota-agendo {
+  position: absolute;
+  z-index: 3;
+  right: 2px;
+  top: calc(12px + (100% - 12px) * 0.445);
+  display: flex;
+  align-items: flex-start;
+  gap: 3px;
+  color: var(--tinta);
+  font-size: 19px;
+  text-align: right;
+  rotate: -3deg;
+}
+.nota-agendo svg {
+  flex: none;
+  width: 22px;
+  height: 19px;
+  margin-top: -6px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.senala-cerca {
+  width: 110px;
+  /* El puño queda del lado de Moli. */
+  transform-origin: 90% 50%;
+}
+
+/* La hoja del 14, hecha bolita. */
+.bolita svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ════════════ Modo cine ════════════ */
+
+/* El día está debajo de la noche desde el principio; la cámara lo enseña al arrancar la hoja. */
+.cine .plano-dia {
+  z-index: 0;
+  opacity: 0;
+  visibility: hidden;
+  will-change: opacity;
+}
+/* El empujón de la cámara va hacia la computadora. Ana entra por la orilla del dibujo, no del vacío. */
+.cine .lamina-dia {
+  transform-origin: 84% 66.4%;
+  overflow: hidden;
+}
+/* El reposo de P0 a P6 vive aquí y no en el director (manana.ts): el letrero dice CERRADO, Ana no ha
+   llegado, el sol no ha salido y la nota de Moli no está escrita. */
+.cine .letrero-abierto,
+.cine .sol,
+.cine .ana-general,
+.cine .nota-agendo {
+  opacity: 0;
+  visibility: hidden;
+}
+.cine .manecilla {
+  will-change: transform;
+}
+
+.cine .dia-cerca {
+  z-index: 2;
+  background: var(--crema);
+  opacity: 0;
+  visibility: hidden;
+  --bajo-compu: clamp(150px, 24svh, 210px);
+}
+/* En el celular el monitor deja libre la orilla derecha: ahí entra la mano de Moli sin salirse. */
+.cine .compu {
+  position: absolute;
+  left: 12px;
+  right: 56px;
+  top: var(--arriba-contenido);
+  bottom: calc(var(--zona-pastilla) + var(--bajo-compu));
+}
+.cine .tel-dia {
+  z-index: 1;
+  opacity: 0;
+  visibility: hidden;
+}
+.cine .ana-cerca,
+.cine .ancla-ana {
+  position: absolute;
+  bottom: calc(var(--zona-pastilla) - 4px);
+}
+.cine .ana-cerca {
+  left: 14px;
+  height: min(calc(var(--bajo-compu) - 6px), 190px);
+  aspect-ratio: 100 / 154;
+}
+/* Adonde camina Ana en P9: a un lado del celular, donde estaba Moli. */
+.cine .ancla-ana {
+  left: calc(min(60%, 260px) + 6px);
+}
+.cine .moli-dia-cerca {
+  z-index: 3;
+}
+
+.cine .bolita {
+  position: absolute;
+  z-index: 5;
+  left: calc(50% - 37px);
+  top: 100%;
+  width: 74px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Los rótulos de día van en tinta sobre el papel. */
+.cine .rotulo-dia {
+  color: var(--tinta);
+}
+.cine .rotulo-dia .texto-paso {
+  color: var(--tinta-suave);
+}
+
+/* La marca y la pastilla se invierten con el día (el director pone «dia» en <html>). */
+.marca {
+  transition: color 0.3s;
+}
+.dia .marca {
+  color: var(--tinta);
+}
+
+/* Con las barras de Safari a la vista (~664 px) la agenda se aprieta: la nota se achica y el
+   subtítulo de la pantalla cede su renglón, para que la nota no pise el bloque de las 12:00. */
+@media (max-height: 760px) and (max-width: 899px) {
+  .cine .compu-cabeza span {
+    display: none;
+  }
+  .cine .nota-agendo {
+    font-size: 15px;
+  }
+}
+
+@media (min-width: 900px) {
+  .cine .compu {
+    left: 40%;
+    right: auto;
+    top: calc(50% - min(430px, 60svh) / 2 - 24px);
+    bottom: auto;
+    width: min(560px, 42vw);
+    height: min(430px, 60svh);
+  }
+  .compu-cabeza b {
+    font-size: 21px;
+  }
+  .nota-agendo {
+    font-size: 22px;
+  }
+  .cine .ana-cerca,
+  .cine .ancla-ana {
+    bottom: 9svh;
+  }
+  .cine .ana-cerca {
+    left: calc(40% - 118px);
+    height: 210px;
+  }
+  .cine .ancla-ana {
+    left: calc(40% + 336px);
+  }
+  .senala-cerca {
+    width: 170px;
+  }
+}
+
+/* ════════════ Versión quieta: el cuadro final de las 09:00 ════════════ */
+
+:root:not(.cine) .luna,
+:root:not(.cine) .letrero-cerrado,
+:root:not(.cine) .bolita,
+:root:not(.cine) .tel-dia,
+:root:not(.cine) .ana-cerca,
+:root:not(.cine) .ancla-ana {
+  display: none;
+}
+:root:not(.cine) .plano-dia {
+  order: 5;
+  position: relative;
+  width: calc(100% - 24px);
+  max-width: 560px;
+  aspect-ratio: 480 / 560;
+  margin: 18px auto 0;
+  overflow: hidden;
+  border-radius: 28px;
+}
+:root:not(.cine) .pasos-dia {
+  order: 6;
+  /* La numeración sigue la de la noche. */
+  counter-reset: none;
+}
+/* En el celular la pantalla usa todo el ancho (la cita cabe entera) y Moli guiña desde la esquina. */
+:root:not(.cine) .dia-cerca {
+  order: 7;
+  position: relative;
+  display: grid;
+  grid-template-areas: "compu";
+  margin: 0 12px;
+  padding: 22px 14px 86px;
+  border-radius: 28px;
+  background: var(--crema);
+}
+:root:not(.cine) .compu {
+  position: relative;
+  grid-area: compu;
+  height: 420px;
+  max-width: 400px;
+}
+:root:not(.cine) .moli-dia-cerca {
+  position: absolute;
+  right: 12px;
+  bottom: 10px;
+  width: 72px;
+}
+
+@media (min-width: 900px) {
+  :root:not(.cine) .dia-cerca {
+    grid-template-columns: 560px 150px;
+    grid-template-areas: "compu moli";
+    align-items: end;
+    gap: 8px;
+    justify-content: center;
+    margin: 0 var(--margen);
+    padding: 36px 36px 64px;
+  }
+  :root:not(.cine) .compu {
+    max-width: none;
+    height: 460px;
+  }
+  :root:not(.cine) .moli-dia-cerca {
+    position: static;
+    grid-area: moli;
+    width: 150px;
+  }
+}
