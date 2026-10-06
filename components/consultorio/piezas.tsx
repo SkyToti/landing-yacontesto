@@ -36,25 +36,39 @@ export function Rejilla({ bloques }: { bloques: readonly Bloque[] }) {
   );
 }
 
+/** Un mensaje del chat: del paciente, de la clínica (lo contestó Moli: verde) o de tu equipo (crema). */
+export type Mensaje = { readonly de: "paciente" | "clinica" | "equipo"; readonly texto: string; readonly hora: string };
+
 /**
- * El chat de Mariana en el celular de la clínica. De noche llega mensaje por mensaje («Hoy»); a las
- * 09:00 ya está completo en el WhatsApp de la clínica y la etiqueta dice «Ayer».
+ * Un chat en el celular de la clínica. Por omisión, el de Mariana: de noche llega mensaje por mensaje
+ * («Hoy»); a las 09:00 ya está completo en el WhatsApp de la clínica y la etiqueta dice «Ayer». A las
+ * 11:20 es otro paciente, en el mismo celular.
  */
-export function Telefono({ dia = "Hoy", className = "" }: { dia?: string; className?: string }) {
+export function Telefono({
+  dia = "Hoy",
+  className = "",
+  chat = CHAT_NOCHE,
+  contacto = { iniciales: "ML", nombre: "Mariana L." },
+}: {
+  dia?: string;
+  className?: string;
+  chat?: readonly Mensaje[];
+  contacto?: { iniciales: string; nombre: string };
+}) {
   return (
     <div className={`tel ${className}`}>
       <div className="tel-pantalla">
         <div className="tel-cabeza">
-          <span className="tel-av">ML</span>
+          <span className="tel-av">{contacto.iniciales}</span>
           <span className="tel-quien">
-            <b>Mariana L.</b>
+            <b>{contacto.nombre}</b>
             <small>Ejemplo con una clínica ficticia</small>
           </span>
         </div>
         <div className="tel-chat">
           <ol className="chat">
             <li className="chat-dia">{dia}</li>
-            {CHAT_NOCHE.map((b, i) => (
+            {chat.map((b, i) => (
               <li key={i} className={`burbuja de-${b.de}`} data-burbuja={i}>
                 {b.texto}
                 <time>{b.hora}</time>

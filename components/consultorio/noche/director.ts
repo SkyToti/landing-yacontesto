@@ -1,14 +1,16 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { armarManana } from "../dia/manana";
+import { armarMediodia } from "../dia/mediodia";
 import { type Cara } from "../moli/partes";
 import { crearMoli } from "../moli/titere";
 import { PANTALLAS, PAUSAS, T1 } from "../pausas";
 import { PUNTOS } from "./dibujo";
 
 /**
- * El director de la escena fija: las 23:47 (aquí) y, con el mismo sistema, la transición T1 y las
- * 09:00 (`../dia/manana.ts`). Dos relojes, como en la hoja de Moli:
+ * El director de la escena fija: las 23:47 (aquí) y, con el mismo sistema, los actos de día: la
+ * transición T1 y las 09:00 (`../dia/manana.ts`), y la T2 y las 11:20 (`../dia/mediodia.ts`).
+ * Dos relojes, como en la hoja de Moli:
  * - el SCROLL mueve la cámara (plano general ↔ primer plano), atado al pulgar;
  * - cada PAUSA dispara una actuación con su propio tiempo (Moli salta, habla, señala; llegan
  *   los mensajes; la cita se pinta). Una actuación a medio scroll se ve de títere.
@@ -17,6 +19,21 @@ import { PUNTOS } from "./dibujo";
  * Regla de la hoja: cada propiedad tiene UN dueño. La cámara mueve `.lamina`, `.plano-general`
  * y `.primer-plano`; las actuaciones mueven todo lo de adentro.
  */
+
+/** Un acto de día: su parte de la cámara, su reposo por pausa, sus actuaciones y su Moli a cuadro. */
+type Acto = {
+  camara: (tl: gsap.core.Timeline) => void;
+  estado: (pausa: number) => void;
+  entradas: Record<string, (tl: gsap.core.Timeline) => void>;
+  /** El Moli a cuadro en esa pausa; null si no hay ninguno; undefined si la pausa no es de este acto. */
+  moliEn: (k: number) => ReturnType<typeof crearMoli> | null | undefined;
+  reponer: () => void;
+};
+/** Los actos de día, en orden. Cada uno se arma en su propia tarea, después de la noche. */
+const ARMADORES = [
+  { nombre: "dia", armar: armarManana },
+  { nombre: "mediodia", armar: armarMediodia },
+];
 
 /** Lo de la noche se indexa por pausa de P0 a P6; de P7 en adelante la noche se queda como en P6. */
 const ULTIMA_NOCHE = 6;
@@ -87,8 +104,8 @@ export function armarNoche(raiz: HTMLElement): () => void {
   let actuacion: gsap.core.Timeline | null = null;
   let reponer = () => {};
 
-  /** El acto de la mañana (T1 y las 09:00): llega en una segunda tarea, un instante después. */
-  let manana: ReturnType<typeof armarManana> | null = null;
+  /** Los actos de día: llegan en tareas aparte, un instante después de la noche. */
+  const actos: Acto[] = [];
   let diferido = 0;
 
   const ctx = gsap.context(() => {
@@ -242,7 +259,7 @@ export function armarNoche(raiz: HTMLElement): () => void {
     }
 
     function estado(pausaDelDia: number) {
-      manana?.estado(pausaDelDia);
+      actos.forEach((a) => a.estado(pausaDelDia));
       const k = Math.min(pausaDelDia, ULTIMA_NOCHE);
       const n = BURBUJAS[k];
       burbujas.forEach((b, i) => gsap.set(b, { autoAlpha: i < n ? 1 : 0, scale: 1, y: 0 }));
@@ -272,7 +289,7 @@ export function armarNoche(raiz: HTMLElement): () => void {
     }
     reponer = () => {
       medidas = false;
-      manana?.reponer();
+      actos.forEach((a) => a.reponer());
       if (pausa >= 0) estado(pausa);
     };
 
@@ -388,7 +405,7 @@ export function armarNoche(raiz: HTMLElement): () => void {
           .to(luzChica, { opacity: 1, duration: 0.45, ease: "sine.inOut" }, 1.85)
           .to(luzGrande, { opacity: 0, duration: 0.3, ease: "sine.out" }, 2.3);
       },
-      // P7 a P9 (las 09:00) los agrega el acto de la mañana.
+      // P7 a P12 (las 09:00 y las 11:20) los agregan los actos de día.
     };
 
     function irA(k: number) {
@@ -423,21 +440,28 @@ export function armarNoche(raiz: HTMLElement): () => void {
     activa = st.isActive;
     irA(pausaEn(st.progress));
 
-    // Segunda tarea: el acto de la mañana. Armado junto con la noche, la tarea pasaba de 70 ms con la
-    // CPU 4× más lenta (scripts/medir-carga.mjs); separado, ninguna de las dos llega a ser larga.
-    diferido = window.setTimeout(() =>
-      ctx.add(() => {
-        performance.mark("historia:dia");
-        manana = armarManana(raiz, { escenario, escritorio });
-        manana.camara(camara);
-        Object.assign(ENTRADAS, manana.entradas);
-        // Si la página abrió a media escena, la cámara se vuelve a pintar con lo que se le agregó.
-        const t = camara.time();
-        if (t > 0) camara.time(0).time(t);
-        manana.estado(pausa);
-        performance.measure("historia:dia", "historia:dia");
-      }),
-    );
+    // Los actos de día, cada uno en su propia tarea. Armado junto con la noche, el de la mañana llevaba
+    // la tarea a más de 70 ms con la CPU 4× más lenta (scripts/medir-carga.mjs); separados, ninguna llega
+    // a ser larga.
+    const armaDesde = (i: number) => {
+      diferido = window.setTimeout(() =>
+        ctx.add(() => {
+          const { nombre, armar } = ARMADORES[i];
+          performance.mark(`historia:${nombre}`);
+          const acto: Acto = armar(raiz, { escenario, escritorio });
+          acto.camara(camara);
+          Object.assign(ENTRADAS, acto.entradas);
+          actos.push(acto);
+          // Si la página abrió a media escena, la cámara se vuelve a pintar con lo que se le agregó.
+          const t = camara.time();
+          if (t > 0) camara.time(0).time(t);
+          acto.estado(pausa);
+          performance.measure(`historia:${nombre}`, `historia:${nombre}`);
+          if (i + 1 < ARMADORES.length) armaDesde(i + 1);
+        }),
+      );
+    };
+    armaDesde(0);
   }, raiz);
 
   /* ── Línea viva: el trazo de Moli tiembla a 12 cuadros por segundo, solo el que está a cuadro ── */
@@ -446,8 +470,10 @@ export function armarNoche(raiz: HTMLElement): () => void {
   const linea = window.setInterval(() => {
     if (!activa || document.hidden) return;
     cuadro = (cuadro + 1) % 3;
-    const visible = manana?.moliEn(pausa) ?? (pausa >= 1 && pausa <= 5 ? moliC : moliG);
-    visible.ruido.setAttribute("seed", String(semillas[cuadro]));
+    let visible: ReturnType<typeof crearMoli> | null | undefined;
+    for (let i = actos.length - 1; i >= 0 && visible === undefined; i--) visible = actos[i].moliEn(pausa);
+    if (visible === undefined) visible = pausa >= 1 && pausa <= 5 ? moliC : moliG;
+    visible?.ruido.setAttribute("seed", String(semillas[cuadro]));
   }, 1000 / 12);
 
   // Al cruzar el corte de escritorio la hoja cambia de lugar: se recalcula el reposo.

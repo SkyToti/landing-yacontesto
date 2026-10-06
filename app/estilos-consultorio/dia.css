@@ -141,8 +141,11 @@
 /* ════════════ Modo cine ════════════ */
 
 /* El día está debajo de la noche desde el principio; la cámara lo enseña al arrancar la hoja. */
+/* Las capas de día no existen para el navegador (display: none) hasta que la cámara las pide: así no
+   entran al cálculo de estilos de la tarea que arma la noche. La cámara las prende con un set. */
 .cine .plano-dia {
   z-index: 0;
+  display: none;
   opacity: 0;
   visibility: hidden;
   will-change: opacity;
@@ -167,6 +170,7 @@
 
 .cine .dia-cerca {
   z-index: 2;
+  display: none;
   background: var(--crema);
   opacity: 0;
   visibility: hidden;

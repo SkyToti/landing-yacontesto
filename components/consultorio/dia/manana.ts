@@ -1,6 +1,7 @@
 import { gsap } from "gsap";
 import { crearMoli, type Titere } from "../moli/titere";
 import { T1 } from "../pausas";
+import { MIRA, anaQuieta, camina, crearAna } from "./ana";
 import { HOMBROS } from "./dibujo";
 
 /**
@@ -13,20 +14,7 @@ import { HOMBROS } from "./dibujo";
  * las actuaciones mueven a Ana, el letrero, a Moli, la computadora, el celular, la mano y la nota.
  */
 
-type Opciones = { escenario: HTMLElement; escritorio: MediaQueryList };
-
-/** Ana como títere: el cuerpo entero (HTML), los ojos y los brazos (SVG, giran en el hombro). */
-function crearAna(el: HTMLElement) {
-  return {
-    el,
-    ojos: el.querySelector<SVGGElement>(".ana-ojos")!,
-    izq: el.querySelector<SVGGElement>(".ana-brazo-izq")!,
-    der: el.querySelector<SVGGElement>(".ana-brazo-der")!,
-  };
-}
-type Ana = ReturnType<typeof crearAna>;
-/** Hacia dónde mira Ana. */
-const MIRA = { frente: { x: 0, y: 0 }, moli: { x: 2.2, y: 0 }, compu: { x: 1.8, y: -1.8 }, celular: { x: -2.2, y: 0.6 } };
+export type Opciones = { escenario: HTMLElement; escritorio: MediaQueryList };
 
 export function armarManana(raiz: HTMLElement, { escenario, escritorio }: Opciones) {
   const q = <T extends Element = HTMLElement>(s: string) => raiz.querySelector<T>(s)!;
@@ -103,7 +91,8 @@ export function armarManana(raiz: HTMLElement, { escenario, escritorio }: Opcion
     const t = T1.inicio;
     tl
       // El día ya está debajo; la hoja de la noche se desprende por arriba (asoma su orilla de zigzag)...
-      .set(planoDia, { autoAlpha: 1 }, t)
+      // Las capas de día empiezan en display: none (dia.css): la cámara las prende justo antes de usarlas.
+      .set(planoDia, { display: "block", autoAlpha: 1 }, t)
       .fromTo(capaRotulos, { opacity: 1 }, { opacity: 0, duration: 0.08 }, t)
       .fromTo(general, { yPercent: 0, rotation: 0, transformOrigin: "100% 0%" }, { yPercent: 4, rotation: -1.4, ease: "power1.in", duration: 0.12 }, t)
       // ...y se arranca hacia abajo, girando, hasta salir de la pantalla.
@@ -123,17 +112,13 @@ export function armarManana(raiz: HTMLElement, { escenario, escritorio }: Opcion
       // P7 → P8: empujón a la computadora y corte al primer plano.
       .fromTo(laminaDia, { scale: 1 }, { scale: 2.3, ease: "power2.in", duration: 0.42 }, 5.5)
       .fromTo(planoDia, { opacity: 1 }, { opacity: 0, duration: 0.26, immediateRender: false }, 5.7)
-      .fromTo(cercaDia, { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, ease: "power2.out", duration: 0.36 }, 5.64);
+      // Se prende a media P7 y no junto al empujón: si su primer cálculo de diseño cae en el mismo cuadro
+      // en que P8 mide la mano, sale una tarea larga (medido: 52–60 ms con la CPU 4× más lenta).
+      .set(cercaDia, { display: "block" }, 5.2)
+      .fromTo(cercaDia, { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, ease: "power2.out", duration: 0.36, immediateRender: false }, 5.64);
   }
 
   /* ── Reposo: lo que se ve quieto en cada pausa ── */
-  function anaQuieta(a: Ana, mira: { x: number; y: number }) {
-    gsap.set(a.el, { yPercent: 0 });
-    // Los brazos vuelven a su lugar quitando el giro, sin svgOrigin: ese obliga a medir el SVG (getBBox)
-    // y, al arrancar, alargaba la tarea de armar la escena unos 30 ms con la CPU 4× más lenta.
-    gsap.set([a.izq, a.der], { clearProps: "transform" });
-    gsap.set(a.ojos, mira);
-  }
   /**
    * De P0 a P6 el día está tapado y su reposo es el mismo: el de P6, que es lo que ya dice el CSS
    * (`.cine` en dia.css). Así, al arrancar no se toca nada del día: con la CPU 4× más lenta eso le
@@ -170,12 +155,6 @@ export function armarManana(raiz: HTMLElement, { escenario, escritorio }: Opcion
     gsap.set(anaC.el, { x: celular ? destinoAna() : 0 });
   }
 
-  /** Ana camina: el cuerpo avanza y la cabeza sube y baja a cada paso. */
-  function camina(tl: gsap.core.Timeline, a: Ana, t: number, duracion: number, vars: gsap.TweenVars) {
-    tl.to(a.el, { ...vars, duration: duracion, ease: "power1.inOut" }, t);
-    const pasos = Math.max(2, Math.round(duracion / 0.15));
-    tl.fromTo(a.el, { yPercent: 0 }, { yPercent: -2.2, duration: duracion / pasos, yoyo: true, repeat: pasos - 1 + (pasos % 2), ease: "sine.inOut" }, t);
-  }
   function escribe(tl: gsap.core.Timeline, el: HTMLElement, t: number) {
     tl.fromTo(el, { autoAlpha: 1, clipPath: "inset(0% 100% 0% 0%)" }, { clipPath: "inset(0% 0% 0% 0%)", duration: 0.55, ease: "steps(6)" }, t);
   }
@@ -244,8 +223,8 @@ export function armarManana(raiz: HTMLElement, { escenario, escritorio }: Opcion
     ]),
   );
 
-  /** El Moli que está a cuadro en la pausa k (para la línea viva), si es de este acto. */
-  const moliEn = (k: number): Titere | null => (k === 7 ? moliD : k >= 8 ? moliDC : null);
+  /** El Moli que está a cuadro en la pausa k (para la línea viva), si es de este acto (si no, undefined). */
+  const moliEn = (k: number): Titere | null | undefined => (k === 7 ? moliD : k >= 8 ? moliDC : undefined);
   const reponer = () => {
     puntaDedo = null;
     ultimo = -1;

@@ -32,3 +32,44 @@ export const AGENDA_COMPU = [
   { id: "ocupado-1000", desde: "10:00", hasta: "10:30", tipo: "ocupado", texto: "Ocupado", lado: "todo" },
   { id: "otro", desde: "12:00", hasta: "13:30", tipo: "otro", texto: "Ocupado · otro calendario", lado: "todo" },
 ] as const;
+
+/**
+ * Las 11:20 (`GUION-LANDING.md`, escena 3): un paciente pide hablar con el doctor y el chat pasa a tu
+ * equipo. PROPUESTA del paso 3 (5-oct-2026), pendiente de que Diego la apruebe.
+ *
+ * Cotejado el 5-oct-2026 contra `recepcionista-ia-whatsapp` (`main` = 7e6ef5a):
+ * - P10 le pasa el chat a tu equipo ............... src/brain.ts (herramienta `pasar_a_humano`: «Úsala
+ *                                                    SIEMPRE que el paciente pida hablar con una persona»)
+ *       con el cierre que tú elijas ................ `fallbackToHuman` del config de cada clínica; el
+ *                                                    paciente recibe la frase entrecomillada tal cual
+ *                                                    (`cierreParaHumano`). La de abajo es la del demo
+ *                                                    (`config/config.example.json`), con todo y el «le».
+ * - P11 deja de contestar en esa conversación ..... src/state.ts (`setModoHumano`, `modoHumanoVigente`):
+ *       aunque el paciente siga escribiendo          lo que escribe el paciente se guarda y el bot no
+ *                                                    contesta. Vence a los `humanModeMinutes` (demo: 15)
+ *                                                    contados desde lo último que escribió tu equipo
+ *                                                    (`registrarMensajeDeRecepcionista`): por eso
+ *                                                    «mientras tu equipo lo atiende».
+ * - P12 tu equipo contesta desde el mismo WhatsApp  coexistencia con Dualhook (la app de WhatsApp Business
+ *                                                    del celular de la clínica, el mismo número); lo que
+ *                                                    escribe ahí llega como eco y calla al bot en ese chat
+ *                                                    (`parseEcos`, src/whatsapp.ts).
+ * Lo que NO hay (regla 2): ningún aviso, alerta ni campanita para Ana. Ve el chat porque el paciente
+ * escribió, como cualquier chat de su WhatsApp. La estafeta es la metáfora del traspaso, no un aviso.
+ */
+export const ROTULOS_MEDIODIA = [
+  { titulo: "Si piden a una persona, le pasa el chat a tu equipo.", texto: "Con el mensaje de cierre que tú elijas." },
+  { titulo: "Y deja de contestar en esa conversación.", texto: "Mientras tu equipo lo atiende, aunque el paciente siga escribiendo." },
+  { titulo: "Tu equipo contesta desde el mismo WhatsApp.", texto: "El de la clínica, en el celular de siempre." },
+];
+
+/** El paciente de las 11:20, en la cabecera del chat (clínica ficticia, regla 6). */
+export const CONTACTO_MEDIODIA = { iniciales: "LR", nombre: "Luis R." };
+
+/** El chat de las 11:20: la petición, el cierre del demo (verde), un mensaje que ya no contesta y Ana (crema). */
+export const CHAT_MEDIODIA = [
+  { de: "paciente", texto: "Hola, quiero hablar con el doctor sobre mi tratamiento", hora: "11:20" },
+  { de: "clinica", texto: "Con gusto 🙂 Enseguida una persona de nuestro equipo le va a escribir.", hora: "11:20" },
+  { de: "paciente", texto: "Es sobre mi ortodoncia", hora: "11:21" },
+  { de: "equipo", texto: "Hola, Luis, soy Ana, de recepción. Ya le comento al doctor. ¿Te puede llamar hoy en la tarde?", hora: "11:26" },
+] as const;

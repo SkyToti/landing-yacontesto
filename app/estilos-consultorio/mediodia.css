@@ -1,0 +1,129 @@
+/*
+ * Las 11:20 y la transición T2 (la cámara recorre el mostrador). En el celular el teléfono va arriba y
+ * abajo quedan Ana (izquierda) y Moli (derecha), como la computadora de las 09:00: así la estafeta
+ * pasa de lado a lado. En escritorio, el teléfono a la izquierda y los dos a su derecha.
+ */
+
+/* Lo que escribió tu equipo: crema, como manda la regla de color (verde = lo hizo Moli). */
+.de-equipo {
+  align-self: flex-end;
+  border-radius: 15px 15px 4px 15px;
+  background: var(--crema);
+}
+
+.mano-estafeta,
+.mano-puno {
+  width: 132px;
+  /* Salen del lado de Moli: el puño. */
+  transform-origin: 80% 50%;
+}
+
+/* Moli se voltea hacia la salida antes de irse a saltitos. */
+.moli-mediodia.mira-derecha .moli-svg {
+  scale: 1 1;
+}
+.moli-mediodia.mira-derecha .moli-onda {
+  left: 72.6%;
+}
+
+/* ════════════ Modo cine ════════════ */
+
+/* Como las capas de las 09:00: display: none hasta que la cámara la pide en la T2. */
+.cine .mediodia-cerca {
+  z-index: 2;
+  display: none;
+  background: var(--crema);
+  opacity: 0;
+  visibility: hidden;
+  --bajo-tel: clamp(150px, 24svh, 210px);
+}
+/* El reposo de antes de las 11:20 vive aquí y no en el director (mediodia.ts): el chat está vacío. */
+.cine .tel-mediodia .burbuja {
+  opacity: 0;
+  visibility: hidden;
+}
+.cine .tel-mediodia {
+  position: absolute;
+  z-index: 1;
+  left: 12px;
+  top: var(--arriba-contenido);
+  bottom: calc(var(--zona-pastilla) + var(--bajo-tel));
+  width: min(76%, 300px);
+}
+.cine .ana-mediodia {
+  position: absolute;
+  left: 14px;
+  bottom: calc(var(--zona-pastilla) - 4px);
+  height: min(calc(var(--bajo-tel) - 6px), 190px);
+  aspect-ratio: 100 / 154;
+}
+.cine .moli-mediodia {
+  z-index: 3;
+}
+
+@media (min-width: 900px) {
+  .cine .tel-mediodia {
+    left: 40%;
+    top: calc(50% - min(600px, 78svh) / 2);
+    bottom: auto;
+    width: 296px;
+    height: min(600px, 78svh);
+  }
+  .cine .ana-mediodia {
+    left: calc(40% + 316px);
+    bottom: 9svh;
+    height: 210px;
+  }
+  .mano-estafeta,
+  .mano-puno {
+    width: 150px;
+  }
+}
+
+/* ════════════ Versión quieta: el cuadro final de las 11:20 ════════════ */
+
+/* Moli ya se fue: queda el chat completo y Ana junto al celular. */
+:root:not(.cine) .moli-mediodia {
+  display: none;
+}
+:root:not(.cine) .pasos-mediodia {
+  order: 8;
+  counter-reset: none;
+}
+:root:not(.cine) .mediodia-cerca {
+  order: 9;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 72px;
+  /* .tel ya trae grid-area: tel (quieto.css). */
+  grid-template-areas: "tel ana";
+  align-items: end;
+  gap: 8px;
+  margin: 0 12px;
+  padding: 22px 14px 30px;
+  border-radius: 28px;
+  background: var(--crema);
+}
+:root:not(.cine) .tel-mediodia {
+  max-width: 330px;
+}
+:root:not(.cine) .tel-mediodia .tel-chat {
+  overflow: visible;
+}
+:root:not(.cine) .ana-mediodia {
+  grid-area: ana;
+  width: 72px;
+  aspect-ratio: 100 / 154;
+}
+
+@media (min-width: 900px) {
+  :root:not(.cine) .mediodia-cerca {
+    grid-template-columns: 320px 110px;
+    justify-content: center;
+    margin: 0 var(--margen);
+    padding: 36px;
+  }
+  :root:not(.cine) .ana-mediodia {
+    width: 110px;
+  }
+}

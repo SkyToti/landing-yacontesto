@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
-import { Bolita, CercaDia, PlanoDia, RotulosDia } from "../dia/PlanosDia";
+import { Bolita, CercaDia, CercaMediodia, PlanoDia, RotulosDia, RotulosMediodia } from "../dia/PlanosDia";
+import { CHAT_MEDIODIA } from "../dia/textos";
 import { ManoHerramienta, Moli } from "../moli/Moli";
 import { Rejilla, Telefono } from "../piezas";
 import { FILTRO_FONDO, LIENZO, PUNTOS, dibujoApagado, dibujoEncendido, mancha } from "./dibujo";
@@ -59,6 +60,17 @@ function Transcripcion() {
         en la agenda de la computadora, con el servicio y el nombre de la paciente, y la conversación de anoche está en
         el WhatsApp de la clínica.
       </p>
+      <p>
+        A las 11:20, otro paciente pide hablar con el doctor. El asistente contesta con el mensaje de cierre de la clínica,
+        le pasa el chat a Ana y ya no contesta en esa conversación. Ana le escribe desde el mismo celular:
+      </p>
+      <ol>
+        {CHAT_MEDIODIA.map((b, i) => (
+          <li key={i}>
+            {b.de === "paciente" ? "Paciente" : b.de === "equipo" ? "Ana, de recepción" : "Asistente"}, {b.hora}: «{b.texto}»
+          </li>
+        ))}
+      </ol>
     </div>
   );
 }
@@ -104,6 +116,7 @@ export function EscenaNoche() {
             ))}
           </ol>
           <RotulosDia />
+          <RotulosMediodia />
         </div>
 
         <PlanoDia />
@@ -177,6 +190,7 @@ export function EscenaNoche() {
         </div>
 
         <CercaDia />
+        <CercaMediodia />
         <Bolita />
 
         <p className="desliza" aria-hidden="true">

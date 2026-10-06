@@ -4,7 +4,7 @@ import { LIENZO, PUNTOS } from "../noche/dibujo";
 import { AGENDA } from "../noche/textos";
 import { Rejilla, Telefono } from "../piezas";
 import { CAJA_ANA, PUNTOS_DIA, ana, bolita, caraLetrero, diaFondo, diaFrente, luna, manecilla, sol } from "./dibujo";
-import { AGENDA_COMPU, NOTA_CITA, ROTULOS_DIA } from "./textos";
+import { AGENDA_COMPU, CHAT_MEDIODIA, CONTACTO_MEDIODIA, NOTA_CITA, ROTULOS_DIA, ROTULOS_MEDIODIA } from "./textos";
 
 const caja = `0 0 ${LIENZO.ancho} ${LIENZO.alto}`;
 
@@ -31,12 +31,12 @@ function Ana({ className, style }: { className: string; style?: CSSProperties })
   );
 }
 
-/** Los rótulos de las 09:00: van en la misma columna que los de la noche, en tinta sobre el papel. */
-export function RotulosDia() {
+/** Los rótulos de día (las 09:00 y las 11:20): en la misma columna que los de la noche, en tinta sobre el papel. */
+export function RotulosDia({ rotulos = ROTULOS_DIA, desde = 7, className = "pasos-dia" }) {
   return (
-    <ol className="pasos pasos-dia">
-      {ROTULOS_DIA.map((r, i) => (
-        <li key={r.titulo} className="rotulo rotulo-dia" data-rotulo={i + 7}>
+    <ol className={`pasos ${className}`}>
+      {rotulos.map((r, i) => (
+        <li key={r.titulo} className="rotulo rotulo-dia" data-rotulo={i + desde}>
           <h2 className="titulo-paso">{r.titulo}</h2>
           <p className="texto-paso">{r.texto}</p>
         </li>
@@ -139,6 +139,28 @@ export function Bolita() {
   return (
     <div className="bolita" aria-hidden="true">
       <svg viewBox="0 0 80 80" focusable="false" dangerouslySetInnerHTML={{ __html: bolita() }} />
+    </div>
+  );
+}
+
+/** Los rótulos de las 11:20 (P10 a P12). */
+export function RotulosMediodia() {
+  return <RotulosDia rotulos={ROTULOS_MEDIODIA} desde={10} className="pasos-mediodia" />;
+}
+
+/**
+ * El primer plano de las 11:20: el celular de la clínica con otro paciente, Ana abajo a la izquierda y
+ * Moli a la derecha. Moli contesta el cierre, le pasa el chat a Ana como estafeta (la estafeta y el
+ * puño son dos capas: el puño la suelta) y se va a saltitos; Ana contesta desde el mismo celular.
+ */
+export function CercaMediodia() {
+  return (
+    <div className="plano mediodia-cerca" aria-hidden="true">
+      <Telefono dia="Hoy" className="tel-mediodia" chat={CHAT_MEDIODIA} contacto={CONTACTO_MEDIODIA} />
+      <Ana className="ana-mediodia" />
+      <ManoHerramienta id="estafeta" herramienta="estafeta" className="estafeta-cerca" />
+      <ManoHerramienta id="puno" herramienta="puno" className="puno-cerca" />
+      <Moli id="mm" className="moli-cerca moli-mediodia" caraCine="normal" caraQuieta="feliz" />
     </div>
   );
 }

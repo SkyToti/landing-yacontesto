@@ -97,6 +97,8 @@ export const EXPRESIONES = {
   // Combinaciones nuevas, sin trazo nuevo: ojos cerrados + boca de línea, y ojos cerrados + «o».
   dormita: { ojos: "cerrados", cejas: "normal", boca: "linea" },
   bosteza: { ojos: "cerrados", cejas: "arriba", boca: "o" },
+  // A las 11:20, cuando le pasa el chat a tu equipo: se queda callado (guiño + boca de línea).
+  calla: { ojos: "guino", cejas: "normal", boca: "linea" },
 } satisfies Record<string, Expresion>;
 
 export type Cara = keyof typeof EXPRESIONES;
@@ -183,6 +185,26 @@ export function manoLapiz() {
     <circle class="punta" cx="0" cy="-207" r="1" fill="none"/>
     ${PUNO}
   </g>`;
+}
+
+/**
+ * La estafeta de las 11:20: el chat que Moli le pasa a tu equipo (pieza nueva). Un tubo crema con un
+ * globito de chat de tinta: lo hizo una persona, así que no lleva verde. Va acostada, con la punta
+ * hacia Ana; `.punta` marca la orilla que ella toma. Va en su propia capa, separada del puño, para
+ * que el puño la suelte y regrese solo.
+ * Termina dentro del puño (x = 8): suelta, no le sobra palo. Caja (la misma del puño): -160 -46 272 90.
+ */
+export function estafeta() {
+  return `
+    <path d="M-146 -15H0Q8 -15 8 0Q8 15 0 15H-146Q-154 15 -154 0Q-154 -15 -146 -15Z" fill="${C}" stroke="${T}" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M-112 -9H-78Q-73 -9 -73 -4V2Q-73 7 -78 7H-93L-101 12L-99 7H-112Q-117 7 -117 2V-4Q-117 -9 -112 -9Z" fill="none" stroke="${T}" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M-108 -2H-82" stroke="${T}" stroke-width="3" stroke-linecap="round"/>
+    <circle class="punta" cx="-148" cy="0" r="1" fill="none"/>`;
+}
+
+/** El puño que carga la estafeta: el mismo puño de la hoja, acostado, con la manga hacia Moli. */
+export function punoEstafeta() {
+  return `<g transform="rotate(-90)">${PUNO}</g>`;
 }
 
 /** El filtro de tinta de la hoja: desplaza el trazo para que no haya ninguna curva perfecta. */

@@ -34,6 +34,25 @@ export function crearMoli(el: HTMLElement, prefijo: string, inicial: Cara) {
         .to(el, { scaleY: 0.94, scaleX: 1.05, yPercent: 0, duration: 0.14, ease: "power2.in" })
         .to(el, { scaleY: 1, scaleX: 1, duration: 0.55, ease: "elastic.out(1, 0.4)" });
     },
+    /**
+     * Se va a saltitos: brincos cortos que avanzan `hasta` (en % de su ancho) y lo sacan de cuadro.
+     * Cada brinco aplasta, despega y cae; el avance va parejo debajo. Solo `transform`.
+     */
+    saltitos(tl: gsap.core.Timeline, t: number, hasta: number, brincos = 4) {
+      const d = 0.3;
+      tl.to(el, { xPercent: hasta, duration: brincos * d, ease: "none" }, t);
+      for (let i = 0; i < brincos; i++) {
+        const s = t + i * d;
+        tl.to(el, { yPercent: -9, scaleY: 1.06, scaleX: 0.96, duration: d * 0.45, ease: "power2.out" }, s).to(el, {
+          yPercent: 0,
+          scaleY: 0.92,
+          scaleX: 1.05,
+          duration: d * 0.55,
+          ease: "power2.in",
+        });
+      }
+      tl.to(el, { scaleY: 1, scaleX: 1, duration: 0.12 }, t + brincos * d);
+    },
     /** Habla por cuadros (la boca cambia cada 0.11 s) y del micrófono sale la onda. */
     habla(tl: gsap.core.Timeline, t: number, final: Cara, cuadros = 7) {
       const bocas: Boca[] = ["abierta", "o", "linea", "abierta", "sonrisa", "o"];
