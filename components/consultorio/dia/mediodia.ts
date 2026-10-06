@@ -148,8 +148,12 @@ export function armarMediodia(raiz: HTMLElement, { escenario }: Opciones) {
       // se apartan mientras tanto: el reloj queda donde suelen ir.
       .set(cerca, { display: "block" }, t)
       .to(capaRotulos, { opacity: 0, duration: 0.06 }, t)
-      .to(cercaDia, { autoAlpha: 0, scale: 0.94, ease: "power2.in", duration: 0.18 }, t)
-      .to(planoDia, { opacity: 1, duration: 0.16 }, t + 0.04)
+      // El plano general se prende completo DEBAJO del primer plano (que lo tapa) y luego el primer plano
+      // se va. Al revés, al entrar a las 11:20: el plano general se apaga hasta que el primer plano nuevo
+      // lo tapa entero. Dos capas cruzadas a media opacidad dejan ver la tinta del fondo: un velo gris con
+      // doble imagen (lo vio Diego el 5-oct; scripts/r1-velo.mjs lo mide).
+      .set(planoDia, { opacity: 1 }, t)
+      .to(cercaDia, { autoAlpha: 0, scale: 0.96, ease: "power1.in", duration: 0.08 }, t)
       // La cámara se abre y recorre el mostrador hacia el celular de la clínica, y el reloj gira de 09:00
       // a 11:20: el minutero da dos vueltas y un tercio.
       .to(laminaDia, { scale: ESCALA_ABIERTA, x: abre, ease: "power1.inOut", duration: 0.34 }, t + 0.06)
@@ -157,8 +161,8 @@ export function armarMediodia(raiz: HTMLElement, { escenario }: Opciones) {
       .fromTo(minuto, { rotation: 1080 }, { rotation: 1920, ease: "power1.inOut", duration: 0.3, immediateRender: false }, t + 0.1)
       // Empujón al celular (se queda a media pantalla) y corte al primer plano de las 11:20.
       .to(laminaDia, { scale: ESCALA_CELULAR, x: empuja, ease: "power2.in", duration: 0.26 }, T2.llega - 0.1)
-      .to(planoDia, { opacity: 0, duration: 0.12 }, T2.llega + 0.06)
-      .fromTo(cerca, { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, ease: "power2.out", duration: 0.24, immediateRender: false }, T2.llega + 0.02)
+      .fromTo(cerca, { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, ease: "power2.out", duration: 0.12, immediateRender: false }, T2.llega + 0.08)
+      .set(planoDia, { opacity: 0 }, T2.llega + 0.2)
       .to(capaRotulos, { opacity: 1, duration: 0.1 }, T2.llega + 0.12);
   }
 

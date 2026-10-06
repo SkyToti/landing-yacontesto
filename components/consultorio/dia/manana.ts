@@ -111,11 +111,13 @@ export function armarManana(raiz: HTMLElement, { escenario, escritorio }: Opcion
       .to(capaRotulos, { opacity: 1, duration: 0.12 }, t + 0.5)
       // P7 → P8: empujón a la computadora y corte al primer plano.
       .fromTo(laminaDia, { scale: 1 }, { scale: 2.3, ease: "power2.in", duration: 0.42 }, 5.5)
-      .fromTo(planoDia, { opacity: 1 }, { opacity: 0, duration: 0.26, immediateRender: false }, 5.7)
       // Se prende a media P7 y no junto al empujón: si su primer cálculo de diseño cae en el mismo cuadro
       // en que P8 mide la mano, sale una tarea larga (medido: 52–60 ms con la CPU 4× más lenta).
       .set(cercaDia, { display: "block" }, 5.2)
-      .fromTo(cercaDia, { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, ease: "power2.out", duration: 0.36, immediateRender: false }, 5.64);
+      .fromTo(cercaDia, { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, ease: "power2.out", duration: 0.36, immediateRender: false }, 5.64)
+      // El plano general se apaga cuando el primer plano ya lo tapa entero, no a la vez: dos capas cruzadas
+      // a media opacidad dejan ver la tinta del fondo (un velo gris con doble imagen; scripts/r1-velo.mjs).
+      .set(planoDia, { opacity: 0 }, 6.0);
   }
 
   /* ── Reposo: lo que se ve quieto en cada pausa ── */
