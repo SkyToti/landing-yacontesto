@@ -76,7 +76,8 @@ export const CHAT_MEDIODIA = [
 
 /**
  * Las 16:05 (`GUION-LANDING.md`, escena 4): Jorge mueve su cita del viernes al sábado mientras el
- * doctor atiende. Textos nuevos del paso 4 (6-oct-2026), PROPUESTOS: falta que Diego los apruebe.
+ * doctor atiende. Textos nuevos del paso 4 (6-oct-2026): Diego los aprobó tal cual el 7-oct-2026 (~14:05),
+ * con el chat y las pinzas.
  *
  * Cotejado el 6-oct-2026 contra `recepcionista-ia-whatsapp` (`main` = 7e6ef5a):
  * - P13 busca la cita del paciente ............... src/brain.ts (herramienta `buscar_mis_citas`: «las
@@ -170,8 +171,8 @@ export const TIRA = {
 
 /**
  * Las 19:00 (`GUION-LANDING.md`, la transición de la escena 4 y la escena 5): tu equipo se va, la noche
- * vuelve y las tres cifras cruzan la pantalla. Textos nuevos del paso 5 (7-oct-2026), PROPUESTOS: falta
- * que Diego los apruebe. Las cifras son las del guion, que él ya aprobó.
+ * vuelve y las tres cifras cruzan la pantalla. Textos nuevos del paso 5 (7-oct-2026): Diego los aprobó
+ * tal cual el 7-oct-2026 (~14:05), con la letra chica de P20. Las cifras son las del guion, que ya estaba aprobado.
  *
  * Cotejo de cada cifra con su fuente (7-oct-2026):
  * - P17 sigue contestando, a cualquier hora ........ `PASOS_INSTALACION` (datos.ts, día 7): «En tu WhatsApp,
