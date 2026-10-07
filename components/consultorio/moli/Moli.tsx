@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { cuerpo, diademaCompleta, estafeta, filtroTinta, manoLapiz, manoLupa, manoPinzas, manoSenala, punoEstafeta, rasgos, type Cara } from "./partes";
+import { cuerpo, diademaCompleta, estafeta, filtroTinta, manoLapiz, manoLetrero, manoLupa, manoPinzas, manoSenala, punoEstafeta, rasgos, type Cara } from "./partes";
 
 type Props = {
   /** Único por Moli en la página: prefija el filtro de tinta y los recortes de la boca. */
@@ -49,6 +49,9 @@ const HERRAMIENTAS = {
   puno: { caja: "-160 -46 272 90", dibujo: punoEstafeta },
   // A las 16:05, las pinzas que cargan la cita del viernes al sábado.
   pinzas: { caja: "-200 -108 310 226", dibujo: manoPinzas },
+  // En el cierre, la mano con letrero de la hoja: allá dice «¡ESCRÍBEME!»; aquí, «¡ESCRÍBENOS!», porque
+  // contestas tú (guion, «Después del día»).
+  letrero: { caja: "-96 -240 192 352", dibujo: () => manoLetrero("¡ESCRÍBENOS!", 27) },
 };
 
 /**

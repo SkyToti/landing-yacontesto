@@ -1,0 +1,67 @@
+/* Las páginas aparte: la 404 y el aviso de privacidad. */
+
+.boton-obra {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  height: 48px;
+  margin-top: 8px;
+  padding: 0 22px;
+  border-radius: 999px;
+  background: var(--crema);
+  color: var(--tinta);
+  font-weight: 600;
+  text-decoration: none;
+}
+.boton-obra:focus-visible {
+  outline-color: var(--lima);
+}
+
+.no-encontrada {
+  display: grid;
+  place-content: center;
+  gap: 14px;
+  min-height: 100svh;
+  padding: var(--margen);
+}
+
+.aviso {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 96px var(--margen) 72px;
+  font-size: 17px;
+  line-height: 1.55;
+}
+.aviso h1 {
+  font: 800 clamp(30px, 8vw, 48px) / 1.02 var(--f-titular);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.aviso h2 {
+  margin: 36px 0 8px;
+  font: 800 22px/1.15 var(--f-titular);
+  letter-spacing: -0.02em;
+}
+.aviso p,
+.aviso li {
+  color: var(--crema-suave);
+  text-wrap: pretty;
+}
+.aviso p + p {
+  margin-top: 10px;
+}
+.aviso ul {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+  padding-left: 1.2em;
+  list-style: disc;
+}
+.aviso-fecha {
+  margin-top: 10px;
+  font-size: 14px;
+}
+.aviso a {
+  color: var(--crema);
+  text-underline-offset: 3px;
+}

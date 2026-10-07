@@ -118,7 +118,40 @@ export function mensualidad(pacientes: number) {
   return segundo + Math.max(0, pacientes - hastaSegundo) * porPacienteExtra;
 }
 
-/** Las 6 preguntas de la landing anterior, al día (23-sep-2026). */
+const fmtPacientes = (n: number) => n.toLocaleString("es-MX");
+
+/** En qué escalón cae: 0 = hasta 300, 1 = hasta 800, 2 = arriba de 800. */
+export function escalonDe(pacientes: number) {
+  if (pacientes <= PRECIO.escalones.hasta) return 0;
+  if (pacientes <= PRECIO.escalones.hastaSegundo) return 1;
+  return 2;
+}
+
+/** La frase bajo la mensualidad de la calculadora. */
+export function detalleDe(pacientes: number) {
+  const { hasta, hastaSegundo, porPacienteExtra, segundo } = PRECIO.escalones;
+  if (pacientes <= hasta) return `Incluye hasta ${hasta} pacientes atendidos al mes.`;
+  if (pacientes <= hastaSegundo) return `Pasaste de ${hasta}: incluye hasta ${hastaSegundo} pacientes atendidos.`;
+  return `${fmtPacientes(segundo)} más ${porPacienteExtra} por cada uno de los ${fmtPacientes(pacientes - hastaSegundo)} pacientes arriba de ${hastaSegundo}.`;
+}
+
+/**
+ * Las preguntas. Las 6 de la landing anterior (23-sep-2026), re-cotejadas contra el bot (`7e6ef5a`) el
+ * 7-oct-2026, más «¿Contesta audios?» (guion de R-1). Lo que cambió y por qué:
+ * - «¿Y si le contesta mal?»: decía «Tiene prohibido inventar datos» y «Si no sabe algo… le deja el chat».
+ *   La regla existe (`src/prompt.ts`: «NUNCA inventes precios…»), pero el hallazgo 42 de AUDITORIA.md
+ *   (6-oct) midió que ante lo que no está en el config (un seguro) inventó, y otra vez no pasó el chat. Ahora
+ *   dice que puede pasar y qué se hace: probarlo en la instalación y cargar esas respuestas (`faqs` del
+ *   config). Lo que sí funciona: pedir a una persona → `pasar_a_humano` y el cierre de la clínica.
+ * - «¿Tengo que cambiar mi número?»: suma la semana de uso que pide la coexistencia (Dualhook, CLAUDE.md §4),
+ *   como la letra chica de P20.
+ * - «¿Contesta audios?»: `AVISO_SOLO_TEXTO` y `avisoParaMensajeNoTexto` (`src/brain.ts`): a un audio,
+ *   foto, ubicación, sticker o documento contesta una sola vez «Por aquí solo leo texto, ¿me lo escribes?» y
+ *   el paciente sigue con el bot. Con la coexistencia el mensaje llega igual a la app de la clínica.
+ * Las otras cuatro siguen siendo ciertas: varios chats a la vez (`encolarPorUsuario`, en orden por
+ * paciente), citas en Google Calendar, 7 días (PASOS_INSTALACION) y mes a mes sin plazo forzoso (plan que
+ * Diego aprobó para Sonata el 23-sep).
+ */
 export const PREGUNTAS = [
   {
     p: "Ya tengo recepcionista. ¿Para qué lo quiero?",
@@ -126,11 +159,15 @@ export const PREGUNTAS = [
   },
   {
     p: "¿Y si le contesta mal a un paciente?",
-    r: "Solo responde con la información que tú apruebas: tus servicios, precios, horarios y políticas. Tiene prohibido inventar datos y no da diagnósticos ni recetas. Si no sabe algo o el paciente pide a una persona, le deja el chat a tu equipo. Y tienes 14 días para probarlo.",
+    r: "Puede pasar, sobre todo con lo que no está en tu información: si le preguntan por un seguro que no le contaste, puede contestar de más. Por eso, en la instalación lo probamos contigo con esas preguntas y le cargamos tus respuestas. Tiene prohibido dar diagnósticos y recetas, y si el paciente pide a una persona, le deja el chat a tu equipo. Cada conversación queda en tu WhatsApp, y tienes 14 días para probarlo.",
+  },
+  {
+    p: "¿Contesta audios?",
+    r: "No: solo lee texto. Si un paciente le manda un audio, una foto o un documento, le pide una vez que se lo escriba. El mensaje sí llega al WhatsApp de tu clínica, así que tu equipo lo puede escuchar.",
   },
   {
     p: "¿Tengo que cambiar mi número de WhatsApp?",
-    r: "No. El asistente contesta en el número de tu clínica y tu equipo sigue usando WhatsApp Business en su celular, con los mismos chats. Solo necesita estar en la app de WhatsApp Business.",
+    r: "No. El asistente contesta en el número de tu clínica y tu equipo sigue usando WhatsApp Business en su celular, con los mismos chats. Solo necesita estar en la app de WhatsApp Business desde hace una semana o más.",
   },
   {
     p: "¿Necesito instalar algo o aprender un sistema?",

@@ -5,25 +5,12 @@ import { Info } from "lucide-react";
 import { AnimatedNumber } from "@/components/ui/animated-number";
 import { AnimatedTooltip } from "@/components/ui/animated-tooltip";
 import { AnimatedButton } from "@/components/ui/animated-button";
-import { ENLACE_FUNDADOR, PRECIO, mensualidad } from "./datos";
+import { ENLACE_FUNDADOR, PRECIO, detalleDe, escalonDe, mensualidad } from "./datos";
 
 const MAXIMO = 1200;
 const TOPE_GRAFICA = 2700;
 const fmt = (n: number) => n.toLocaleString("es-MX");
 const precio = (n: number) => `$${fmt(n)}`;
-
-function escalonDe(p: number) {
-  if (p <= PRECIO.escalones.hasta) return 0;
-  if (p <= PRECIO.escalones.hastaSegundo) return 1;
-  return 2;
-}
-
-function detalleDe(p: number) {
-  const { hasta, hastaSegundo, porPacienteExtra, segundo } = PRECIO.escalones;
-  if (p <= hasta) return `Incluye hasta ${hasta} pacientes atendidos al mes.`;
-  if (p <= hastaSegundo) return `Pasaste de ${hasta}: incluye hasta ${hastaSegundo} pacientes atendidos.`;
-  return `${precio(segundo)} más $${porPacienteExtra} por cada uno de los ${fmt(p - hastaSegundo)} pacientes arriba de ${hastaSegundo}.`;
-}
 
 // La escalera en coordenadas de la gráfica (600 × 220).
 const x = (p: number) => (p / MAXIMO) * 600;

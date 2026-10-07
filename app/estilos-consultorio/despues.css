@@ -1,0 +1,805 @@
+/*
+ * Después del día (R-1, paso 6): la página normal, sobre la noche. Instalación, precio, preguntas, cierre
+ * y pie. Tinta y crema dominan; el verde no sale aquí (el único texto verde son las cifras de las 19:00) y
+ * el lima marca lo posible: el escalón donde caes en la calculadora. Las tarjetas son papel crema con la
+ * sombra dura de la hoja de Moli. Nada se anima al hacer scroll: lo único que se mueve es Moli si lo tocan
+ * y la pastilla cuando se acopla al botón del cierre.
+ */
+
+.despues {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 72px;
+  padding: 80px var(--margen) 96px;
+}
+
+/*
+ * Fuera de pantalla no se calcula: el primer layout de la página ya pesa ~630 ms con CPU 4× (la escena) y
+ * estas secciones le sumaban ~165 ms (traza del 7-oct). Con content-visibility se calculan al acercarse.
+ * Contiene la pintura: el relleno de arriba y abajo deja lugar a las sombras y al letrero del cierre.
+ */
+.seccion,
+.pie,
+.precio-frase,
+.calc > *,
+.cierre-dibujo {
+  content-visibility: auto;
+  contain-intrinsic-block-size: auto var(--alto);
+}
+/*
+ * El alto de cada pieza antes de calcularse: el medido a 390 y a 1280 px (7-oct). Si el estimado se aleja del
+ * real, lo de arriba cambia de alto al calcularse y «Precio» de la pastilla cae corto.
+ */
+.instalacion { --alto: 580px; }
+.precio { --alto: 1320px; }
+.preguntas { --alto: 625px; }
+.cierre { --alto: 650px; }
+.pie { --alto: 465px; }
+.cierre-dibujo { --alto: 375px; }
+.precio-frase { --alto: 300px; }
+.calc-inst { --alto: 120px; }
+.calc-control { --alto: 303px; }
+.calc-resultado { --alto: 161px; }
+.calc-atendido { --alto: 87px; }
+.calc-lista { --alto: 65px; }
+.calc-boton { --alto: 64px; }
+@media (min-width: 900px) {
+  .instalacion { --alto: 390px; }
+  .precio { --alto: 855px; }
+  .preguntas { --alto: 580px; }
+  .cierre { --alto: 500px; }
+  .pie { --alto: 322px; }
+  .cierre-dibujo { --alto: 468px; }
+  .precio-frase { --alto: 320px; }
+  .calc-control { --alto: 256px; }
+  .calc-resultado { --alto: 113px; }
+  .calc-atendido { --alto: 65px; }
+  .calc-lista { --alto: 44px; }
+  .calc-boton { --alto: 52px; }
+}
+.seccion {
+  scroll-margin-top: 64px;
+  max-width: 1120px;
+  width: 100%;
+  margin: 0 auto;
+  padding-block: 16px;
+}
+.seccion:focus {
+  outline: none;
+}
+
+.titulo-seccion {
+  font-family: var(--f-titular);
+  font-optical-sizing: auto;
+  font-weight: 800;
+  font-size: clamp(30px, 8.2vw, 56px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.texto-seccion {
+  margin-top: 12px;
+  max-width: 40ch;
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--crema-suave);
+  text-wrap: pretty;
+}
+
+/* ── Instalación: tres hojas del calendario de taco ── */
+.taco {
+  display: grid;
+  gap: 22px;
+  margin-top: 36px;
+  counter-reset: none;
+}
+.taco-paso {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.taco-hoja {
+  display: grid;
+  grid-template-rows: 22px 1fr;
+  height: 92px;
+  border-radius: 8px;
+  background: var(--crema);
+  color: var(--tinta);
+  box-shadow:
+    0 0 0 2.5px var(--tinta),
+    4px 4px 0 2.5px var(--apagado);
+  overflow: hidden;
+  rotate: -2deg;
+}
+.taco-paso:nth-child(2) .taco-hoja {
+  rotate: 1.5deg;
+}
+.taco-paso:nth-child(3) .taco-hoja {
+  rotate: -1deg;
+}
+.taco-hoja span {
+  display: grid;
+  place-items: center;
+  background: var(--tinta);
+  color: var(--crema);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  border-bottom: 2.5px solid var(--tinta);
+}
+.taco-hoja b {
+  display: grid;
+  place-items: center;
+  font: 800 34px/1 var(--f-titular);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.taco-cuando {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--lima);
+}
+.taco-que {
+  margin: 4px 0 0;
+  font: 800 23px/1.1 var(--f-titular);
+  letter-spacing: -0.02em;
+}
+.taco-detalle {
+  margin-top: 6px;
+  max-width: 34ch;
+  font-size: 16px;
+  line-height: 1.45;
+  color: var(--crema-suave);
+}
+
+/* ── Precio ── */
+.precio {
+  display: grid;
+  gap: 36px;
+}
+.garantia {
+  margin-top: 22px;
+  max-width: 40ch;
+  padding: 14px 16px;
+  border: 2px dashed var(--apagado);
+  border-radius: 14px;
+  font-size: 16px;
+  line-height: 1.45;
+}
+.fundador {
+  margin-top: 16px;
+  font: 22px/1.1 var(--f-mano);
+  color: var(--lima);
+}
+.precio-tarjeta {
+  min-width: 0;
+}
+/*
+ * El precio entero se calculaba de un jalón al acercarse: 84 objetos, ~40 ms con CPU 4× (una tarea de 50 a 57
+ * ms al hacer scroll). Por eso va en piezas (arriba), que VidaCierre calcula una por una en ratos libres.
+ */
+/* La pieza contiene su pintura: el margen deja ver el contorno de foco del deslizador (3 px + 4 px). */
+.calc-control {
+  margin-inline: -10px;
+  padding: 2px 10px 10px;
+}
+
+.calc {
+  display: grid;
+  gap: 22px;
+  padding: 22px 20px 24px;
+  border-radius: 22px;
+  background: var(--crema);
+  color: var(--tinta);
+  box-shadow:
+    0 0 0 2.5px var(--tinta),
+    6px 6px 0 2.5px var(--apagado);
+}
+.calc-etiqueta,
+.calc-cabeza label {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.calc-cabeza label {
+  letter-spacing: 0.02em;
+  text-transform: none;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+.calc-cifra {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 4px;
+}
+.calc-cifra b {
+  font: 800 40px/1 var(--f-titular);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.calc-cifra s {
+  font-size: 18px;
+  color: var(--tinta-suave);
+}
+.calc-inst {
+  padding-bottom: 20px;
+  border-bottom: 2px dashed var(--rayado);
+}
+.calc-inst small {
+  display: block;
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--tinta-suave);
+}
+.calc-control {
+  display: grid;
+  gap: 12px;
+}
+.calc-cabeza {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px 14px;
+}
+.calc-cuantos {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.calc-grafica {
+  position: relative;
+  height: 128px;
+  margin-top: 4px;
+}
+.calc-grafica svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.calc-area {
+  fill: var(--rayado);
+}
+.calc-borde {
+  fill: none;
+  stroke: var(--tinta);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.calc-escalon {
+  position: absolute;
+  translate: 0 calc(-100% - 6px);
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--tinta-suave);
+}
+.calc-escalon:last-of-type {
+  translate: 0 0;
+}
+/* Donde caes: lo posible va en lima. */
+.calc-escalon[data-activo] {
+  background: var(--lima);
+  color: var(--tinta);
+  box-shadow: 0 0 0 2px var(--tinta);
+}
+.calc-linea {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 0;
+  border-left: 2px dashed var(--tinta-suave);
+}
+.calc-punto {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: var(--lima);
+  box-shadow: 0 0 0 3px var(--tinta);
+}
+
+.calc input[type="range"] {
+  --llenado: 12.5%;
+  width: 100%;
+  height: 32px;
+  margin: 0;
+  background: transparent;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  touch-action: pan-y;
+}
+.calc input[type="range"]::-webkit-slider-runnable-track {
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--tinta) var(--llenado), var(--rayado) var(--llenado));
+}
+.calc input[type="range"]::-moz-range-track {
+  height: 10px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--tinta) var(--llenado), var(--rayado) var(--llenado));
+}
+.calc input[type="range"]::-webkit-slider-thumb {
+  width: 30px;
+  height: 30px;
+  margin-top: -10px;
+  border-radius: 50%;
+  background: var(--crema);
+  border: 3px solid var(--tinta);
+  box-shadow: 2px 2px 0 var(--tinta);
+  -webkit-appearance: none;
+  appearance: none;
+}
+.calc input[type="range"]::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--crema);
+  border: 3px solid var(--tinta);
+  box-shadow: 2px 2px 0 var(--tinta);
+}
+.calc input[type="range"]:focus-visible {
+  outline: 3px solid var(--tinta);
+  outline-offset: 4px;
+}
+.calc-marcas {
+  position: relative;
+  height: 18px;
+  font-size: 13px;
+  color: var(--tinta-suave);
+  font-variant-numeric: tabular-nums;
+}
+.calc-marcas span {
+  position: absolute;
+  top: 0;
+}
+
+.calc-resultado {
+  padding: 18px;
+  border-radius: 16px;
+  background: var(--tinta);
+  color: var(--crema);
+}
+.calc-mes {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+}
+.calc-mes b {
+  font: 800 48px/1 var(--f-titular);
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+.calc-mes span {
+  font-size: 15px;
+  color: var(--crema-suave);
+}
+.calc-detalle {
+  margin-top: 8px;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--crema-suave);
+}
+.calc-atendido,
+.calc-lista {
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--tinta-suave);
+}
+.calc-atendido b {
+  color: var(--tinta);
+}
+.calc-boton {
+  justify-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  padding: 8px 18px;
+  text-align: center;
+  font-size: 16px;
+  border-radius: 999px;
+  background: var(--tinta);
+  color: var(--crema);
+  font-weight: 600;
+  text-decoration: none;
+}
+.calc-boton:focus-visible {
+  outline-color: var(--tinta);
+}
+@media (hover: hover) {
+  .calc-boton:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+}
+
+/* ── Preguntas ── */
+.preguntas-lista {
+  margin-top: 28px;
+  max-width: 760px;
+  border-top: 2px dashed var(--apagado);
+}
+.pregunta {
+  border-bottom: 2px dashed var(--apagado);
+}
+.pregunta summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  min-height: 64px;
+  padding: 14px 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
+  cursor: pointer;
+  list-style: none;
+}
+.pregunta summary::-webkit-details-marker {
+  display: none;
+}
+/* La cruz: un + que gira a × al abrir. */
+.pregunta summary::after {
+  content: "";
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid var(--crema-suave);
+  background:
+    linear-gradient(var(--crema), var(--crema)) center / 12px 2px no-repeat,
+    linear-gradient(var(--crema), var(--crema)) center / 2px 12px no-repeat;
+  transition: rotate 0.25s ease;
+}
+.pregunta[open] summary::after {
+  rotate: 45deg;
+}
+.pregunta p {
+  max-width: 62ch;
+  padding: 0 0 20px;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--crema-suave);
+  text-wrap: pretty;
+}
+@media (hover: hover) {
+  .pregunta summary:hover {
+    text-decoration: underline;
+    text-underline-offset: 5px;
+    text-decoration-thickness: 1.5px;
+  }
+}
+
+/* ── Cierre: Moli en la luz del celular, con su letrero ── */
+.cierre {
+  display: grid;
+  gap: 28px;
+  justify-items: center;
+  text-align: center;
+}
+.cierre-dibujo {
+  position: relative;
+  width: min(100%, 360px);
+  /* Se calcula aparte del texto (content-visibility, arriba): el relleno deja ver el letrero. */
+  padding-top: 28px;
+}
+.cierre-escena {
+  position: relative;
+  aspect-ratio: 1;
+}
+.cierre-luz {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  fill: var(--crema);
+}
+.cierre-tel {
+  position: absolute;
+  right: 9%;
+  bottom: 19%;
+  width: 15%;
+  overflow: visible;
+}
+.moli-cierre {
+  position: absolute;
+  left: 15%;
+  bottom: 12%;
+  width: 46%;
+}
+/* El letrero va también en la versión quieta: es el dibujo del cierre, no una herramienta a media acción. */
+.cierre .mano-herramienta.letrero-cierre,
+:root:not(.cine) .cierre .mano-herramienta.letrero-cierre {
+  display: block;
+  left: 50%;
+  top: -3%;
+  width: 27%;
+  opacity: 1;
+  visibility: visible;
+  rotate: 9deg;
+  transform-origin: 50% 90%;
+}
+/* La cara feliz solo mientras contesta. */
+.moli-cierre .cara-feliz,
+.moli-cierre.contesta .cara-guardia {
+  display: none;
+}
+.moli-cierre.contesta .cara-feliz {
+  display: inline;
+}
+.cierre-toque {
+  position: absolute;
+  left: 12%;
+  top: 30%;
+  width: 54%;
+  height: 62%;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+.cierre-toque:focus-visible {
+  outline: 3px solid var(--lima);
+}
+/* Dentro de la luz, arriba de la cabeza de Moli y a la izquierda del letrero. */
+.nota-cierre {
+  position: absolute;
+  left: 12%;
+  top: 20%;
+  color: var(--tinta);
+  rotate: -6deg;
+  opacity: 0;
+}
+.cierre-dibujo:has(.contesta) .nota-cierre {
+  opacity: 1;
+}
+
+.cierre-texto {
+  display: grid;
+  justify-items: center;
+  gap: 0;
+}
+.cierre-texto .texto-seccion {
+  margin-inline: auto;
+}
+.cierre-boton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 64px;
+  margin-top: 26px;
+  padding: 0 28px 0 30px;
+  border-radius: 999px;
+  background: var(--crema);
+  color: var(--tinta);
+  font-size: 19px;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow:
+    0 0 0 2.5px var(--tinta),
+    5px 5px 0 2.5px var(--apagado);
+}
+.cierre-boton svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: translate 0.2s ease;
+}
+.cierre-boton:focus-visible {
+  outline-color: var(--lima);
+}
+@media (hover: hover) {
+  .cierre-boton:hover svg {
+    translate: 3px 0;
+  }
+}
+.cierre-boton:active {
+  scale: 0.97;
+}
+
+/* ── La pastilla se acopla al botón del cierre y desaparece ── */
+.pastilla {
+  transition:
+    background-color 0.3s,
+    color 0.3s,
+    box-shadow 0.3s,
+    translate 0.4s cubic-bezier(0.5, 0, 0.75, 0),
+    scale 0.4s cubic-bezier(0.5, 0, 0.75, 0),
+    opacity 0.25s 0.15s;
+}
+.acoplada .pastilla {
+  translate: calc(-50% + var(--acople-x, 0px)) var(--acople-y, 0px);
+  scale: 0.9;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* ── El pie ── */
+.pie {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 14px;
+  padding: 40px var(--margen) calc(var(--zona-pastilla) + 32px);
+  border-top: 2px dashed var(--apagado);
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--crema-suave);
+}
+.pie > * {
+  max-width: 1120px;
+  width: 100%;
+  margin-inline: auto;
+}
+.pie-marca b {
+  display: block;
+  margin-bottom: 4px;
+  font: 800 22px/1 var(--f-titular);
+  letter-spacing: -0.02em;
+  color: var(--crema);
+}
+.pie-contacto {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 22px;
+  color: var(--crema);
+}
+.pie-contacto a {
+  display: inline-block;
+  padding: 6px 0;
+  text-underline-offset: 4px;
+}
+.pie-contacto li:not(:has(a)) {
+  padding: 6px 0;
+}
+.pie-chica {
+  font-size: 13px;
+}
+
+/* Pasada la escena, la marca lleva fondo: el texto ya no pasa por debajo de ella. */
+.pagina .cabecera,
+:root:not(.cine) .cabecera {
+  background: var(--tinta);
+  box-shadow: 0 1px 0 var(--apagado);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .moli-cierre.salta {
+    animation: salta-cierre 0.9s cubic-bezier(0.3, 0, 0.3, 1);
+  }
+  .moli-cierre.salta ~ .letrero-cierre {
+    animation: letrero-cierre 0.9s ease-out;
+  }
+  .cierre-dibujo:has(.contesta) .nota-cierre {
+    animation: nota-cierre 1.8s ease-out both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pastilla,
+  .pregunta summary::after {
+    transition: none;
+  }
+}
+
+/* Salto de caricatura, el mismo del títere: anticipa, se estira, aterriza y rebota. */
+@keyframes salta-cierre {
+  0% {
+    transform: none;
+  }
+  13% {
+    transform: scale(1.08, 0.86);
+  }
+  31% {
+    transform: translateY(-13%) scale(0.94, 1.1);
+  }
+  47% {
+    transform: scale(1.05, 0.94);
+  }
+  65% {
+    transform: scale(0.98, 1.02);
+  }
+  100% {
+    transform: none;
+  }
+}
+@keyframes letrero-cierre {
+  0%,
+  100% {
+    transform: none;
+  }
+  30% {
+    transform: translateY(-6%) rotate(-8deg);
+  }
+  60% {
+    transform: rotate(5deg);
+  }
+}
+@keyframes nota-cierre {
+  0% {
+    opacity: 0;
+    transform: scale(0.6) translateY(10px);
+  }
+  15% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  25%,
+  80% {
+    opacity: 1;
+    transform: none;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+@media (min-width: 900px) {
+  .despues {
+    gap: 112px;
+    padding-top: 128px;
+  }
+  .texto-seccion {
+    font-size: 19px;
+  }
+  .taco {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    margin-top: 48px;
+  }
+  .taco-paso {
+    grid-template-columns: 1fr;
+  }
+  .precio {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);
+    gap: 64px;
+    align-items: start;
+  }
+  .precio-frase {
+    position: sticky;
+    top: 96px;
+  }
+  .calc {
+    padding: 30px 30px 32px;
+  }
+  .cierre {
+    grid-template-columns: 1fr 1fr;
+    justify-items: start;
+    align-items: center;
+    text-align: left;
+    gap: 48px;
+  }
+  .cierre-texto {
+    justify-items: start;
+    order: -1;
+  }
+  .cierre-texto .texto-seccion {
+    margin-inline: 0;
+  }
+  .cierre-dibujo {
+    width: min(100%, 440px);
+    justify-self: center;
+  }
+}

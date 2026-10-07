@@ -147,10 +147,10 @@ const PUNO = `
 const PALO = `<path d="M-7 -96H7V60H-7Z" fill="${C}" stroke="${T}" stroke-width="6"/>`;
 
 /** La mano con letrero de la hoja (para el cierre: «¡ESCRÍBENOS!»). */
-export function manoLetrero(texto = "¡ESCRÍBEME!") {
+export function manoLetrero(texto = "¡ESCRÍBEME!", tamano = 34) {
   return `${PALO}
     <path d="M-86 -208C-86 -222 -76 -230 -62 -230H62C78 -230 86 -222 86 -208V-112C86 -100 78 -94 64 -94H-64C-78 -94 -86 -100 -86 -112Z" fill="${C}" stroke="${T}" stroke-width="8" stroke-linejoin="round"/>
-    <text x="0" y="-150" text-anchor="middle" font-family="var(--f-mano), cursive" font-size="34" fill="${T}">${texto}</text>
+    <text x="0" y="-150" text-anchor="middle" font-family="var(--f-mano), cursive" font-size="${tamano}" fill="${T}">${texto}</text>
     <path d="M-40 -126q40 10 80 0" fill="none" stroke="${V}" stroke-width="7" stroke-linecap="round"/>
     ${PUNO}`;
 }

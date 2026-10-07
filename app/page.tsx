@@ -1,7 +1,8 @@
-import { PRECIO } from "@/components/historia/datos";
 import { DirectorNoche } from "@/components/consultorio/noche/DirectorNoche";
 import { EscenaNoche } from "@/components/consultorio/noche/EscenaNoche";
-import { ENLACE_ESCRIBENOS, Pastilla } from "@/components/consultorio/Pastilla";
+import { Pastilla } from "@/components/consultorio/Pastilla";
+import { Despues, Pie } from "@/components/consultorio/despues/Despues";
+import { VidaCierre } from "@/components/consultorio/despues/VidaCierre";
 
 const datosEstructurados = {
   "@context": "https://schema.org",
@@ -15,13 +16,10 @@ const datosEstructurados = {
     "Asistente con inteligencia artificial para el WhatsApp de clínicas dentales: contesta al instante, revisa la agenda y deja la cita en el calendario de la clínica.",
 };
 
-const pesos = (n: number) => `$${n.toLocaleString("es-MX")}`;
-
 /**
- * «Un día en tu consultorio», rediseño con Moli (R-1, rama r1-moli). Paso 5: el día está completo,
- * de las 23:47 a las 19:00, cuando la noche vuelve; lo que sigue (instalación, precio y preguntas) está
- * anunciado abajo, en obra.
- * Guion: proyecto/ventas/rebranding/GUION-LANDING.md.
+ * «Un día en tu consultorio», rediseño con Moli (R-1, rama r1-moli). Paso 6: el día completo, de las 23:47 a
+ * las 19:00, y después, sobre la noche, la página normal: instalación, precio, preguntas, el cierre con Moli
+ * y el pie. Guion: proyecto/ventas/rebranding/GUION-LANDING.md.
  */
 export default function Inicio() {
   return (
@@ -34,37 +32,12 @@ export default function Inicio() {
       </header>
       <main>
         <EscenaNoche />
-        <section className="en-obra" id="precio" aria-labelledby="titulo-obra">
-          <p className="ceja">Prototipo · paso 5 de varios</p>
-          <h2 id="titulo-obra" className="titulo-paso">
-            Después del día: el precio.
-          </h2>
-          <p className="texto-paso">
-            Aquí van la instalación, el precio y las preguntas. Por ahora está construido el día completo, de las 23:47
-            a las 19:00.
-          </p>
-          <dl className="precio-corto">
-            <div>
-              <dt>Precio fundador</dt>
-              <dd>
-                {pesos(PRECIO.instalacionFundador)} de instalación + {pesos(PRECIO.escalones.base)} al mes, hasta{" "}
-                {PRECIO.escalones.hasta} pacientes atendidos.
-              </dd>
-            </div>
-            <div>
-              <dt>Precio de lista</dt>
-              <dd>
-                {pesos(PRECIO.instalacionLista)} + desde {pesos(PRECIO.mensualidadLista)} al mes.
-              </dd>
-            </div>
-          </dl>
-          <a className="boton-obra" href={ENLACE_ESCRIBENOS} target="_blank" rel="noopener">
-            Escríbenos por WhatsApp
-          </a>
-        </section>
+        <Despues />
       </main>
+      <Pie />
       <Pastilla />
       <DirectorNoche />
+      <VidaCierre />
     </>
   );
 }
