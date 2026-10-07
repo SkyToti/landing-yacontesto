@@ -467,10 +467,10 @@
 
 /* ════════════ Modo cine: la escena fija y el scroll como reloj ════════════ */
 
-/* 9 pantallas de scroll: la noche, el arrancón del calendario, las 09:00 y las 11:20 (las pausas viven en pausas.ts). */
+/* 14.75 pantallas de scroll, del día entero: de las 23:47 a las 19:00 (las pausas viven en pausas.ts). */
 .cine .noche {
   position: relative;
-  height: calc(12.25 * 100svh);
+  height: calc(15.75 * 100svh);
 }
 .cine .escenario {
   position: sticky;

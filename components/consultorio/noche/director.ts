@@ -1,17 +1,18 @@
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { armarAnochecer } from "../dia/anochecer";
 import { armarManana } from "../dia/manana";
 import { armarMediodia } from "../dia/mediodia";
 import { armarTarde } from "../dia/tarde";
 import { type Cara } from "../moli/partes";
 import { crearMoli } from "../moli/titere";
-import { PANTALLAS, PAUSAS, T1 } from "../pausas";
+import { PANTALLAS, PAUSAS, T1, T5 } from "../pausas";
 import { PUNTOS } from "./dibujo";
 
 /**
  * El director de la escena fija: las 23:47 (aquí) y, con el mismo sistema, los actos de día: la
  * transición T1 y las 09:00 (`../dia/manana.ts`), la T2 y las 11:20 (`../dia/mediodia.ts`) y la T3
- * y las 16:05 (`../dia/tarde.ts`).
+ * y las 16:05 (`../dia/tarde.ts`), y la T4, la T5 y las 19:00, cuando la noche vuelve (`../dia/anochecer.ts`).
  * Dos relojes, como en la hoja de Moli:
  * - el SCROLL mueve la cámara (plano general ↔ primer plano), atado al pulgar;
  * - cada PAUSA dispara una actuación con su propio tiempo (Moli salta, habla, señala; llegan
@@ -36,6 +37,7 @@ const ARMADORES = [
   { nombre: "dia", armar: armarManana },
   { nombre: "mediodia", armar: armarMediodia },
   { nombre: "tarde", armar: armarTarde },
+  { nombre: "anochecer", armar: armarAnochecer },
 ];
 
 /** Lo de la noche se indexa por pausa de P0 a P6; de P7 en adelante la noche se queda como en P6. */
@@ -100,8 +102,12 @@ export function armarNoche(raiz: HTMLElement): () => void {
   const moliC = crearMoli(q('[data-moli="mc"]'), "mc-c", "dormita");
 
   const escritorio = matchMedia("(min-width: 900px)");
-  /** De día la marca y la pastilla se invierten (tinta sobre el papel). */
+  /** De día la marca y la pastilla se invierten (tinta sobre el papel); a las 19:00 vuelven a la noche. */
   const amanecer = (si: boolean) => document.documentElement.classList.toggle("dia", si);
+  const esDeDia = (self: ScrollTrigger) => {
+    const pos = self.progress * PANTALLAS;
+    return self.isActive && pos >= T1.amanece && pos < T5.anochece;
+  };
   let pausa = -1;
   let activa = false;
   let actuacion: gsap.core.Timeline | null = null;
@@ -164,11 +170,11 @@ export function armarNoche(raiz: HTMLElement): () => void {
       },
       onUpdate: (self) => {
         irA(pausaEn(self.progress));
-        amanecer(self.isActive && self.progress * PANTALLAS >= T1.amanece);
+        amanecer(esDeDia(self));
       },
       onToggle: (self) => {
         activa = self.isActive;
-        amanecer(self.isActive && self.progress * PANTALLAS >= T1.amanece);
+        amanecer(esDeDia(self));
       },
     });
 
@@ -408,7 +414,7 @@ export function armarNoche(raiz: HTMLElement): () => void {
           .to(luzChica, { opacity: 1, duration: 0.45, ease: "sine.inOut" }, 1.85)
           .to(luzGrande, { opacity: 0, duration: 0.3, ease: "sine.out" }, 2.3);
       },
-      // P7 a P15 (las 09:00, las 11:20 y las 16:05) los agregan los actos de día.
+      // P7 a P17 (las 09:00, las 11:20, las 16:05 y las 19:00) los agregan los actos de día.
     };
 
     function irA(k: number) {

@@ -18,9 +18,9 @@ const datosEstructurados = {
 const pesos = (n: number) => `$${n.toLocaleString("es-MX")}`;
 
 /**
- * «Un día en tu consultorio», rediseño con Moli (R-1, rama r1-moli). Paso 4: están construidas
- * las 23:47, el arrancón del calendario, las 09:00, el recorrido del mostrador, las 11:20, el viaje al
- * consultorio y las 16:05; lo que sigue del día está anunciado abajo, en obra.
+ * «Un día en tu consultorio», rediseño con Moli (R-1, rama r1-moli). Paso 5: el día está completo,
+ * de las 23:47 a las 19:00, cuando la noche vuelve; lo que sigue (instalación, precio y preguntas) está
+ * anunciado abajo, en obra.
  * Guion: proyecto/ventas/rebranding/GUION-LANDING.md.
  */
 export default function Inicio() {
@@ -35,13 +35,13 @@ export default function Inicio() {
       <main>
         <EscenaNoche />
         <section className="en-obra" id="precio" aria-labelledby="titulo-obra">
-          <p className="ceja">Prototipo · paso 4 de varios</p>
+          <p className="ceja">Prototipo · paso 5 de varios</p>
           <h2 id="titulo-obra" className="titulo-paso">
-            El día sigue: 19:00.
+            Después del día: el precio.
           </h2>
           <p className="texto-paso">
-            Aquí van la última escena, el precio y las preguntas. Por ahora están construidas la de las 23:47, la de las
-            09:00, la de las 11:20 y la de las 16:05.
+            Aquí van la instalación, el precio y las preguntas. Por ahora está construido el día completo, de las 23:47
+            a las 19:00.
           </p>
           <dl className="precio-corto">
             <div>

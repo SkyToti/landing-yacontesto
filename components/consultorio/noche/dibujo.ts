@@ -92,8 +92,16 @@ export function calendario(e: Estilo, dia = "14", semana = "MIÉ") {
   ].join("");
 }
 
-/** El reloj de pared en 23:47: la hora en 353.5° y el minutero en 282°. De día las manecillas giran aparte. */
-export function reloj(e: Estilo, conManecillas = true) {
+/**
+ * Lo que cambia entre una noche y otra: la hoja del calendario y la hora del reloj (los grados de cada
+ * manecilla). La de las 23:47 es la del miércoles 14; a las 19:00 la noche vuelve el jueves 15.
+ */
+export type Momento = { dia: string; semana: string; hora: number; minuto: number };
+export const ONCE_47: Momento = { dia: "14", semana: "MIÉ", hora: 353.5, minuto: 282 };
+export const SIETE: Momento = { dia: "15", semana: "JUE", hora: 210, minuto: 0 };
+
+/** El reloj de pared, por omisión en 23:47 (la hora en 353.5° y el minutero en 282°). De día las manecillas giran aparte. */
+export function reloj(e: Estilo, conManecillas = true, { hora, minuto } = ONCE_47) {
   const cx = 392;
   const cy = 452;
   const punta = (grados: number, largo: number) => {
@@ -103,8 +111,8 @@ export function reloj(e: Estilo, conManecillas = true) {
   return [
     forma(`M${cx} ${cy - 37}C${cx + 21} ${cy - 37} ${cx + 37} ${cy - 20} ${cx + 36} ${cy + 1}C${cx + 36} ${cy + 22} ${cx + 20} ${cy + 37} ${cx - 1} ${cy + 36}C${cx - 22} ${cy + 36} ${cx - 37} ${cy + 20} ${cx - 36} ${cy}C${cx - 36} ${cy - 21} ${cx - 21} ${cy - 37} ${cx} ${cy - 37}Z`, e, 6),
     linea(`M${cx} ${cy - 30}v7M${cx + 30} ${cy}h-7M${cx} ${cy + 30}v-7M${cx - 30} ${cy}h7`, e.trazo, 4),
-    conManecillas ? linea(`M${cx} ${cy}L${punta(353.5, 17)}`, e.trazo, 6) : "",
-    conManecillas ? linea(`M${cx} ${cy}L${punta(282, 25)}`, e.trazo, 4.5) : "",
+    conManecillas ? linea(`M${cx} ${cy}L${punta(hora, 17)}`, e.trazo, 6) : "",
+    conManecillas ? linea(`M${cx} ${cy}L${punta(minuto, 25)}`, e.trazo, 4.5) : "",
     conManecillas ? `<circle cx="${cx}" cy="${cy}" r="4" fill="${e.trazo}"/>` : "",
   ].join("");
 }
@@ -158,9 +166,9 @@ export function compu(e: Estilo, encendida = false) {
   ].join("");
 }
 
-/** El consultorio completo en un estilo. */
-function consultorio(e: Estilo, conLetrero: boolean) {
-  return piso(e) + ventana(e) + (conLetrero ? letrero() : "") + calendario(e) + reloj(e) + mostrador(e) + telefono(e) + compu(e);
+/** El consultorio completo en un estilo, en un momento (la hoja del calendario y la hora del reloj). */
+function consultorio(e: Estilo, conLetrero: boolean, m: Momento) {
+  return piso(e) + ventana(e) + (conLetrero ? letrero() : "") + calendario(e, m.dia, m.semana) + reloj(e, true, m) + mostrador(e) + telefono(e) + compu(e);
 }
 
 export const FILTRO_FONDO = `<filter id="tinta-fondo" x="-5%" y="-5%" width="110%" height="110%">
@@ -169,18 +177,18 @@ export const FILTRO_FONDO = `<filter id="tinta-fondo" x="-5%" y="-5%" width="110
 </filter>`;
 
 /** Lo de fuera de la luz. */
-export function dibujoApagado() {
-  return consultorio(APAGADO, true);
+export function dibujoApagado(m = ONCE_47) {
+  return consultorio(APAGADO, true, m);
 }
 
 /**
  * Lo de dentro de una luz: la mancha crema y el consultorio en tinta, recortado por ella.
  * Con la pantalla apagada (la luz chica del final), el celular ya no alumbra ni enseña burbujas.
  */
-export function dibujoEncendido(id: string, x: number, y: number, r: number, semilla: number, pantallaEncendida = true) {
+export function dibujoEncendido(id: string, x: number, y: number, r: number, semilla: number, pantallaEncendida = true, m = ONCE_47) {
   const borde = mancha(x, y, r, r * 0.96, semilla);
   const estilo = pantallaEncendida ? ENCENDIDO : { ...ENCENDIDO, pantalla: "#0E100F", burbujas: false };
   return `<clipPath id="${id}"><path d="${borde}"/></clipPath>
     <path d="${borde}" fill="#FFFCE1"/>
-    <g clip-path="url(#${id})">${consultorio(estilo, false)}</g>`;
+    <g clip-path="url(#${id})">${consultorio(estilo, false, m)}</g>`;
 }

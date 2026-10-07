@@ -1,12 +1,14 @@
 // ¿Se asoma el fondo de tinta entre las capas de día? Recorre de día con el scroll (de P7 a P15) y, en
-// cada cuadro, multiplica lo transparente de las capas que están prendidas (plano general de día y los
-// primeros planos de las 09:00, las 11:20 y las 16:05). Si dos capas se cruzan a media opacidad, el producto pasa
-// de 0 y se ve un velo gris con doble imagen (lo que vio Diego el 5-oct al salir de P9).
+// cada cuadro, multiplica lo transparente de las capas que están prendidas (plano general de día, los
+// primeros planos de las 09:00, las 11:20 y las 16:05, y la noche de las 19:00). Si dos capas se cruzan a media
+// opacidad, el producto pasa de 0 y se ve un velo gris con doble imagen (lo que vio Diego el 5-oct al salir de P9).
+// La noche de las 19:00 entra como un iris: solo cuenta como capa que tapa cuando el círculo ya cubre las cuatro
+// esquinas de la pantalla (mientras crece, lo de abajo tiene que seguir completo).
 // Uso (con el servidor de out/ en marcha): node scripts/r1-velo.mjs [URL]
 import { chromium } from "playwright";
 
 const URL = process.argv[2] ?? "http://localhost:3200/";
-const PANTALLAS = 11.25;
+const PANTALLAS = 14.75;
 const navegador = await chromium.launch();
 let falla = false;
 for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 800 }]) {
@@ -18,10 +20,20 @@ for (const viewport of [{ width: 390, height: 844 }, { width: 1280, height: 800 
   const r = await pagina.evaluate(async (total) => {
     const s = document.getElementById("noche");
     const ir = (p) => window.scrollTo(0, s.offsetTop + (p / total) * (s.offsetHeight - innerHeight));
-    const capas = [".plano-dia", ".dia-cerca", ".mediodia-cerca", ".tarde-cerca"].map((q) => s.querySelector(q));
+    const capas = [".plano-dia", ".dia-cerca", ".mediodia-cerca", ".tarde-cerca", ".plano-anochecer"].map((q) => s.querySelector(q));
+    const iris = s.querySelector(".anochecer-iris");
+    const escenario = s.querySelector(".escenario").getBoundingClientRect();
+    const cubre = () => {
+      if (getComputedStyle(iris).visibility === "hidden") return 0;
+      const r = iris.getBoundingClientRect();
+      const [cx, cy, radio] = [r.left + r.width / 2, r.top + r.height / 2, r.width / 2];
+      const esquinas = [[escenario.left, escenario.top], [escenario.right, escenario.top], [escenario.left, escenario.bottom], [escenario.right, escenario.bottom]];
+      return esquinas.every(([x, y]) => Math.hypot(x - cx, y - cy) <= radio) ? 1 : 0;
+    };
     const opaca = (el) => {
       const c = getComputedStyle(el);
-      return c.display === "none" || c.visibility === "hidden" ? 0 : Number(c.opacity);
+      if (c.display === "none" || c.visibility === "hidden") return 0;
+      return el.classList.contains("plano-anochecer") ? Number(c.opacity) * cubre() : Number(c.opacity);
     };
     const cuadro = () => new Promise((res) => requestAnimationFrame(res));
     ir(5.25);

@@ -221,7 +221,8 @@ export function armarTarde(raiz: HTMLElement, { escenario, escritorio }: Opcione
    */
   let ultimo = 12;
   function estado(pausa: number) {
-    const k = Math.max(pausa, 12);
+    // Desde las 19:00 esta capa ya se fue: se queda como en P15, sin medir nada (el chat mide).
+    const k = Math.min(Math.max(pausa, 12), 15);
     if (k === ultimo) return;
     ultimo = k;
     const n = BURBUJAS[k] ?? 0;
@@ -354,8 +355,8 @@ export function armarTarde(raiz: HTMLElement, { escenario, escritorio }: Opcione
     ]),
   );
 
-  /** El Moli que está a cuadro (para la línea viva): de P13 en adelante, el de las 16:05. */
-  const moliEn = (k: number): Titere | null | undefined => (k >= 13 ? moli : undefined);
+  /** El Moli que está a cuadro (para la línea viva): de P13 a P15, el de las 16:05. */
+  const moliEn = (k: number): Titere | null | undefined => (k >= 13 && k <= 15 ? moli : k > 15 ? null : undefined);
   const reponer = () => {
     manos = null;
     ultimo = -1;

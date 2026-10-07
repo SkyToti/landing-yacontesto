@@ -1,0 +1,161 @@
+/*
+ * Las 19:00, con la T4 (la cámara vuelve a la ventana) y la T5 (la noche entra por ella). La noche de
+ * las 19:00 es el consultorio de las 23:47 con el reloj en 19:00 y la hoja del jueves 15, la luz del
+ * celular y Moli de guardia; arriba, las tres cifras cruzan la pantalla. Solo las cifras van en verde,
+ * y siempre sobre tinta (guion, escena 5).
+ */
+
+/* ── Las cifras (la cámara prende su capa en la T4, con ellas fuera de cuadro) ── */
+.cifra {
+  font-family: var(--f-titular);
+  font-optical-sizing: auto;
+  font-weight: 800;
+  line-height: 0.92;
+  letter-spacing: -0.04em;
+  color: var(--crema);
+  white-space: nowrap;
+}
+.cifra b,
+.cifra-verde {
+  color: var(--verde);
+}
+.cifra b {
+  font-weight: inherit;
+}
+.texto-paso .cifra-verde {
+  font-weight: 600;
+}
+
+/* ════════════ Modo cine ════════════ */
+
+.cine .escenario {
+  --cifra-fs: min(19vw, 92px);
+}
+
+/*
+ * La noche que vuelve: como las otras capas nuevas, display: none hasta que la cámara la pide en la T4.
+ * El iris es una ventana redonda de 2·(ancho + alto) de lado (su radio alcanza cualquier esquina); la
+ * cámara la escala desde el vidrio y el contenido, que llena la pantalla, se escala al revés.
+ */
+.cine .plano-anochecer {
+  z-index: 3;
+  display: none;
+}
+.cine .anochecer-iris {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(2 * (100cqw + 100cqh));
+  height: calc(2 * (100cqw + 100cqh));
+  overflow: hidden;
+  border-radius: 50%;
+  visibility: hidden;
+  will-change: transform;
+}
+.cine .anochecer-contenido {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100cqw;
+  height: 100cqh;
+  background: var(--tinta);
+  transform-origin: 0 0;
+  will-change: transform;
+}
+/* La misma lámina que la de día, centrada con margen y no con translate: su x es solo la de la cámara. */
+.cine .lamina-anochecer {
+  translate: none;
+  margin-left: calc(max(100cqw, 100cqh * 0.5334) / -2);
+  transform-origin: 84% 66.4%;
+}
+/* El reposo de antes de las 19:00 vive aquí y no en el director (anochecer.ts): la luz apagada y Moli de
+   guardia sin llegar. La cámara los prende en la T4, un poco después que el dibujo. */
+.cine .luz-siete {
+  display: none;
+  opacity: 0;
+}
+.cine .moli-guardia {
+  display: none;
+  opacity: 0;
+  visibility: hidden;
+}
+
+/* Las cifras cruzan por arriba, en la noche: debajo de los rótulos, encima de todo lo demás. */
+.cine .cifras {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: none;
+  overflow: hidden;
+  pointer-events: none;
+}
+.cine .cifra {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 60px;
+  padding: 0 var(--margen);
+  font-size: var(--cifra-fs);
+  will-change: transform;
+}
+.cine .cifra-larga span {
+  display: block;
+}
+
+/* En el celular el rótulo de cada cifra va debajo de ella (una o dos líneas de cifra). */
+@media (max-width: 899px) {
+  .cine .rotulo-cifra {
+    top: calc(70px + var(--lineas) * 0.92 * var(--cifra-fs));
+  }
+}
+@media (max-height: 760px) and (max-width: 899px) {
+  .cine .escenario {
+    --cifra-fs: min(16vw, 80px);
+  }
+}
+
+/* En escritorio el rótulo sigue en su columna y la cifra cruza arriba, en una sola línea. */
+@media (min-width: 900px) {
+  .cine .escenario {
+    --cifra-fs: min(9vw, 132px);
+  }
+  .cine .cifra {
+    top: 9svh;
+  }
+  .cine .cifra-larga span {
+    display: inline;
+  }
+}
+
+/* ════════════ Versión quieta: el cuadro final de las 19:00 ════════════ */
+
+:root:not(.cine) .plano-anochecer {
+  order: 13;
+  position: relative;
+  width: 100%;
+  max-width: 560px;
+  aspect-ratio: 480 / 560;
+  margin: 0 auto;
+  overflow: hidden;
+}
+:root:not(.cine) .anochecer-iris,
+:root:not(.cine) .anochecer-contenido {
+  position: absolute;
+  inset: 0;
+}
+:root:not(.cine) .cifras {
+  order: 14;
+  display: grid;
+  gap: 8px;
+  padding: 0 var(--margen);
+  font-size: clamp(54px, 15vw, 112px);
+}
+/* Quieta, la cifra larga se parte en dos líneas si no cabe. */
+:root:not(.cine) .cifra {
+  white-space: normal;
+}
+:root:not(.cine) .pasos-anochecer {
+  order: 12;
+  /* La numeración sigue la de las 16:05. */
+  counter-reset: none;
+}

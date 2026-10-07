@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { Bolita, CercaDia, CercaMediodia, CercaTarde, PlanoDia, RotulosDia, RotulosMediodia, RotulosTarde } from "../dia/PlanosDia";
+import { Cifras, PlanoAnochecer, RotulosAnochecer } from "../dia/PlanosAnochecer";
 import { CHAT_MEDIODIA, CHAT_TARDE } from "../dia/textos";
 import { ManoHerramienta, Moli } from "../moli/Moli";
 import { Rejilla, Telefono } from "../piezas";
@@ -84,6 +85,10 @@ function Transcripcion() {
           </li>
         ))}
       </ol>
+      <p>
+        A las 19:00 Ana se despide, voltea el letrero a «Cerrado» y se va. Anochece y el consultorio vuelve a quedar a
+        oscuras, con la luz del celular de la clínica prendida: el asistente se queda de guardia.
+      </p>
     </div>
   );
 }
@@ -102,7 +107,7 @@ function Agenda() {
 
 /**
  * El día en el consultorio, en una sola escena fija: 23:47 (la portada y la noche), el arrancón del
- * calendario (T1), las 09:00, las 11:20 y las 16:05 (`../dia/`).
+ * calendario (T1), las 09:00, las 11:20, las 16:05 y las 19:00, cuando la noche vuelve (`../dia/`).
  * 23:47: la portada y la noche. Plano general (el consultorio cerrado, la luz del celular y Moli
  * dormitando) y primer plano (el chat, la agenda y Moli actuando cada capacidad).
  * Sin JavaScript o con movimiento reducido, todo se ve quieto y completo (clase `cine` ausente).
@@ -131,6 +136,7 @@ export function EscenaNoche() {
           <RotulosDia />
           <RotulosMediodia />
           <RotulosTarde />
+          <RotulosAnochecer />
         </div>
 
         <PlanoDia />
@@ -206,6 +212,8 @@ export function EscenaNoche() {
         <CercaDia />
         <CercaMediodia />
         <CercaTarde />
+        <PlanoAnochecer />
+        <Cifras />
         <Bolita />
 
         <p className="desliza" aria-hidden="true">
