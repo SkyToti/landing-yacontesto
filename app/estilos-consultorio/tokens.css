@@ -33,4 +33,14 @@
   :root {
     --margen: 6vw;
   }
+  /*
+   * Un píxel de los primeros planos de escritorio, que se diseñaron y probaron a 1280 × 800. Crece con la
+   * pantalla (lo que pida menos: el ancho o el alto) y nunca baja de 1 px: a 1280 × 800 y abajo no cambia
+   * nada, y a 1920 × 950 vale ~1.19 px. Sin él, a 1920 el celular, Ana y Moli se veían chiquitos y
+   * separados, con mucho papel vacío (recorrido del 7-oct, paso 8 del guion). Solo en el cine: la versión
+   * quieta tiene su propia rejilla. Se usa como `calc(296 * var(--u, 1px))`.
+   */
+  .cine {
+    --u: max(1px, min(100vw / 1280, 100svh / 800));
+  }
 }

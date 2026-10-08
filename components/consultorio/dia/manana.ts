@@ -16,6 +16,9 @@ import { HOMBROS } from "./dibujo";
 
 export type Opciones = { escenario: HTMLElement; escritorio: MediaQueryList };
 
+/** El corte de P7 a P8: el empujón (que acelera) ya dejó la computadora casi del tamaño del primer plano. */
+const CORTE_P8 = 5.88;
+
 export function armarManana(raiz: HTMLElement, { escenario, escritorio }: Opciones) {
   const q = <T extends Element = HTMLElement>(s: string) => raiz.querySelector<T>(s)!;
 
@@ -114,10 +117,12 @@ export function armarManana(raiz: HTMLElement, { escenario, escritorio }: Opcion
       // Se prende a media P7 y no junto al empujón: si su primer cálculo de diseño cae en el mismo cuadro
       // en que P8 mide la mano, sale una tarea larga (medido: 52–60 ms con la CPU 4× más lenta).
       .set(cercaDia, { display: "block" }, 5.2)
-      .fromTo(cercaDia, { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, ease: "power2.out", duration: 0.36, immediateRender: false }, 5.64)
-      // El plano general se apaga cuando el primer plano ya lo tapa entero, no a la vez: dos capas cruzadas
-      // a media opacidad dejan ver la tinta del fondo (un velo gris con doble imagen; scripts/r1-velo.mjs).
-      .set(planoDia, { opacity: 0 }, 6.0);
+      // Corte, no fundido (como en la noche: director.ts): el plano general se apaga en el mismo instante en
+      // que se prende el primer plano, ya con la computadora grande. Fundidos se veían encimados (dos Anas,
+      // dos Molis). El primer plano termina de crecer; sus orillas son el papel del escenario (dia.css).
+      .set(planoDia, { opacity: 0 }, CORTE_P8)
+      .set(cercaDia, { autoAlpha: 1 }, CORTE_P8)
+      .fromTo(cercaDia, { scale: 0.92 }, { scale: 1, ease: "power2.out", duration: 0.12, immediateRender: false }, CORTE_P8);
   }
 
   /* ── Reposo: lo que se ve quieto en cada pausa ── */

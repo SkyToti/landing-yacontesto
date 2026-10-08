@@ -4,7 +4,7 @@
 // su posición de scroll y arma hojas de contacto por tramo (de la pausa anterior a la siguiente) y para
 // el resto de la página, con la diferencia entre cuadros (Δ) para encontrar brincos. Así se vieron las
 // dos escenas encimadas en los cambios de cámara y lo vacío de las escenas de cerca a 1920 px.
-// Uso (con el servidor de out/ en marcha): node scripts/r1-recorrido.mjs [URL] [carpeta] [--perfiles iphone,pc,ipad]
+// Uso (con el servidor de out/ en marcha): node scripts/r1-recorrido.mjs [URL] [carpeta] [--perfiles iphone,pc,ipad,laptop]
 // Por omisión: http://localhost:3200/ e investigacion/r1-capturas/recorrido (fuera de git).
 import { mkdir, writeFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -26,6 +26,7 @@ const PERFILES = {
   iphone: { viewport: { width: 390, height: 664 }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, miniatura: 200, columnas: 6 },
   ipad: { viewport: { width: 834, height: 1112 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, miniatura: 280, columnas: 5 },
   pc: { viewport: { width: 1920, height: 950 }, deviceScaleFactor: 1, miniatura: 470, columnas: 3 },
+  laptop: { viewport: { width: 1280, height: 800 }, deviceScaleFactor: 1, miniatura: 400, columnas: 3 },
 };
 
 const navegador = await chromium.launch();

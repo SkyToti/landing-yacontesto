@@ -163,10 +163,11 @@ export function armarAnochecer(raiz: HTMLElement, { escenario, escritorio }: Opc
   function camara(tl: gsap.core.Timeline) {
     const t = T4.inicio;
     tl
-      // El primer plano de las 16:05 se aleja: debajo ya está el plano general, completo (sin velo).
+      // Corte del primer plano de las 16:05 al plano general, en el mismo instante (sin fundido: dos capas
+      // a media opacidad se ven encimadas; scripts/r1-recorrido.mjs, 7-oct).
       .to(capaRotulos, { opacity: 0, duration: 0.06 }, t)
       .set(planoDia, { opacity: 1 }, t)
-      .to(cercaTarde, { autoAlpha: 0, scale: 0.96, ease: "power1.in", duration: 0.08 }, t)
+      .set(cercaTarde, { autoAlpha: 0 }, t)
       // La cámara vuelve del consultorio a la ventana, pasando por el reloj, que gira de 16:05 a 19:00:
       // el minutero da dos vueltas y once doceavos.
       .to(laminaDia, { scale: PUERTA.escala, x: () => `+=${mide().dx}`, ease: "power1.inOut", duration: 0.38 }, t + 0.04)

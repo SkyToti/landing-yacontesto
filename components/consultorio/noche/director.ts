@@ -130,19 +130,26 @@ export function armarNoche(raiz: HTMLElement): () => void {
     };
 
     /* ── La cámara, atada al scroll ── */
+    // Cada cambio de plano es un CORTE: en el mismo instante se apaga uno y se prende el otro. Fundidos,
+    // los dos se veían encimados a media opacidad (un Moli gigante y gris detrás del celular, el texto
+    // sobre su cara; recorrido del 7-oct, scripts/r1-recorrido.mjs). El primer plano llega un poco chico y
+    // termina de crecer, como si la cámara siguiera empujando: sin fondo propio, sus orillas son la noche.
     const camara = gsap.timeline({ defaults: { ease: "none" } });
+    const CORTE_IDA = 0.84;
+    const CORTE_VUELTA = 3.9;
     camara
       .set({}, {}, PANTALLAS)
-      // Empujón al celular: el plano general crece hacia él y se funde con el primer plano.
+      // Empujón al celular: el plano general crece hacia él y, ya encima, corte al primer plano.
       .fromTo(lamina, { scale: 1 }, { scale: 2.3, ease: "power2.in", duration: 0.72 }, 0.18)
       // Solo opacidad, sin visibility: oculto, el plano tendría que volver a rasterizarse al regresar
       // (medido: un cuadro de ~40 ms justo al iniciar el regreso de la cámara).
-      .fromTo(general, { opacity: 1 }, { opacity: 0, duration: 0.28 }, 0.62)
-      .fromTo(cerca, { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, ease: "power2.out", duration: 0.4 }, 0.58)
+      .set(general, { opacity: 0 }, CORTE_IDA)
+      .set(cerca, { autoAlpha: 1 }, CORTE_IDA)
+      .fromTo(cerca, { scale: 0.92 }, { scale: 1, ease: "power2.out", duration: 0.16, immediateRender: false }, CORTE_IDA)
       // De regreso al plano general: la noche sigue y Moli vuelve a su guardia.
-      .to(cerca, { autoAlpha: 0, scale: 0.92, ease: "power2.in", duration: 0.32 }, 3.86)
-      .fromTo(lamina, { scale: 2.3 }, { scale: 1, ease: "power2.out", duration: 0.55, immediateRender: false }, 3.9)
-      .to(general, { opacity: 1, duration: 0.3 }, 3.9);
+      .set(cerca, { autoAlpha: 0 }, CORTE_VUELTA)
+      .set(general, { opacity: 1 }, CORTE_VUELTA)
+      .fromTo(lamina, { scale: 2.3 }, { scale: 1, ease: "power2.out", duration: 0.55, immediateRender: false }, CORTE_VUELTA);
 
     const mitades = PAUSAS.slice(1).map((p, i) => (PAUSAS[i] + p) / 2);
     const pausaEn = (progreso: number) => {
@@ -493,12 +500,26 @@ export function armarNoche(raiz: HTMLElement): () => void {
     reponer();
   };
   escritorio.addEventListener("change", alCambiarTamano);
+  // En escritorio los primeros planos miden en --u (tokens.css), que crece con la ventana: si cambió, lo
+  // que se midió de las manos con el tamaño anterior quedaría chueco y se vuelve a medir.
+  const unidad = () => (escritorio.matches ? Math.max(1, Math.min(innerWidth / 1280, innerHeight / 800)) : 1);
+  let u = unidad();
+  const alRefrescar = () => {
+    const nueva = unidad();
+    if (Math.abs(nueva - u) < 0.001) return;
+    u = nueva;
+    actuacion?.progress(1).kill();
+    actuacion = null;
+    reponer();
+  };
+  ScrollTrigger.addEventListener("refresh", alRefrescar);
 
   return () => {
     copia.replaceChildren();
     window.clearInterval(linea);
     window.clearTimeout(diferido);
     escritorio.removeEventListener("change", alCambiarTamano);
+    ScrollTrigger.removeEventListener("refresh", alRefrescar);
     actuacion?.kill();
     ctx.revert();
     amanecer(false);

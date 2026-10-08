@@ -20,14 +20,19 @@ export const T1 = {
 };
 
 /**
- * Lo que pasa entre P9 y P10, atado al pulgar: la cámara se aleja del celular, se desliza por el
- * mostrador mientras el reloj gira de 09:00 a 11:20 y entra al primer plano de las 11:20.
+ * Lo que pasa entre P9 y P10, atado al pulgar: la cámara no sale del primer plano. Corta del celular de
+ * las 09:00 al de las 11:20, que está en el mismo lugar: el mismo celular, otra hora y otro paciente.
+ * Antes se alejaba hasta el mostrador y medio segundo después volvía a otro chat casi igual: un zoom de
+ * ida y vuelta sin motivo (lo vio Diego el 7-oct; paso 8 del guion). Debajo, sin verse, el plano general
+ * se acomoda en el celular de la clínica para que la T3 arranque desde ahí, y el reloj llega a las 11:20.
  * La pausa cambia a la mitad (7.05): la actuación de P10 espera a que el primer plano ya esté.
  */
 export const T2 = {
-  /** El primer plano de las 09:00 se aleja y vuelve el plano general, cerca del mostrador. */
+  /** Se apartan los rótulos y, sin verse, el plano general empieza a moverse. */
   inicio: 6.72,
-  /** Entra el primer plano de las 11:20. */
+  /** Corte al primer plano de las 11:20. */
+  corte: 7.0,
+  /** El plano general, sin verse, ya empuja hacia el celular de la clínica. */
   llega: 7.14,
 };
 

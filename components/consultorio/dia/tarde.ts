@@ -184,10 +184,11 @@ export function armarTarde(raiz: HTMLElement, { escenario, escritorio }: Opcione
   function camara(tl: gsap.core.Timeline) {
     const t = T3.inicio;
     tl
-      // El primer plano de las 11:20 se aleja: debajo ya está el plano general, completo (sin velo).
+      // Corte del primer plano de las 11:20 al plano general, en el mismo instante (sin fundido: dos capas a
+      // media opacidad se ven encimadas; scripts/r1-recorrido.mjs, 7-oct). La T2 lo dejó en ese celular.
       .to(capaRotulos, { opacity: 0, duration: 0.06 }, t)
       .set(planoDia, { opacity: 1 }, t)
-      .to(cercaMediodia, { autoAlpha: 0, scale: 0.96, ease: "power1.in", duration: 0.08 }, t)
+      .set(cercaMediodia, { autoAlpha: 0 }, t)
       // El consultorio se prende ya con la cámara en marcha y lejos de la pausa: su primer cálculo de
       // diseño no cae en el cuadro en que una actuación mide (sección 7 del guion).
       // La lámina deja de recortar lo que sale de su caja: el consultorio vive a su derecha.
@@ -208,9 +209,11 @@ export function armarTarde(raiz: HTMLElement, { escenario, escritorio }: Opcione
       .call(() => void (manos ?? mideManos()), undefined, t + 0.3)
       // Y se va a la derecha, al consultorio: el doctor atiende en el sillón con las manos ocupadas.
       .to(laminaDia, { scale: ESCALA_CONSULTORIO, x: () => `+=${encuadres.consultorio}`, ease: "power1.inOut", duration: 0.2 }, t + 0.22)
-      // Corte al primer plano: el celular de la clínica, que ya está sonando.
-      .fromTo(cerca, { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, ease: "power2.out", duration: 0.12, immediateRender: false }, T3.llega)
-      .set(planoDia, { opacity: 0 }, T3.llega + 0.14)
+      // Corte al primer plano: el celular de la clínica, que ya está sonando. El plano general se apaga en
+      // el mismo instante; el primer plano termina de crecer y sus orillas son el papel del escenario.
+      .set(planoDia, { opacity: 0 }, T3.llega)
+      .set(cerca, { autoAlpha: 1 }, T3.llega)
+      .fromTo(cerca, { scale: 0.92 }, { scale: 1, ease: "power2.out", duration: 0.12, immediateRender: false }, T3.llega)
       .to(capaRotulos, { opacity: 1, duration: 0.1 }, T3.llega + 0.06);
   }
 

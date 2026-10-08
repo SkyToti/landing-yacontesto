@@ -61,22 +61,23 @@
   z-index: 3;
 }
 
+/* En --u, como los de la noche (tokens.css): a 1280 son píxeles; en pantallas más grandes, crecen. */
 @media (min-width: 900px) {
   .cine .tel-mediodia {
     left: 40%;
-    top: calc(50% - min(600px, 78svh) / 2);
+    top: calc(50% - min(600 * var(--u, 1px), 78svh) / 2);
     bottom: auto;
-    width: 296px;
-    height: min(600px, 78svh);
+    width: calc(296 * var(--u, 1px));
+    height: min(600 * var(--u, 1px), 78svh);
   }
   .cine .ana-mediodia {
-    left: calc(40% + 316px);
+    left: calc(40% + 316 * var(--u, 1px));
     bottom: 9svh;
-    height: 210px;
+    height: calc(210 * var(--u, 1px));
   }
   .mano-estafeta,
   .mano-puno {
-    width: 150px;
+    width: calc(150 * var(--u, 1px));
   }
 }
 

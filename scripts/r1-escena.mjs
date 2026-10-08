@@ -1,8 +1,9 @@
 // Recorre la escena fija (rama r1-moli) pausa por pausa y toma una captura de cada una: las 23:47
-// (P0 a P6), el arrancón del calendario (T1, en cuadros sueltos), las 09:00 (P7 a P9), el recorrido del
-// mostrador (T2, en cuadros sueltos), las 11:20 (P10 a P12), el viaje al consultorio (T3, en cuadros
-// sueltos), las 16:05 (P13 a P15), la vuelta a la ventana (T4), Ana que se va (P16), la noche que entra por
-// la ventana (T5) y las 19:00 (P17 a P20), con las tres cifras cruzando en cuadros sueltos.
+// (P0 a P6), el arrancón del calendario (T1, en cuadros sueltos), las 09:00 (P7 a P9), el corte del
+// celular de las 09:00 al de las 11:20 (T2, en cuadros sueltos), las 11:20 (P10 a P12), el viaje al
+// consultorio (T3, en cuadros sueltos), las 16:05 (P13 a P15), la vuelta a la ventana (T4), Ana que se va
+// (P16), la noche que entra por la ventana (T5) y las 19:00 (P17 a P20), con las tres cifras cruzando en
+// cuadros sueltos.
 // Perfiles: iPhone 13 con y sin barras de Safari (390 × 844 y 390 × 664) y escritorio (1280 × 800),
 // más la versión quieta (prefers-reduced-motion) en celular y escritorio.
 // Uso: node scripts/r1-escena.mjs [URL] [carpeta] [--desde N]   (por omisión http://localhost:3100/ y investigacion/r1-capturas)

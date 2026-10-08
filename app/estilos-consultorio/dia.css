@@ -150,6 +150,11 @@
   visibility: hidden;
   will-change: opacity;
 }
+/* Los primeros planos de día entran con un corte, un poco chicos (0.92), y terminan de crecer: mientras,
+   sus orillas dejan ver el escenario. De día es papel, como ellos (el director pone «dia» en <html>). */
+.cine.dia .escenario {
+  background: var(--crema);
+}
 /* El empujón de la cámara va hacia la computadora. Ana entra por la orilla del dibujo, no del vacío. */
 .cine .lamina-dia {
   transform-origin: 84% 66.4%;
@@ -246,33 +251,34 @@
 }
 
 @media (min-width: 900px) {
+  /* En --u, como los de la noche (tokens.css): a 1280 son píxeles; en pantallas más grandes, crecen. */
   .cine .compu {
     left: 40%;
     right: auto;
-    top: calc(50% - min(430px, 60svh) / 2 - 24px);
+    top: calc(50% - min(430 * var(--u, 1px), 60svh) / 2 - 24 * var(--u, 1px));
     bottom: auto;
-    width: min(560px, 42vw);
-    height: min(430px, 60svh);
+    width: min(560 * var(--u, 1px), 42vw);
+    height: min(430 * var(--u, 1px), 60svh);
   }
   .compu-cabeza b {
-    font-size: 21px;
+    font-size: calc(21 * var(--u, 1px));
   }
   .nota-agendo {
-    font-size: 22px;
+    font-size: calc(22 * var(--u, 1px));
   }
   .cine .ana-cerca,
   .cine .ancla-ana {
     bottom: 9svh;
   }
   .cine .ana-cerca {
-    left: calc(40% - 118px);
-    height: 210px;
+    left: calc(40% - 118 * var(--u, 1px));
+    height: calc(210 * var(--u, 1px));
   }
   .cine .ancla-ana {
-    left: calc(40% + 336px);
+    left: calc(40% + 336 * var(--u, 1px));
   }
   .senala-cerca {
-    width: 170px;
+    width: calc(170 * var(--u, 1px));
   }
 }
 

@@ -722,45 +722,48 @@
     top: 3%;
     height: 100%;
   }
+  /* Los primeros planos miden en --u (tokens.css): a 1280 son píxeles; en pantallas más grandes, crecen. */
   .cine .tel {
     left: 40%;
-    top: calc(50% - min(600px, 78svh) / 2);
+    top: calc(50% - min(600 * var(--u, 1px), 78svh) / 2);
     bottom: auto;
-    width: 296px;
-    height: min(600px, 78svh);
+    width: calc(296 * var(--u, 1px));
+    height: min(600 * var(--u, 1px), 78svh);
   }
   /* La hoja va arriba: así la mano de Moli flota sobre su cabeza y nunca le tapa la cara. */
   .cine .hoja {
-    left: calc(40% + 316px);
+    left: calc(40% + 316 * var(--u, 1px));
     top: 9svh;
     bottom: auto;
-    width: 290px;
-    height: min(500px, 64svh);
+    width: calc(290 * var(--u, 1px));
+    height: min(500 * var(--u, 1px), 64svh);
   }
+  /* Moli, junto a lo demás: a la orilla derecha solo mientras la pantalla no dé para más (hasta 1280),
+     y en pantallas anchas a un lado de la hoja, como a 1280 (a 1920 ya no queda en la esquina). */
   .cine .moli-cerca {
-    right: 1vw;
+    right: max(1vw, 60% - 755.2 * var(--u, 1px));
     bottom: 9svh;
-    width: 160px;
+    width: calc(160 * var(--u, 1px));
   }
   .mano-lupa {
-    width: 250px;
+    width: calc(250 * var(--u, 1px));
   }
   .mano-lapiz {
-    width: 270px;
+    width: calc(270 * var(--u, 1px));
   }
   .cine .nota-yo,
   .cine .nota-listo {
-    right: 3.4vw;
-    bottom: calc(9svh + 196px);
-    font-size: 34px;
+    right: max(3.4vw, 60% - 724.48 * var(--u, 1px));
+    bottom: calc(9svh + 196 * var(--u, 1px));
+    font-size: calc(34 * var(--u, 1px));
   }
   .burbuja {
-    font-size: 14.5px;
+    font-size: calc(14.5 * var(--u, 1px));
   }
   .hoja-cabeza b {
-    font-size: 21px;
+    font-size: calc(21 * var(--u, 1px));
   }
   .blq {
-    font-size: 12px;
+    font-size: calc(12 * var(--u, 1px));
   }
 }

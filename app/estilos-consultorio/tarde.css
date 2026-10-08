@@ -286,28 +286,29 @@
   .letra-chica {
     font-size: 14px;
   }
+  /* En --u, como los de la noche (tokens.css): a 1280 son píxeles; en pantallas más grandes, crecen. */
   .cine .tira {
-    left: calc(40% + 316px);
+    left: calc(40% + 316 * var(--u, 1px));
     top: 9svh;
     bottom: auto;
-    width: 290px;
-    height: min(400px, 52svh);
+    width: calc(290 * var(--u, 1px));
+    height: min(400 * var(--u, 1px), 52svh);
   }
   .cine .tarde-fondo {
-    left: calc(40% + 326px);
+    left: calc(40% + 326 * var(--u, 1px));
     right: auto;
-    top: calc(9svh + min(400px, 52svh) + 22px);
-    width: 250px;
+    top: calc(9svh + min(400 * var(--u, 1px), 52svh) + 22 * var(--u, 1px));
+    width: calc(250 * var(--u, 1px));
   }
   .tira-dia {
-    font-size: 15px;
+    font-size: calc(15 * var(--u, 1px));
   }
   .fila-caja,
   .blq-jorge {
-    font-size: 12px;
+    font-size: calc(12 * var(--u, 1px));
   }
   .mano-pinzas {
-    width: 250px;
+    width: calc(250 * var(--u, 1px));
   }
 }
 

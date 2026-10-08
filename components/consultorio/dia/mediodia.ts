@@ -6,10 +6,11 @@ import { HOMBROS } from "./dibujo";
 import type { Opciones } from "./manana";
 
 /**
- * El acto de las 11:20: la transición T2 (la cámara se aleja del celular, recorre el mostrador y el
- * reloj gira de 09:00 a 11:20) y la escena 3 (P10 a P12): un paciente pide hablar con el doctor, Moli
- * contesta el cierre de la clínica, le pasa el chat a Ana como estafeta y se va a saltitos; Ana
- * contesta desde el mismo celular. Lo arma el director de `noche/director.ts`, igual que la mañana.
+ * El acto de las 11:20: la transición T2 (corte del celular de las 09:00 al de las 11:20, en el mismo
+ * lugar; debajo, sin verse, el plano general se acomoda para la T3) y la escena 3 (P10 a P12): un
+ * paciente pide hablar con el doctor, Moli contesta el cierre de la clínica, le pasa el chat a Ana como
+ * estafeta y se va a saltitos; Ana contesta desde el mismo celular. Lo arma el director de
+ * `noche/director.ts`, igual que la mañana.
  *
  * Nada de alertas ni avisos para Ana (regla 2): ella ve el chat porque el paciente escribió. Las
  * capacidades, con su fuente, están junto a los textos (`ROTULOS_MEDIODIA` en textos.ts).
@@ -41,9 +42,9 @@ const ANA = { x: -50, y: -26, ancho: 100, alto: 154 };
 /** Moli fuera de cuadro, a la derecha (en % de su ancho). */
 const FUERA = 125;
 /**
- * La cámara de la T2, en unidades del lienzo de 480 de ancho: se abre (ESCALA_ABIERTA) con el
- * mostrador entre el celular (x = 323) y el reloj (x = 392) a media pantalla, y empuja (ESCALA_CELULAR)
- * hasta dejar el celular donde va a estar el del primer plano.
+ * La cámara de la T2 (sin verse), en unidades del lienzo de 480 de ancho: se abre (ESCALA_ABIERTA) con
+ * el mostrador entre el celular (x = 323) y el reloj (x = 392) a media pantalla, y empuja (ESCALA_CELULAR)
+ * hasta dejar el celular donde está el del primer plano. Es donde la T3 encuentra el plano general.
  */
 const LIENZO_ANCHO = 480;
 const ENTRE_CELULAR_Y_RELOJ = 357;
@@ -144,25 +145,23 @@ export function armarMediodia(raiz: HTMLElement, { escenario }: Opciones) {
   function camara(tl: gsap.core.Timeline) {
     const t = T2.inicio;
     tl
-      // El primer plano de las 09:00 se aleja y vuelve el plano general, cerca del mostrador. Los rótulos
-      // se apartan mientras tanto: el reloj queda donde suelen ir.
+      // Los rótulos se apartan y el primer plano de las 11:20 se prende (todavía oculto, debajo del de las
+      // 09:00): su primer cálculo de diseño cae aquí, lejos del corte y de las mediciones de P10.
       .set(cerca, { display: "block" }, t)
       .to(capaRotulos, { opacity: 0, duration: 0.06 }, t)
-      // El plano general se prende completo DEBAJO del primer plano (que lo tapa) y luego el primer plano
-      // se va. Al revés, al entrar a las 11:20: el plano general se apaga hasta que el primer plano nuevo
-      // lo tapa entero. Dos capas cruzadas a media opacidad dejan ver la tinta del fondo: un velo gris con
-      // doble imagen (lo vio Diego el 5-oct; scripts/r1-velo.mjs lo mide).
-      .set(planoDia, { opacity: 1 }, t)
-      .to(cercaDia, { autoAlpha: 0, scale: 0.96, ease: "power1.in", duration: 0.08 }, t)
-      // La cámara se abre y recorre el mostrador hacia el celular de la clínica, y el reloj gira de 09:00
-      // a 11:20: el minutero da dos vueltas y un tercio.
+      // Sin verse (el plano general sigue apagado desde P8), la cámara se abre, recorre el mostrador hasta
+      // el celular de la clínica y empuja hacia él, y el reloj gira de 09:00 a 11:20 (el minutero da dos
+      // vueltas y un tercio). Así la T3 arranca con el plano general en ese celular, el de las 11:20.
       .to(laminaDia, { scale: ESCALA_ABIERTA, x: abre, ease: "power1.inOut", duration: 0.34 }, t + 0.06)
       .fromTo(hora, { rotation: 630 }, { rotation: 700, ease: "power1.inOut", duration: 0.3, immediateRender: false }, t + 0.1)
       .fromTo(minuto, { rotation: 1080 }, { rotation: 1920, ease: "power1.inOut", duration: 0.3, immediateRender: false }, t + 0.1)
-      // Empujón al celular (se queda a media pantalla) y corte al primer plano de las 11:20.
       .to(laminaDia, { scale: ESCALA_CELULAR, x: empuja, ease: "power2.in", duration: 0.26 }, T2.llega - 0.1)
-      .fromTo(cerca, { autoAlpha: 0, scale: 0.92 }, { autoAlpha: 1, scale: 1, ease: "power2.out", duration: 0.12, immediateRender: false }, T2.llega + 0.08)
-      .set(planoDia, { opacity: 0 }, T2.llega + 0.2)
+      // Corte del celular de las 09:00 al de las 11:20: los dos están en el mismo lugar. Sin fundido: dos
+      // capas a media opacidad se ven encimadas (scripts/r1-recorrido.mjs, 7-oct).
+      .set(cercaDia, { autoAlpha: 0 }, T2.corte)
+      .set(cerca, { autoAlpha: 1, scale: 1 }, T2.corte)
+      // Los rótulos vuelven ya con el título de las 11:20: si vuelven con el corte, se alcanzan a ver el
+      // viejo y el nuevo cruzándose (la pausa cambia en 7.05, casi junto al corte).
       .to(capaRotulos, { opacity: 1, duration: 0.1 }, T2.llega + 0.12);
   }
 
