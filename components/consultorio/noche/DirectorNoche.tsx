@@ -1,17 +1,21 @@
 "use client";
 
 import { useEffect } from "react";
+import { soltarAplazados } from "./aplazados";
 
 /**
  * Enciende la escena de las 23:47 solo si la página se cuenta con scroll (clase `cine`, que pone
  * el guion de arranque del layout antes de pintar). GSAP llega en un pedazo aparte, después del
- * primer render: el titular (el LCP) no lo espera.
+ * primer render: el titular (el LCP) no lo espera. Mientras llega, la transcripción para lectores
+ * de pantalla se calcula en ratos libres (`aplazados.ts`).
  */
 export function DirectorNoche() {
   useEffect(() => {
     if (!document.documentElement.classList.contains("cine")) return;
     let vivo = true;
     let limpiar: (() => void) | undefined;
+    const noche = document.getElementById("noche");
+    const cancelarAplazados = noche ? soltarAplazados(noche) : undefined;
     performance.mark("historia:pide");
     import("./director").then(({ armarNoche }) => {
       performance.measure("historia:llega", "historia:pide");
@@ -27,6 +31,7 @@ export function DirectorNoche() {
     });
     return () => {
       vivo = false;
+      cancelarAplazados?.();
       limpiar?.();
     };
   }, []);

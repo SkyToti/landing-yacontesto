@@ -75,7 +75,9 @@ export const viewport: Viewport = {
 // Con prefers-reduced-motion, sin JavaScript, con ?movimiento=0 o en pantallas de menos de 500 px
 // de alto (celular acostado, zoom de 200 %), se ve quieta y completa.
 // Si en 20 s no llegó el JavaScript que la cuenta (red rota, error), se vuelve a la versión quieta.
-const arranque = `(function(){var d=document.documentElement;try{var q=new URLSearchParams(location.search).get('movimiento')==='0';if(q||matchMedia('(prefers-reduced-motion: reduce)').matches||matchMedia('(max-height: 499px)').matches)return;d.classList.add('cine');setTimeout(function(){if(!window.__directorVivo)d.classList.remove('cine')},20000)}catch(e){d.classList.remove('cine')}})();`;
+// Con «cine» va «aplaza»: la transcripción para lectores de pantalla se calcula después de abrir
+// (components/consultorio/noche/aplazados.ts).
+const arranque = `(function(){var d=document.documentElement;try{var q=new URLSearchParams(location.search).get('movimiento')==='0';if(q||matchMedia('(prefers-reduced-motion: reduce)').matches||matchMedia('(max-height: 499px)').matches)return;d.classList.add('cine','aplaza');setTimeout(function(){if(!window.__directorVivo)d.classList.remove('cine','aplaza')},20000)}catch(e){d.classList.remove('cine','aplaza')}})();`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

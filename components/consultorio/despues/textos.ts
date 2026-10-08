@@ -14,6 +14,7 @@
  * - «Paciente atendido»: una persona distinta atendida por el asistente en el mes, con todos sus mensajes
  *   (CLAUDE.md §2, «conversación»). Mismo texto que la landing publicada.
  * - Los textos marcados «ya aprobado» salen tal cual de la landing publicada (yacontesto.com, `main`).
+ * - Los nuevos (N1 a N8 del guion, sección 7, «Resultado del paso 6»): Diego los aprobó tal cual el 7-oct.
  */
 
 export const INSTALACION = {

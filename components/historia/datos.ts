@@ -151,6 +151,7 @@ export function detalleDe(pacientes: number) {
  * Las otras cuatro siguen siendo ciertas: varios chats a la vez (`encolarPorUsuario`, en orden por
  * paciente), citas en Google Calendar, 7 días (PASOS_INSTALACION) y mes a mes sin plazo forzoso (plan que
  * Diego aprobó para Sonata el 23-sep).
+ * Diego aprobó tal cual las tres nuevas (N2, N3 y N4 del guion) el 7-oct-2026.
  */
 export const PREGUNTAS = [
   {

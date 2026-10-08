@@ -542,6 +542,13 @@
 .cine .rotulo-portada {
   opacity: 1;
 }
+/*
+ * La transcripción para lectores de pantalla, fuera del primer cálculo de la página (paso 7):
+ * `noche/aplazados.ts` la suelta parte por parte en ratos libres y al final quita la clase.
+ */
+.cine.aplaza #noche > .solo-lectores > :not(.suelta) {
+  display: none;
+}
 
 .cine .luz-cerca {
   left: -26%;

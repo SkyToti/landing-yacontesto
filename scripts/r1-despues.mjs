@@ -34,6 +34,26 @@ for (const quieta of [false, true]) {
     if (!quieta) await pagina.waitForFunction(() => window.__directorVivo === true, null, { timeout: 30000 });
     revisa((await pagina.evaluate(() => document.documentElement.classList.contains("cine"))) === !quieta, `${nombre}: clase cine ${quieta ? "apagada" : "prendida"}`);
 
+    // La transcripción (paso 7, noche/aplazados.ts) ya se soltó entera, y los lectores de pantalla ya
+    // tienen todos los títulos (también los de después, que VidaCierre suelta en ratos libres).
+    await pagina
+      .waitForFunction(
+        () =>
+          !document.documentElement.classList.contains("aplaza") &&
+          Array.from(document.querySelectorAll(".despues .seccion, .pie")).every((e) => e.style.contentVisibility === "visible"),
+        null,
+        { timeout: 10000 },
+      )
+      .catch(() => {});
+    const aplazado = await pagina.evaluate(() => {
+      const piezas = Array.from(document.querySelectorAll("#noche > .solo-lectores > *"));
+      return { clase: document.documentElement.classList.contains("aplaza"), saltadas: piezas.filter((e) => getComputedStyle(e).display === "none").length, piezas: piezas.length, titulos: document.querySelectorAll("h1, h2").length };
+    });
+    const ax = await (await contexto.newCDPSession(pagina)).send("Accessibility.getFullAXTree");
+    const titulosAx = ax.nodes.filter((n) => !n.ignored && n.role?.value === "heading").length;
+    revisa(!aplazado.clase && aplazado.saltadas === 0, `${nombre}: lo aplazado ya se soltó (${JSON.stringify(aplazado)})`);
+    revisa(titulosAx >= aplazado.titulos, `${nombre}: los ${aplazado.titulos} títulos están en el árbol de accesibilidad (${titulosAx})`);
+
     // «Precio» de la pastilla salta a su sección.
     await pagina.click(".p-precio");
     await pagina.waitForTimeout(900);
@@ -101,6 +121,26 @@ for (const quieta of [false, true]) {
     await contexto.close();
   }
 }
+
+// La pastilla mide lo mismo con la fuente de respaldo que con Instrument Sans: no brinca cuando llega
+// (PageSpeed marcaba CLS 0.001 por eso, 7-oct). Sin fuentes de la página = lo que se ve mientras cargan.
+const medidas = [];
+for (const sinFuentes of [true, false]) {
+  const c = await navegador.newContext(PERFILES[0]);
+  const pg = await c.newPage();
+  if (sinFuentes) await pg.route(/\.woff2$/, (r) => r.abort());
+  await pg.goto(URL, { waitUntil: "load" });
+  await pg.waitForTimeout(600);
+  medidas.push(
+    await pg.evaluate(() => {
+      const n = document.querySelector(".pastilla").getBoundingClientRect();
+      const w = document.querySelector(".p-whatsapp").getBoundingClientRect();
+      return [n.left, n.width, w.left, w.width].map((v) => Math.round(v * 100) / 100);
+    }),
+  );
+  await c.close();
+}
+revisa(medidas[0].every((v, i) => Math.abs(v - medidas[1][i]) < 0.1), `la pastilla no brinca al llegar la fuente (respaldo ${medidas[0]} · final ${medidas[1]})`);
 
 // Sin JavaScript: todo está y el botón para tocar a Moli no aparece.
 const sinJs = await navegador.newContext({ ...PERFILES[0], javaScriptEnabled: false });

@@ -55,10 +55,18 @@
 .pastilla :focus-visible {
   outline-color: var(--tinta);
 }
+/*
+ * El ancho mínimo de cada botón es el que tiene con Instrument Sans (medido el 7-oct a 15 px y 600, igual en
+ * Chromium y en WebKit). Mientras llega la fuente, la de respaldo es más angosta: sin esto la pastilla
+ * crecía 7 px al cambiar de fuente y el botón de WhatsApp se recorría (PageSpeed: CLS 0.001). Si cambia el
+ * texto o el tamaño, se vuelve a medir (scripts/r1-despues.mjs lo revisa).
+ */
 .p-precio {
+  min-width: 75.35px;
   padding: 0 14px 0 16px;
 }
 .p-whatsapp {
+  min-width: 244.44px;
   transition:
     background-color 0.3s,
     color 0.3s;

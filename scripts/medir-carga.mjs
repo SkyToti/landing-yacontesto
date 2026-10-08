@@ -54,6 +54,11 @@ for (let i = 0; i < veces; i++) {
         largas: window.__largas,
         lista: window.__historiaLista === true,
         armado: performance.getEntriesByType("measure").filter((m) => m.name.startsWith("historia:")).map((m) => [m.name.slice(9), Math.round(m.startTime), Math.round(m.duration)]),
+        // Lo que no se ve al abrir se suelta en ratos libres (paso 7): cuántas piezas y la más cara.
+        aplazado: performance
+          .getEntriesByType("measure")
+          .filter((m) => m.name.startsWith("aplazado:"))
+          .reduce((r, m) => ({ piezas: r.piezas + 1, mayor: m.duration > r.mayor[1] ? [m.name.slice(9), Math.round(m.duration)] : r.mayor }), { piezas: 0, mayor: ["", 0] }),
         cls: 0,
       }));
   resultados.push(r);

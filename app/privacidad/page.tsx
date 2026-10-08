@@ -11,8 +11,9 @@ export const metadata: Metadata = {
 /**
  * Aviso de privacidad de YaContesto para quien nos escribe (prospectos). Sigue lo que pide el artículo 15
  * de la LFPDPPP de 2025 (identidad y domicilio, datos, finalidades, cómo limitar su uso, derechos y
- * cambios). BORRADOR del 7-oct-2026: lo aprueba Diego y falta la revisión de un abogado. No cubre a los
- * pacientes de las clínicas: de ellos la clínica es la responsable (contratos, anexo de encargado).
+ * cambios). Diego lo aprobó tal cual el 7-oct-2026, con el domicilio como «Cuernavaca, Morelos» por ahora:
+ * faltan el domicilio completo que pide el art. 15 y la revisión de un abogado. No cubre a los pacientes de
+ * las clínicas: de ellos la clínica es la responsable (contratos, anexo de encargado).
  */
 export default function Privacidad() {
   return (
