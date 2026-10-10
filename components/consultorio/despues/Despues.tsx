@@ -172,6 +172,15 @@ export function Pie() {
           <a href="/privacidad/">Aviso de privacidad</a>
         </li>
       </ul>
+      <ul className="pie-contacto" aria-label="Redes sociales">
+        {PIE.redes.map((red) => (
+          <li key={red.nombre}>
+            <a href={red.url} target="_blank" rel="noopener">
+              {red.nombre}
+            </a>
+          </li>
+        ))}
+      </ul>
       <p className="pie-chica">{PIE.ficticia}</p>
       <p className="pie-chica">{PIE.legal}</p>
     </footer>

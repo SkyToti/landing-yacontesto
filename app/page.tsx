@@ -3,6 +3,7 @@ import { EscenaNoche } from "@/components/consultorio/noche/EscenaNoche";
 import { Pastilla } from "@/components/consultorio/Pastilla";
 import { Logo } from "@/components/consultorio/Logo";
 import { Despues, Pie } from "@/components/consultorio/despues/Despues";
+import { PIE } from "@/components/consultorio/despues/textos";
 import { VidaCierre } from "@/components/consultorio/despues/VidaCierre";
 
 const datosEstructurados = {
@@ -12,7 +13,9 @@ const datosEstructurados = {
   serviceType: "Recepcionista con inteligencia artificial para WhatsApp",
   areaServed: { "@type": "Country", name: "México" },
   url: "https://yacontesto.com/",
-  provider: { "@type": "Person", name: "Diego Benítez", email: "diego@yacontesto.com" },
+  provider: { "@type": "Person", name: "Diego Benítez", email: PIE.correo },
+  // Los perfiles de YaContesto: así los buscadores los ligan con el sitio.
+  sameAs: PIE.redes.map((red) => red.url),
   description:
     "Asistente con inteligencia artificial para el WhatsApp de clínicas dentales: contesta al instante, revisa la agenda y deja la cita en el calendario de la clínica.",
 };

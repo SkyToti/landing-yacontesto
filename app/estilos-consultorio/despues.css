@@ -35,7 +35,7 @@
 .precio { --alto: 1320px; }
 .preguntas { --alto: 625px; }
 .cierre { --alto: 650px; }
-.pie { --alto: 465px; }
+.pie { --alto: 513px; }
 .cierre-dibujo { --alto: 375px; }
 .precio-frase { --alto: 300px; }
 .calc-inst { --alto: 120px; }
@@ -49,7 +49,7 @@
   .precio { --alto: 855px; }
   .preguntas { --alto: 580px; }
   .cierre { --alto: 500px; }
-  .pie { --alto: 322px; }
+  .pie { --alto: 371px; }
   .cierre-dibujo { --alto: 468px; }
   .precio-frase { --alto: 320px; }
   .calc-control { --alto: 256px; }

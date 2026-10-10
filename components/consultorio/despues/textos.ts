@@ -57,8 +57,15 @@ export const PIE = {
   ficticia: "Ejemplo con una clínica ficticia: las conversaciones y los pacientes de esta página son inventados.",
   // Ya aprobado (pie de la landing publicada).
   legal: "Servicio independiente: no estamos afiliados a WhatsApp ni a Meta Platforms, Inc.",
-  correo: "diego@yacontesto.com",
+  /** El correo de YaContesto (Diego, 9-oct-2026; antes diego@yacontesto.com). */
+  correo: "soporte@yacontesto.com",
   ciudad: "Cuernavaca, Morelos",
   /** El número oficial de YaContesto (desde el 9-oct-2026), escrito para leerse. */
   telefono: "+52 56 5602 1918",
+  /** Las redes de YaContesto (Diego, 9-oct-2026), sin los parámetros de rastreo con que se comparten. */
+  redes: [
+    { nombre: "Facebook", url: "https://www.facebook.com/profile.php?id=61594635314613" },
+    { nombre: "Instagram", url: "https://www.instagram.com/yacontesto/" },
+    { nombre: "TikTok", url: "https://www.tiktok.com/@yacontesto" },
+  ],
 };
