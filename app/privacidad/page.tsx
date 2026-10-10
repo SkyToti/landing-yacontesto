@@ -13,7 +13,8 @@ export const metadata: Metadata = {
  * Aviso de privacidad de YaContesto para quien nos escribe (prospectos). Sigue lo que pide el artículo 15
  * de la LFPDPPP de 2025 (identidad y domicilio, datos, finalidades, cómo limitar su uso, derechos y
  * cambios). Diego lo aprobó tal cual el 7-oct-2026, con el domicilio como «Cuernavaca, Morelos» por ahora:
- * faltan el domicilio completo que pide el art. 15 y la revisión de un abogado. No cubre a los pacientes de
+ * faltan el domicilio completo que pide el art. 15 y la revisión de un abogado. El 9-oct, a pedido de Diego,
+ * sumó los mensajes por las redes (Facebook, Instagram y TikTok) y el correo soporte@. No cubre a los pacientes de
  * las clínicas: de ellos la clínica es la responsable (contratos, anexo de encargado).
  */
 export default function Privacidad() {
@@ -27,7 +28,7 @@ export default function Privacidad() {
       </header>
       <main className="aviso">
         <h1>Aviso de privacidad</h1>
-        <p className="aviso-fecha">Última actualización: 7 de octubre de 2026.</p>
+        <p className="aviso-fecha">Última actualización: 9 de octubre de 2026.</p>
 
         <h2>Quién es el responsable</h2>
         <p>
@@ -36,9 +37,9 @@ export default function Privacidad() {
         </p>
 
         <h2>Qué datos recibimos</h2>
-        <p>Este sitio no tiene formularios, no usa cookies ni herramientas de analítica. Recibimos datos solo cuando nos escribes por WhatsApp o por correo:</p>
+        <p>Este sitio no tiene formularios, no usa cookies ni herramientas de analítica. Recibimos datos solo cuando nos escribes por WhatsApp, por correo o por mensaje en nuestras redes (Facebook, Instagram y TikTok):</p>
         <ul>
-          <li>tu nombre y tu número de WhatsApp o tu correo;</li>
+          <li>tu nombre y tu número de WhatsApp, tu correo o tu usuario en la red desde la que nos escribas;</li>
           <li>el nombre de tu clínica, su ciudad y lo que nos cuentes de ella (servicios, horarios, cómo agendan).</li>
         </ul>
         <p>
@@ -59,8 +60,8 @@ export default function Privacidad() {
 
         <h2>Con quién los compartimos</h2>
         <p>
-          Con nadie, salvo los servicios con que nos comunicamos contigo (WhatsApp, de Meta, y nuestro proveedor de
-          correo) y una autoridad que lo pida conforme a la ley.
+          Con nadie, salvo los servicios con que nos comunicamos contigo (WhatsApp, Facebook e Instagram, de Meta;
+          TikTok; y nuestro proveedor de correo) y una autoridad que lo pida conforme a la ley.
         </p>
 
         <h2>Tus derechos</h2>
