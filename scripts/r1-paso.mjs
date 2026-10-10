@@ -7,6 +7,8 @@
 // También el ritmo (Diego, 9-oct: «los movimientos de cámara pasan muy rápido»): un paso con cámara (la T3)
 // tarda de 2 a 3.6 s y uno común menos de 1.3; y en escritorio, la rueda a media T3 termina la transición
 // hacia adelante, sin regresar la cámara.
+// Desde el 10-oct: en iPhone y iPad va el scroll de siempre (salvo ?paso=1), y si un paso no mueve la página
+// el paso a paso se apaga solo (la red de seguridad).
 // Perfil: iPhone 13 con las barras de Safari (390 × 664); escritorio y movimiento reducido no deben cambiar.
 // Uso (con el servidor de out/ en marcha): node scripts/r1-paso.mjs [URL]
 import { chromium } from "playwright";
@@ -27,12 +29,15 @@ const espera = (ms) => new Promise((r) => setTimeout(r, ms));
 const navegador = await chromium.launch();
 
 async function abrir(opciones, { escena = true } = {}) {
+  return abrirEn(URL, opciones, { escena });
+}
+async function abrirEn(direccion, opciones, { escena = true } = {}) {
   const contexto = await navegador.newContext(opciones);
   const p = await contexto.newPage();
   const errores = [];
   p.on("pageerror", (e) => errores.push(e.message));
   p.on("console", (m) => m.type() === "error" && errores.push(m.text()));
-  await p.goto(URL, { waitUntil: "networkidle" });
+  await p.goto(direccion, { waitUntil: "networkidle" });
   if (escena) await p.waitForFunction(() => window.__directorVivo === true, null, { timeout: 30000 });
   await p.waitForTimeout(1200);
   const geo = await p.evaluate(() => {
@@ -148,11 +153,11 @@ async function toca({ cdp }, x, y) {
 
 const fmt = (e) => (e.k === "después" ? "después" : `P${e.k}${e.fuera > 3 ? ` (+${e.fuera}px)` : ""}`);
 
-/* ── iPhone 13: la historia, deslizón por deslizón ── */
+/* ── Celular (Android; Chromium con la pantalla del iPhone 13): la historia, deslizón por deslizón ── */
 {
   const s = await abrir(IPHONE);
   let e = await estado(s);
-  revisa(e.k === 0 && e.paso, `iPhone: abre en P0 con el paso a paso prendido (${fmt(e)}, paso ${e.paso})`);
+  revisa(e.k === 0 && e.paso, `celular: abre en P0 con el paso a paso prendido (${fmt(e)}, paso ${e.paso})`);
 
   // 1. Un deslizón rápido (400 px en 50 ms ≈ 8,000 px/s): una sola pausa, y la página no sigue al dedo.
   let d = await desliza(s, { ms: 50 });
@@ -238,7 +243,7 @@ const fmt = (e) => (e.k === "después" ? "después" : `P${e.k}${e.fuera > 3 ? ` 
   revisa(ms !== null && ms <= 1300, `de P13 a P14 (sin cámara) tarda ${ms} ms (hasta 1,300)`);
 
 
-  revisa(s.errores.length === 0, `iPhone: ${s.errores.length} errores de consola${s.errores.length ? `: ${s.errores.join(" | ")}` : ""}`);
+  revisa(s.errores.length === 0, `celular: ${s.errores.length} errores de consola${s.errores.length ? `: ${s.errores.join(" | ")}` : ""}`);
   await s.contexto.close();
 }
 
@@ -276,6 +281,50 @@ const fmt = (e) => (e.k === "después" ? "después" : `P${e.k}${e.fuera > 3 ? ` 
     `tocar «Precio» en ${donde} lleva al precio (a ${precio}px; bajo el dedo: ${caja.bajo}; click: ${clic}) y suelta el scroll`);
 
   revisa(s.errores.length === 0, `toques: ${s.errores.length} errores de consola`);
+  await s.contexto.close();
+}
+
+/*
+ * ── iPhone y iPad: el scroll de siempre (10-oct) ──
+ * En el iPhone de Diego la página no se movía con el paso a paso, y en el WebKit de Windows no se reproduce:
+ * en iOS va apagado salvo con ?paso=1 (para diagnosticar con ?depura=1). Aquí, Chromium con el agente de un
+ * iPhone: lo que se prueba es la decisión del código, no el Safari de verdad.
+ */
+{
+  const UA_IPHONE = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1";
+  const s = await abrir({ ...IPHONE, userAgent: UA_IPHONE });
+  let e = await estado(s);
+  revisa(!e.paso, `iPhone: sin paso a paso (paso ${e.paso})`);
+  const d = await desliza(s, { ms: 60 });
+  revisa(d.nativo && d.movioConElDedo > 200, `iPhone: el dedo mueve la página como siempre (se movió ${d.movioConElDedo}px con el dedo)`);
+  revisa(s.errores.length === 0, `iPhone: ${s.errores.length} errores de consola`);
+  await s.contexto.close();
+
+  // Con ?paso=1 se fuerza, para probarlo en un iPhone de verdad.
+  const URL_ORIGINAL = URL;
+  const f = await abrirEn(`${URL_ORIGINAL}?paso=1`, { ...IPHONE, userAgent: UA_IPHONE });
+  e = await estado(f);
+  revisa(e.paso, `iPhone con ?paso=1: el paso a paso se prende (paso ${e.paso})`);
+  await desliza(f, { ms: 50 });
+  await asentado(f);
+  e = await estado(f);
+  revisa(e.k === 1 && e.fuera <= 3, `iPhone con ?paso=1: un deslizón llega a P1 (llegó a ${fmt(e)})`);
+  await f.contexto.close();
+}
+
+/*
+ * ── La red de seguridad: si el navegador no aplica el scroll que se le pide, el paso a paso se apaga ──
+ * Se simula con un window.scrollTo que no hace nada (lo que pudo pasar en el iPhone de Diego).
+ */
+{
+  const s = await abrir(IPHONE);
+  await s.p.evaluate(() => (window.scrollTo = () => {}));
+  await desliza(s, { ms: 50 });
+  await espera(1200);
+  let e = await estado(s);
+  revisa(!e.paso, `red de seguridad: si un paso no mueve la página, el paso a paso se apaga (paso ${e.paso})`);
+  const d = await desliza(s, { ms: 60 });
+  revisa(d.nativo && d.movioConElDedo > 200, `red de seguridad: luego el dedo mueve la página como siempre (${d.movioConElDedo}px)`);
   await s.contexto.close();
 }
 
