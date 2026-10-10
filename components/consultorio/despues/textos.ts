@@ -59,6 +59,6 @@ export const PIE = {
   legal: "Servicio independiente: no estamos afiliados a WhatsApp ni a Meta Platforms, Inc.",
   correo: "diego@yacontesto.com",
   ciudad: "Cuernavaca, Morelos",
-  /** El WhatsApp de ventas (CLAUDE.md §3), escrito para leerse. */
-  telefono: "+52 220 639 5955",
+  /** El número oficial de YaContesto (desde el 9-oct-2026), escrito para leerse. */
+  telefono: "+52 56 5602 1918",
 };

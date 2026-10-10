@@ -16,7 +16,8 @@
  * «Con gusto 🙂 Enseguida una persona…» salen de `config.example.json`, la clínica demo.
  */
 
-export const WHATSAPP_VENTAS = "522206395955";
+// El número oficial de YaContesto desde el 9-oct-2026 (antes, el 220 639 5955).
+export const WHATSAPP_VENTAS = "525656021918";
 
 export function enlaceWhatsApp(texto: string) {
   return `https://wa.me/${WHATSAPP_VENTAS}?text=${encodeURIComponent(texto)}`;
