@@ -478,6 +478,13 @@
   height: 100svh;
   overflow: hidden;
 }
+
+/* Paso a paso en el celular y la tableta, dentro de la historia: el dedo no mueve la página, la mueve
+   noche/pasoAPaso.ts, una pausa por deslizón. El pellizco para acercar y los toques siguen funcionando. */
+html.paso,
+html.paso body {
+  touch-action: pinch-zoom;
+}
 .cine .plano {
   position: absolute;
   inset: 0;

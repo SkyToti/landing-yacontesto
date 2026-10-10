@@ -8,6 +8,7 @@ import { type Cara } from "../moli/partes";
 import { crearMoli } from "../moli/titere";
 import { PANTALLAS, PAUSAS, T1, T5 } from "../pausas";
 import { PUNTOS } from "./dibujo";
+import { armarPasoAPaso } from "./pasoAPaso";
 
 /**
  * El director de la escena fija: las 23:47 (aquí) y, con el mismo sistema, los actos de día: la
@@ -112,6 +113,7 @@ export function armarNoche(raiz: HTMLElement): () => void {
   let activa = false;
   let actuacion: gsap.core.Timeline | null = null;
   let reponer = () => {};
+  let soltarPaso = () => {};
 
   /** Los actos de día: llegan en tareas aparte, un instante después de la noche. */
   const actos: Acto[] = [];
@@ -167,6 +169,8 @@ export function armarNoche(raiz: HTMLElement): () => void {
       scrub: 0.5,
       // Se asienta en la pausa más cercana a donde el scroll de verdad se detuvo: ni «la siguiente»
       // (directional) ni adonde proyecta la velocidad (inertia). El celular ya trae su propia inercia.
+      // En pantallas táctiles el paso a paso (pasoAPaso.ts) ya llega justo a cada pausa: el imán solo
+      // trabaja cuando se vuelve a la historia con el scroll de siempre.
       snap: {
         snapTo: [...PAUSAS.map((p) => p / PANTALLAS), 1],
         directional: false,
@@ -184,6 +188,8 @@ export function armarNoche(raiz: HTMLElement): () => void {
         amanecer(esDeDia(self));
       },
     });
+    // En el celular y la tableta, una pausa por deslizón (Diego, 9-oct-2026).
+    soltarPaso = armarPasoAPaso(st);
 
     /* ── Estados de reposo: lo que se ve quieto en cada pausa ── */
     const hojaArriba = (k: number) => (escritorio.matches ? HOJA_ESCRITORIO : HOJA_CELULAR)[k];
@@ -521,6 +527,7 @@ export function armarNoche(raiz: HTMLElement): () => void {
     escritorio.removeEventListener("change", alCambiarTamano);
     ScrollTrigger.removeEventListener("refresh", alRefrescar);
     actuacion?.kill();
+    soltarPaso();
     ctx.revert();
     amanecer(false);
   };
