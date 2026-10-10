@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PIE } from "@/components/consultorio/despues/textos";
+import { Logo } from "@/components/consultorio/Logo";
 
 export const metadata: Metadata = {
   title: "Aviso de privacidad | YaContesto",
@@ -20,6 +21,7 @@ export default function Privacidad() {
     <>
       <header className="cabecera">
         <Link className="marca" href="/" aria-label="YaContesto, inicio">
+          <Logo />
           YaContesto
         </Link>
       </header>

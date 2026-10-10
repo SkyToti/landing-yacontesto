@@ -46,11 +46,12 @@ export const metadata: Metadata = {
       "Una recepcionista con inteligencia artificial para tu clínica dental: contesta, revisa tu agenda y deja la cita en tu calendario.",
     images: [
       {
-        url: "/og.jpg",
-        type: "image/jpeg",
+        // La imagen al compartir del kit del logo (enlace-compartido-og-oscuro, 7-oct-2026).
+        url: "/og.png",
+        type: "image/png",
         width: 1200,
         height: 630,
-        alt: "Tu WhatsApp contesta solo, a las 11 p. m.: mensajes de pacientes que llegan de noche y en fin de semana.",
+        alt: "YaContesto: el globo de chat con palomita y el nombre, en crema sobre fondo negro.",
       },
     ],
   },
@@ -58,7 +59,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Tu WhatsApp contesta solo, a las 11 p. m.",
     description: "Una recepcionista con inteligencia artificial para tu clínica dental.",
-    images: ["/og.jpg"],
+    images: ["/og.png"],
   },
 };
 

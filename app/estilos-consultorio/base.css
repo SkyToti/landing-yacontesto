@@ -115,7 +115,7 @@ a {
   }
 }
 
-/* La marca, mientras se decide el logo (ruta A, B o C): el nombre escrito en Bricolage. */
+/* La marca: el logo con el nombre, en las proporciones del kit (logo-actual.mjs, 7-oct-2026). */
 .cabecera {
   position: fixed;
   inset: 0 0 auto;
@@ -129,10 +129,20 @@ a {
 
 .marca {
   pointer-events: auto;
+  display: flex;
+  align-items: center;
+  /* 1.09 × la mayúscula de Bricolage (0.66 em), como en el logo con nombre del kit. */
+  gap: 0.72em;
   font: 800 21px/1 var(--f-titular);
   letter-spacing: -0.02em;
   color: var(--crema);
   text-decoration: none;
+}
+/* El globo mide 2.72 × la mayúscula (lo que se ve, con la cola) y la mayúscula queda centrada con él. */
+.marca-logo {
+  flex: none;
+  width: 1.77em;
+  height: 1.793em;
 }
 
 /* Las notas a mano de Moli: letra de su hoja, un poco chuecas. */

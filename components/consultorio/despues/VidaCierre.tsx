@@ -96,10 +96,14 @@ export function VidaCierre() {
       acoplar(false);
     });
 
-    /* ── La cabecera, pasada la escena ── */
-    const verNoche = new IntersectionObserver(([e]) => html.classList.toggle("pagina", e.boundingClientRect.bottom < 60), {
-      rootMargin: "-60px 0px 0px 0px",
-    });
+    /* ── La cabecera, en cuanto la escena empieza a irse ── */
+    // La raíz es una franja en la orilla de abajo: la barra entra cuando el fondo de la noche la cruza (la escena
+    // deja de estar fija y sube), no cuando ya se fue. Antes, los últimos textos pasaban por debajo del logo
+    // (hallazgo 5 del recorrido del 7-oct; con el globo, el encimado era más ancho).
+    const verNoche = new IntersectionObserver(
+      ([e]) => html.classList.toggle("pagina", e.boundingClientRect.bottom < (e.rootBounds?.top ?? innerHeight)),
+      { rootMargin: "-99% 0px 0px 0px" },
+    );
     verNoche.observe(noche);
     limpiar.push(() => {
       verNoche.disconnect();

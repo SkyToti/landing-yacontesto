@@ -1,6 +1,7 @@
 import { DirectorNoche } from "@/components/consultorio/noche/DirectorNoche";
 import { EscenaNoche } from "@/components/consultorio/noche/EscenaNoche";
 import { Pastilla } from "@/components/consultorio/Pastilla";
+import { Logo } from "@/components/consultorio/Logo";
 import { Despues, Pie } from "@/components/consultorio/despues/Despues";
 import { VidaCierre } from "@/components/consultorio/despues/VidaCierre";
 
@@ -27,6 +28,7 @@ export default function Inicio() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datosEstructurados) }} />
       <header className="cabecera">
         <a className="marca" href="#noche" aria-label="YaContesto, inicio">
+          <Logo />
           YaContesto
         </a>
       </header>

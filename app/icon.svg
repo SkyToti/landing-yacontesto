@@ -1,13 +1,15 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 56.19 56.19" width="48" height="48">
   <title>YaContesto</title>
   <style>
-    .globo { fill: #0c3d22; }
-    .palomita { fill: none; stroke: #ffffff; stroke-width: 5; stroke-linecap: round; stroke-linejoin: round; }
+    .globo, .cola { fill: #0E100F; }
+    .cola { stroke: #0E100F; stroke-width: 2; stroke-linejoin: round; }
     @media (prefers-color-scheme: dark) {
-      .globo { fill: #91d5b8; }
-      .palomita { stroke: #0c3d22; }
+      .globo, .cola { fill: #FFFCE1; }
+      .cola { stroke: #FFFCE1; }
     }
   </style>
-  <path class="globo" d="M14 6H34A10 10 0 0 1 44 16V42.6A1 1 0 0 1 42.4 43.4L33.2 36H14A10 10 0 0 1 4 26V16A10 10 0 0 1 14 6Z"/>
-  <path class="palomita" d="M14.6 21.4 20.6 27.4 33.4 14.6"/>
+  <g transform="translate(4.1 1.3)">
+    <path class="globo" fill-rule="evenodd" d="M14.5 4.2H33.5A12.8 12.8 0 0 1 46.3 17V28A12.8 12.8 0 0 1 33.5 40.8H14.5A12.8 12.8 0 0 1 1.7 28V17A12.8 12.8 0 0 1 14.5 4.2ZM10.87 25.13L17.87 32.13A2.3 2.3 0 0 0 21.13 32.13L37.13 16.13A2.3 2.3 0 0 0 33.87 12.87L19.5 27.25L14.13 21.87A2.3 2.3 0 0 0 10.87 25.13Z"/>
+    <path class="cola" d="M7.2 36.2 7.2 49.4 19.8 40.2Z"/>
+  </g>
 </svg>
