@@ -4,6 +4,9 @@
 // avanza solo lo que movió el dedo), así que aquí se simula como en iOS: si la página siguió al dedo (scroll
 // nativo), al soltar sigue a la velocidad del dedo y frena 0.998 por ms (la constante de iOS que se atribuye a
 // la charla de Apple de 2018). Sin el paso a paso, un deslizón rápido se brinca varias pausas.
+// También el ritmo (Diego, 9-oct: «los movimientos de cámara pasan muy rápido»): un paso con cámara (la T3)
+// tarda de 2 a 3.6 s y uno común menos de 1.3; y en escritorio, la rueda a media T3 termina la transición
+// hacia adelante, sin regresar la cámara.
 // Perfil: iPhone 13 con las barras de Safari (390 × 664); escritorio y movimiento reducido no deben cambiar.
 // Uso (con el servidor de out/ en marcha): node scripts/r1-paso.mjs [URL]
 import { chromium } from "playwright";
@@ -120,6 +123,23 @@ async function desliza(sesion, { x0 = 200, y0 = 540, x1 = 200, y1 = 140, ms = 50
   return { nativo, movioConElDedo: Math.round(alSoltar - antes) };
 }
 
+/** Cuánto tarda el scroll en llegar a y (±3 px), contado desde ahora; null si no llega en `tope` ms. */
+const llegaEn = ({ p }, y, tope = 6000) =>
+  p.evaluate(
+    ({ y, tope }) =>
+      new Promise((listo) => {
+        const t0 = performance.now();
+        const mira = () => {
+          const t = performance.now() - t0;
+          if (Math.abs(scrollY - y) <= 3) listo(Math.round(t));
+          else if (t > tope) listo(null);
+          else requestAnimationFrame(mira);
+        };
+        requestAnimationFrame(mira);
+      }),
+    { y, tope },
+  );
+
 async function toca({ cdp }, x, y) {
   await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x, y }] });
   await espera(60);
@@ -204,6 +224,19 @@ const fmt = (e) => (e.k === "después" ? "después" : `P${e.k}${e.fuera > 3 ? ` 
   e = await estado(s);
   revisa(e.paso, `al volver a la historia el paso a paso se prende otra vez (${fmt(e)}, paso ${e.paso})`);
 
+  // 9. El ritmo: de P12 a P13 cruza la T3 (cámara) despacio; de P13 a P14, un paso común.
+  await espera(600);
+  let llegada = llegaEn(s, yPausa(s.geo, 13));
+  await desliza(s, { ms: 50 });
+  let ms = await llegada;
+  revisa(ms !== null && ms >= 2000 && ms <= 3600, `de P12 a P13 (la T3, con cámara) tarda ${ms} ms (de 2,000 a 3,600)`);
+  await asentado(s);
+  await espera(600);
+  llegada = llegaEn(s, yPausa(s.geo, 14));
+  await desliza(s, { ms: 50 });
+  ms = await llegada;
+  revisa(ms !== null && ms <= 1300, `de P13 a P14 (sin cámara) tarda ${ms} ms (hasta 1,300)`);
+
 
   revisa(s.errores.length === 0, `iPhone: ${s.errores.length} errores de consola${s.errores.length ? `: ${s.errores.join(" | ")}` : ""}`);
   await s.contexto.close();
@@ -256,6 +289,19 @@ const fmt = (e) => (e.k === "después" ? "después" : `P${e.k}${e.fuera > 3 ? ` 
   await asentado(s);
   e = await estado(s);
   revisa(e.y > 1200, `escritorio: la rueda avanza como siempre (scroll en ${Math.round(e.y)}px, ${fmt(e)})`);
+  // Tres muescas desde P12 dejan el scroll a media T3, más cerca de P12 (a 1280 × 800: 0.375 pantallas de
+  // 0.9): el imán la termina hacia adelante. Con la pausa más cercana regresaba a P12, y la cámara iba al
+  // doctor y volvía (grabado el 9-oct).
+  await s.p.evaluate((y) => window.scrollTo(0, y), yPausa(s.geo, 12));
+  await asentado(s);
+  await espera(800);
+  for (let i = 0; i < 3; i++) {
+    await s.p.mouse.wheel(0, 100);
+    await espera(90);
+  }
+  await asentado(s, 600, 8000);
+  e = await estado(s);
+  revisa(e.k === 13 && e.fuera <= 3, `escritorio: tres muescas a media T3 terminan en P13, sin regresar (quedó en ${fmt(e)})`);
   revisa(s.errores.length === 0, `escritorio: ${s.errores.length} errores de consola`);
   await s.contexto.close();
 }

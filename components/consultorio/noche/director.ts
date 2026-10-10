@@ -6,7 +6,7 @@ import { armarMediodia } from "../dia/mediodia";
 import { armarTarde } from "../dia/tarde";
 import { type Cara } from "../moli/partes";
 import { crearMoli } from "../moli/titere";
-import { PANTALLAS, PAUSAS, T1, T5 } from "../pausas";
+import { PANTALLAS, PAUSAS, PAUSAS_CON_CAMARA, T1, T5 } from "../pausas";
 import { PUNTOS } from "./dibujo";
 import { armarPasoAPaso } from "./pasoAPaso";
 
@@ -40,6 +40,27 @@ const ARMADORES = [
   { nombre: "tarde", armar: armarTarde },
   { nombre: "anochecer", armar: armarAnochecer },
 ];
+
+/** Dónde se asienta el scroll, en progreso de 0 a 1: cada pausa y el final de la escena. */
+const PARADAS = [...PAUSAS.map((p) => p / PANTALLAS), 1];
+/**
+ * El imán: la pausa más cercana. Pero a media transición de cámara (T1, T3, T4, T5) la termina hacia donde
+ * iba el scroll: con la más cercana, cuatro muescas de la rueda a media T3 llevaban la cámara al doctor y
+ * la regresaban al celular (grabado el 9-oct). En el primer y el último 8 % del tramo manda la cercana:
+ * todavía no arranca la cámara.
+ */
+function iman(valor: number, self?: ScrollTrigger) {
+  if (valor <= 0) return 0;
+  if (valor >= 1) return 1;
+  let i = 0;
+  while (i < PARADAS.length - 2 && PARADAS[i + 1] <= valor) i++;
+  const a = PARADAS[i];
+  const b = PARADAS[i + 1];
+  const tramo = (valor - a) / (b - a);
+  const rumbo = self?.direction ?? 0;
+  if (PAUSAS_CON_CAMARA.includes(i + 1) && tramo > 0.08 && tramo < 0.92 && rumbo) return rumbo > 0 ? b : a;
+  return tramo < 0.5 ? a : b;
+}
 
 /** Lo de la noche se indexa por pausa de P0 a P6; de P7 en adelante la noche se queda como en P6. */
 const ULTIMA_NOCHE = 6;
@@ -167,12 +188,12 @@ export function armarNoche(raiz: HTMLElement): () => void {
       end: "bottom bottom",
       animation: camara,
       scrub: 0.5,
-      // Se asienta en la pausa más cercana a donde el scroll de verdad se detuvo: ni «la siguiente»
-      // (directional) ni adonde proyecta la velocidad (inertia). El celular ya trae su propia inercia.
-      // En pantallas táctiles el paso a paso (pasoAPaso.ts) ya llega justo a cada pausa: el imán solo
-      // trabaja cuando se vuelve a la historia con el scroll de siempre.
+      // Se asienta en la pausa más cercana a donde el scroll de verdad se detuvo, salvo a media transición
+      // de cámara (iman). Nada de adonde proyecta la velocidad (inertia): el celular ya trae su propia
+      // inercia. En pantallas táctiles el paso a paso (pasoAPaso.ts) ya llega justo a cada pausa: el imán
+      // solo trabaja cuando se vuelve a la historia con el scroll de siempre.
       snap: {
-        snapTo: [...PAUSAS.map((p) => p / PANTALLAS), 1],
+        snapTo: iman,
         directional: false,
         inertia: false,
         duration: { min: 0.3, max: 0.8 },

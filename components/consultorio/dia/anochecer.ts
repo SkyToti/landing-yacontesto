@@ -3,11 +3,12 @@ import { crearMoli, type Titere } from "../moli/titere";
 import { PAUSAS, PAUSAS_CIFRAS, T4, T5 } from "../pausas";
 import { MIRA, anaQuieta, camina, crearAna } from "./ana";
 import { HOMBROS } from "./dibujo";
+import { CLINICA, PUERTA, elige, origenPara, yPara } from "./encuadres";
 import type { Opciones } from "./manana";
 
 /**
- * El acto de las 19:00: la transición T4 (el primer plano de las 16:05 se aleja, el reloj llega a 19:00
- * y la cámara vuelve del consultorio a la ventana), P16 (Ana se despide con la mano, voltea el letrero
+ * El acto de las 19:00: la transición T4 (corte a la toma abierta de la clínica entera, donde el reloj
+ * llega a 19:00, y la cámara se acerca a la recepción), P16 (Ana se despide con la mano, voltea el letrero
  * a CERRADO y se va), la transición T5 (el sol se mete, sale la luna y la noche entra por la ventana
  * hasta tapar la pantalla) y la escena 5, P17 a P20: el celular enciende su luz, Moli se acomoda la
  * diadema y se queda de guardia, y las tres cifras cruzan la pantalla con el scroll, una por pausa.
@@ -19,9 +20,8 @@ import type { Opciones } from "./manana";
  * Ana, el letrero, a los dos Molis, su diadema y la luz del celular.
  */
 
-/** La cámara de la T4, en unidades del lienzo de 480 de ancho: la ventana, Ana y Moli a cuadro. */
+/** Las cuentas de la T5, en unidades del lienzo de 480 de ancho (los encuadres de la T4 están en encuadres.ts). */
 const LIENZO_ANCHO = 480;
-const PUERTA = { x: 130, escala: 1.35 };
 /** El centro de la ventana: de ahí entra la noche. */
 const VENTANA = { x: 101, y: 486 };
 /** La luz del celular (la de las 23:47): en el plano de las 19:00 queda abajo, entre el texto y la pastilla. */
@@ -30,8 +30,10 @@ const LUZ = { x: 318, y: 600, r: 196 };
 const IRIS_INICIAL = 18;
 
 type Medidas = {
-  /** Cuánto se mueve la lámina de día para quedar en la puerta. */
+  /** Cuánto se mueve la lámina de día en el corte para quedar en la toma abierta. */
   dx: number;
+  /** Y cuánto, de la toma abierta a la puerta. */
+  dxPuerta: number;
   /** El centro de la ventana en pantalla (relativo al escenario) y el radio de la caja del iris. */
   cx: number;
   cy: number;
@@ -91,20 +93,24 @@ export function armarAnochecer(raiz: HTMLElement, { escenario, escritorio }: Opc
     const [ox, oy] = getComputedStyle(laminaDia).transformOrigin.split(" ").map(parseFloat);
     const w = laminaDia.offsetWidth;
     const k = w / LIENZO_ANCHO;
-    // Dónde queda en pantalla el origen de la lámina con la cámara en la puerta (la cámara solo mueve x).
-    const origenX = e.left + e.width / 2 - (PUERTA.x * k - ox) * PUERTA.escala;
+    const puerta = elige(PUERTA, escritorio.matches);
+    // Dónde queda en pantalla el origen de la lámina en la toma abierta y con la cámara en la puerta (la
+    // cámara solo mueve x; el origen no se mueve al escalar).
+    const origenClinica = origenPara(laminaDia, escenario, elige(CLINICA, escritorio.matches));
+    const origenX = origenPara(laminaDia, escenario, puerta);
     const origenY = r.top + oy * s0;
     // La lámina de la noche sin transformar: centrada en su encuadre, igual que la de día.
     const izquierda = e.left + (e.width - w) / 2;
-    const cx = origenX + (VENTANA.x * k - ox) * PUERTA.escala - esc.left;
-    const cy = origenY + (VENTANA.y * k - oy) * PUERTA.escala - esc.top;
+    const cx = origenX + (VENTANA.x * k - ox) * puerta.escala - esc.left;
+    const cy = origenY + (VENTANA.y * k - oy) * puerta.escala - esc.top;
     // La caja del iris mide 2·(ancho + alto) de lado (CSS): su radio alcanza cualquier esquina.
     const W = escenario.clientWidth;
     const H = escenario.clientHeight;
     const R = W + H;
     const lejos = Math.hypot(Math.max(cx, W - cx), Math.max(cy, H - cy));
     m = {
-      dx: origenX - (r.left + ox * s0),
+      dx: origenClinica - (r.left + ox * s0),
+      dxPuerta: origenX - origenClinica,
       cx,
       cy,
       R,
@@ -163,25 +169,46 @@ export function armarAnochecer(raiz: HTMLElement, { escenario, escritorio }: Opc
   function camara(tl: gsap.core.Timeline) {
     const t = T4.inicio;
     tl
-      // Corte del primer plano de las 16:05 al plano general, en el mismo instante (sin fundido: dos capas
-      // a media opacidad se ven encimadas; scripts/r1-recorrido.mjs, 7-oct).
-      .to(capaRotulos, { opacity: 0, duration: 0.06 }, t)
+      // El título se va antes del corte: con el corte encima, quedaba sobre el dibujo (Diego, 9-oct).
+      .to(capaRotulos, { opacity: 0, duration: 0.035 }, t - 0.045)
+      // Corte del primer plano de las 16:05 a la toma abierta de la clínica entera, en el mismo instante (sin
+      // fundido: dos capas a media opacidad se ven encimadas; scripts/r1-recorrido.mjs, 7-oct).
       .set(planoDia, { opacity: 1 }, t)
       .set(cercaTarde, { autoAlpha: 0 }, t)
-      // La cámara vuelve del consultorio a la ventana, pasando por el reloj, que gira de 16:05 a 19:00:
-      // el minutero da dos vueltas y once doceavos.
-      .to(laminaDia, { scale: PUERTA.escala, x: () => `+=${mide().dx}`, ease: "power1.inOut", duration: 0.38 }, t + 0.04)
-      .fromTo(hora, { rotation: 842.5 }, { rotation: 930, ease: "power1.inOut", duration: 0.3, immediateRender: false }, t + 0.08)
-      .fromTo(minuto, { rotation: 3630 }, { rotation: 4680, ease: "power1.inOut", duration: 0.3, immediateRender: false }, t + 0.08)
-      // Las capas de las 19:00 se prenden con la cámara en marcha, lejos de la medición (t + 0.04) y de la
+      .set(
+        laminaDia,
+        {
+          scale: () => elige(CLINICA, escritorio.matches).escala,
+          x: () => `+=${mide().dx}`,
+          y: () => yPara(escenario, elige(CLINICA, escritorio.matches)),
+        },
+        t,
+      )
+      // Con la clínica a cuadro, el reloj gira de 16:05 a 19:00: el minutero da dos vueltas y once doceavos.
+      .fromTo(hora, { rotation: 842.5 }, { rotation: 930, ease: "power1.inOut", duration: 0.22, immediateRender: false }, t + 0.02)
+      .fromTo(minuto, { rotation: 3630 }, { rotation: 4680, ease: "power1.inOut", duration: 0.22, immediateRender: false }, t + 0.02)
+      // Las capas de las 19:00 se prenden con la cámara en marcha, lejos de la medición (el corte) y de la
       // pausa (11.375), en dos tiempos: primero el dibujo de la noche (dentro de un iris todavía oculto) y
       // luego su luz, Moli y las cifras (fuera de cuadro, a la derecha). Así, cuando la T5 mide, su diseño
       // ya está calculado.
-      .set(plano, { display: "block" }, t + 0.18)
-      .set([luz, moliN.el, capaCifras], { display: "block" }, t + 0.42)
+      .set(plano, { display: "block" }, t + 0.15)
+      // Y se acerca despacio a la recepción entera, donde Ana se despide.
+      .to(
+        laminaDia,
+        {
+          scale: () => elige(PUERTA, escritorio.matches).escala,
+          x: () => `+=${m?.dxPuerta ?? 0}`,
+          // En la puerta la lámina vuelve a su altura: la noche de la T5 se encuadra igual, con y = 0.
+          y: () => yPara(escenario, elige(PUERTA, escritorio.matches)),
+          ease: "power1.inOut",
+          duration: 0.26,
+        },
+        T4.empuja,
+      )
+      .set([luz, moliN.el, capaCifras], { display: "block" }, T4.llega - 0.01)
       // El consultorio ya salió de cuadro: la lámina vuelve a recortar, para que Ana salga por su orilla.
-      .set(laminaDia, { overflow: "hidden" }, t + 0.36)
-      .to(capaRotulos, { opacity: 1, duration: 0.1 }, T4.llega);
+      .set(laminaDia, { overflow: "hidden" }, T4.llega)
+      .to(capaRotulos, { opacity: 1, duration: 0.1 }, T4.llega + 0.02);
 
     const t5 = T5.inicio;
     tl
@@ -191,7 +218,7 @@ export function armarAnochecer(raiz: HTMLElement, { escenario, escritorio }: Opc
       .fromTo(luna, { yPercent: 105 }, { yPercent: 0, ease: "power2.out", duration: 0.16, immediateRender: false }, t5 + 0.06)
       .to(capaRotulos, { opacity: 0, duration: 0.06 }, t5 + 0.08)
       // La noche entra por la ventana: su lámina, encuadrada igual que la de día, se asoma por el iris.
-      .set(lamina, { x: () => m?.xPuerta ?? 0, y: 0, scale: PUERTA.escala }, t5 + 0.14)
+      .set(lamina, { x: () => m?.xPuerta ?? 0, y: 0, scale: () => elige(PUERTA, escritorio.matches).escala }, t5 + 0.14)
       .set(iris, { visibility: "visible" }, t5 + 0.15)
       .fromTo(abre, { p: 0 }, { p: 1, ease: "power2.in", duration: 0.3, immediateRender: false, onUpdate: pintaIris }, t5 + 0.15)
       // El día se apaga cuando la noche ya lo tapa entero, no antes (scripts/r1-velo.mjs).

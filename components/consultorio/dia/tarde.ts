@@ -2,12 +2,12 @@ import { gsap } from "gsap";
 import { type Cara } from "../moli/partes";
 import { crearMoli, type Titere } from "../moli/titere";
 import { T3 } from "../pausas";
+import { CLINICA, CONSULTORIO, elige, origenActual, origenPara, yPara } from "./encuadres";
 import type { Opciones } from "./manana";
-import { PUNTOS_CONSULTORIO } from "./sillon";
 
 /**
- * El acto de las 16:05: la transición T3 (la cámara se aleja del celular, el reloj gira de 11:20 a
- * 16:05 y la cámara se va a la derecha, al consultorio, donde el doctor atiende en el sillón) y la
+ * El acto de las 16:05: la transición T3 (corte a la toma abierta de la clínica entera, donde el reloj
+ * gira de 11:20 a 16:05, y la cámara se acerca al doctor, que atiende en el sillón) y la
  * escena 4 (P13 a P15): Jorge pide mover su cita del viernes al sábado; Moli la busca con la lupa
  * (`buscar_mis_citas`), revisa el sábado (`ver_horarios_ocupados`), la carga con sus pinzas al hueco
  * de las 10:00 (`reagendar_cita`) y se la confirma. Lo arma el director de `noche/director.ts`, igual
@@ -25,14 +25,6 @@ const BURBUJAS: Record<number, number> = { 13: 2, 14: 3, 15: 4 };
 const TIRA_CELULAR: Record<number, boolean> = { 13: false, 14: true, 15: false };
 const CARAS: Record<number, Cara> = { 13: "guino", 14: "feliz", 15: "feliz" };
 const LIMA = "#ABFF84";
-/**
- * La cámara de la T3, en unidades del lienzo de 480 de ancho: se abre con el celular (x = 323) y el reloj
- * (x = 392) a media pantalla, como en la T2, y luego se va a la derecha hasta el doctor y el sillón.
- */
-const LIENZO_ANCHO = 480;
-const ENTRE_CELULAR_Y_RELOJ = 357;
-const ESCALA_ABIERTA = 1.6;
-const ESCALA_CONSULTORIO = 1.25;
 
 export function armarTarde(raiz: HTMLElement, { escenario, escritorio }: Opciones) {
   const q = <T extends Element = HTMLElement>(s: string) => raiz.querySelector<T>(s)!;
@@ -60,7 +52,6 @@ export function armarTarde(raiz: HTMLElement, { escenario, escritorio }: Opcione
   const lente = q<SVGCircleElement>(".lupa-tarde .lente");
   const pinzas = q(".pinzas-tarde");
   const puntaPinzas = q<SVGCircleElement>(".pinzas-tarde .punta");
-  const encuadreDia = laminaDia.parentElement!;
   const moli = crearMoli(q('[data-moli="mt"]'), "mt-c", "normal");
 
   // La tira aumentada dentro de la lupa es una copia: las animaciones tocan las dos. Mientras la capa
@@ -163,52 +154,61 @@ export function armarTarde(raiz: HTMLElement, { escenario, escritorio }: Opcione
 
   /* ── La cámara: T3, atada al scroll ── */
   // Como en la T2: GSAP guarda el centrado de la lámina a veces como xPercent y a veces como x en px, así
-  // que la cámara la mueve con x relativa (+=), calculada con la geometría real. El origen de la lámina
-  // no se mueve al escalar: en pantalla está en r.left + o·s.
-  // Los dos encuadres se calculan juntos, con UNA medición al arrancar la T3: medir otra vez a media
-  // cámara caía en el mismo cuadro en que se prende una capa nueva y salía una tarea larga.
-  const enLamina = (u: number) => (u / LIENZO_ANCHO) * laminaDia.offsetWidth;
-  let encuadres = { abre: 0, consultorio: 0 };
+  // que la cámara la mueve con x relativa (+=), calculada con la geometría real (encuadres.ts).
+  // Los dos encuadres, la toma abierta y el del doctor, se calculan juntos con UNA medición en el corte:
+  // medir otra vez a media cámara caía en el mismo cuadro en que se prende una capa nueva y salía una
+  // tarea larga.
+  let alDoctor = 0;
   function mideEncuadres() {
-    const r = laminaDia.getBoundingClientRect();
     const s0 = Number(gsap.getProperty(laminaDia, "scaleX")) || 1;
-    const o = parseFloat(getComputedStyle(laminaDia).transformOrigin);
-    const e = encuadreDia.getBoundingClientRect();
-    const centro = e.left + e.width / 2;
-    // Dónde tiene que quedar en pantalla el origen de la lámina en cada encuadre.
-    const abierta = centro - (enLamina(ENTRE_CELULAR_Y_RELOJ) - o) * ESCALA_ABIERTA;
-    const consultorio = centro - (enLamina(PUNTOS_CONSULTORIO.centro.x) - o) * ESCALA_CONSULTORIO;
-    encuadres = { abre: abierta - (r.left + o * s0), consultorio: consultorio - abierta };
-    return `+=${encuadres.abre}`;
+    const abierta = origenPara(laminaDia, escenario, elige(CLINICA, escritorio.matches));
+    alDoctor = origenPara(laminaDia, escenario, elige(CONSULTORIO, escritorio.matches)) - abierta;
+    return `+=${abierta - origenActual(laminaDia, s0)}`;
   }
   function camara(tl: gsap.core.Timeline) {
     const t = T3.inicio;
     tl
-      // Corte del primer plano de las 11:20 al plano general, en el mismo instante (sin fundido: dos capas a
-      // media opacidad se ven encimadas; scripts/r1-recorrido.mjs, 7-oct). La T2 lo dejó en ese celular.
-      .to(capaRotulos, { opacity: 0, duration: 0.06 }, t)
+      // El título se va antes del corte: con el corte encima, quedaba sobre el dibujo (Diego lo vio sobre la
+      // cara de Moli, 9-oct).
+      .to(capaRotulos, { opacity: 0, duration: 0.035 }, t - 0.045)
+      // El consultorio se prende todavía tapado por el primer plano de las 11:20: su primer cálculo de
+      // diseño no cae en el cuadro del corte, que mide. La lámina deja de recortar lo que sale de su caja:
+      // el consultorio vive a su derecha.
+      .set(dibConsultorio, { display: "block" }, t - 0.03)
+      .set(laminaDia, { overflow: "visible" }, t - 0.03)
+      // Corte del primer plano de las 11:20 a la toma abierta de la clínica entera, en el mismo instante y sin
+      // fundido (dos capas a media opacidad se ven encimadas; scripts/r1-recorrido.mjs, 7-oct). Ya no pasa
+      // por el plano general empujado hacia el celular, donde lo dejó la T2: ese Moli gigante parecía error.
       .set(planoDia, { opacity: 1 }, t)
       .set(cercaMediodia, { autoAlpha: 0 }, t)
-      // El consultorio se prende ya con la cámara en marcha y lejos de la pausa: su primer cálculo de
-      // diseño no cae en el cuadro en que una actuación mide (sección 7 del guion).
-      // La lámina deja de recortar lo que sale de su caja: el consultorio vive a su derecha.
-      // La cámara se abre sobre el mostrador y el reloj gira de 11:20 a 16:05: el minutero da cuatro
-      // vueltas y tres cuartos.
-      .to(laminaDia, { scale: ESCALA_ABIERTA, x: mideEncuadres, ease: "power1.inOut", duration: 0.16 }, t + 0.04)
-      .set(dibConsultorio, { display: "block" }, t + 0.1)
-      .set(laminaDia, { overflow: "visible" }, t + 0.1)
-      .fromTo(hora, { rotation: 700 }, { rotation: 842.5, ease: "power1.inOut", duration: 0.18, immediateRender: false }, t + 0.08)
-      .fromTo(minuto, { rotation: 1920 }, { rotation: 3630, ease: "power1.inOut", duration: 0.18, immediateRender: false }, t + 0.08)
-      // El primer plano de las 16:05 se prende a media cámara, lejos de las mediciones de P12 y de P13, y
-      // en dos tiempos: primero el celular y Moli, luego la tira y las manos. Prendido entero de un jalón,
-      // su primer cálculo de diseño daba una tarea larga de 51 ms con la CPU 4× (scripts/r1-scroll.mjs).
+      .set(
+        laminaDia,
+        { scale: () => elige(CLINICA, escritorio.matches).escala, x: mideEncuadres, y: () => yPara(escenario, elige(CLINICA, escritorio.matches)) },
+        t,
+      )
+      // Con la clínica a cuadro, el reloj gira de 11:20 a 16:05: el minutero da cuatro vueltas y tres cuartos.
+      .fromTo(hora, { rotation: 700 }, { rotation: 842.5, ease: "power1.inOut", duration: 0.22, immediateRender: false }, t + 0.02)
+      .fromTo(minuto, { rotation: 1920 }, { rotation: 3630, ease: "power1.inOut", duration: 0.22, immediateRender: false }, t + 0.02)
+      // El primer plano de las 16:05 se prende con la cámara en marcha, lejos del corte (que mide) y de la
+      // pausa (9.2), y en dos tiempos: primero el celular y Moli, luego la tira y las manos. Prendido entero
+      // de un jalón, su primer cálculo de diseño daba una tarea larga de 51 ms con la CPU 4× (r1-scroll).
       .set(cerca, { display: "block" }, t + 0.16)
       .set(tira, { display: "flex" }, t + 0.3)
       .set([lupa, pinzas], { display: "block" }, t + 0.3)
       // Las manos se miden en ese mismo cuadro (el diseño ya se está calculando) y no al llegar a P13.
       .call(() => void (manos ?? mideManos()), undefined, t + 0.3)
-      // Y se va a la derecha, al consultorio: el doctor atiende en el sillón con las manos ocupadas.
-      .to(laminaDia, { scale: ESCALA_CONSULTORIO, x: () => `+=${encuadres.consultorio}`, ease: "power1.inOut", duration: 0.2 }, t + 0.22)
+      // Y se acerca despacio al doctor, que atiende en el sillón con las manos ocupadas.
+      .to(
+        laminaDia,
+        {
+          scale: () => elige(CONSULTORIO, escritorio.matches).escala,
+          x: () => `+=${alDoctor}`,
+          y: () => yPara(escenario, elige(CONSULTORIO, escritorio.matches)),
+          ease: "power1.inOut",
+          duration: 0.3,
+        },
+        T3.empuja,
+      )
       // Corte al primer plano: el celular de la clínica, que ya está sonando. El plano general se apaga en
       // el mismo instante; el primer plano termina de crecer y sus orillas son el papel del escenario.
       .set(planoDia, { opacity: 0 }, T3.llega)

@@ -1,14 +1,14 @@
 import { gsap } from "gsap";
 import type { Observer } from "gsap/Observer";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { PANTALLAS, PAUSAS } from "../pausas";
+import { PANTALLAS, PAUSAS, PAUSAS_CON_CAMARA } from "../pausas";
 
 /**
  * Paso a paso en pantallas táctiles (Diego, 9-oct-2026: «le dan scroll súper rápido y se pasan toda la
  * landing»). Con la inercia del celular un deslizón rápido recorre varias pantallas, y la historia pone una
  * pausa cada 0.7: desde la portada caía en P9 (scripts/r1-paso.mjs, con la inercia de iOS simulada).
- * Aquí, dentro de la historia, cada deslizón avanza o regresa UNA pausa a velocidad fija, sin importar la
- * fuerza, como los Estados de WhatsApp.
+ * Aquí, dentro de la historia, cada deslizón avanza o regresa UNA pausa a su ritmo, sin importar la fuerza,
+ * como los Estados de WhatsApp: ~0.7 s una pausa común y 2.4 s las que llevan movimiento de cámara.
  * - El dedo no mueve la página: la clase «paso» pone `touch-action: pinch-zoom` (noche.css) y, de respaldo
  *   para Safari, el touchmove de un dedo se cancela. El pellizco para acercar y los toques (la pastilla, los
  *   enlaces) siguen funcionando.
@@ -43,8 +43,34 @@ export function armarPasoAPaso(st: ScrollTrigger): () => void {
     return seccion ? seccion.getBoundingClientRect().top + scrollY - 64 : fin() + innerHeight;
   };
 
-  // Más distancia, más tiempo: una pausa común (0.65 pantallas) dura ~0.66 s y una transición (~0.95), ~0.82.
+  // Más distancia, más tiempo: una pausa común (0.65 pantallas) dura ~0.66 s.
   const duracion = (pixeles: number) => gsap.utils.clamp(0.5, 1.1, 0.3 + (0.55 * Math.abs(pixeles)) / innerHeight);
+  /**
+   * Un tramo con movimiento de cámara (T1, T3, T4 y T5) va despacio: a ~0.7 s por paso la T3 cruzaba al
+   * consultorio en un cuarto de segundo (grabado el 9-oct; Diego: «pasa muy rápido»). El tiempo de un viaje
+   * es la suma de lo que recorre de cada tramo: si se encadena un deslizón a media transición, lo que queda
+   * de la cámara sigue yendo despacio.
+   */
+  const DURACION_CAMARA = 2.4;
+  function tiempoDe(y0: number, y1: number) {
+    const lo = Math.min(y0, y1);
+    const hi = Math.max(y0, y1);
+    let total = 0;
+    let camara = false;
+    for (let g = 1; g < paradas.length; g++) {
+      const a = yDe(g - 1);
+      const b = yDe(g);
+      const parte = Math.max(0, Math.min(hi, b) - Math.max(lo, a)) / (b - a);
+      if (parte <= 0) continue;
+      const conCamara = PAUSAS_CON_CAMARA.includes(g);
+      camara ||= conCamara && parte > 0.15;
+      total += parte * (conCamara ? DURACION_CAMARA : duracion(b - a));
+    }
+    // La salida a lo de después, más allá de P20.
+    const ultima = yDe(paradas.length - 1);
+    if (hi > ultima) total += duracion(hi - Math.max(lo, ultima));
+    return { duracion: gsap.utils.clamp(0.5, 3.6, total), camara };
+  }
 
   let destino = -1;
   let viaje: gsap.core.Tween | null = null;
@@ -57,10 +83,13 @@ export function armarPasoAPaso(st: ScrollTrigger): () => void {
     if (iman) iman.kill();
     const lleva = { y: scrollY };
     puesto = scrollY;
+    const { duracion: segundos, camara } = tiempoDe(scrollY, y);
     viaje = gsap.to(lleva, {
       y,
-      duration: duracion(y - scrollY),
-      ease: "power2.inOut",
+      duration: segundos,
+      // Con cámara, parejo: cada movimiento de cámara ya trae su propia curva, y con una curva aquí el
+      // acercamiento caía en lo más rápido del paso (~0.3 s, grabado el 9-oct).
+      ease: camara ? "none" : "power2.inOut",
       onUpdate: () => {
         // Si algo más movió la página (un enlace como «Precio»), se le cede el control.
         if (Math.abs(scrollY - puesto) > 3) {

@@ -37,28 +37,33 @@ export const T2 = {
 };
 
 /**
- * Lo que pasa entre P12 y P13, atado al pulgar: la cámara se aleja del celular, el reloj gira de 11:20 a
- * 16:05 y la cámara se va a la derecha, al consultorio, donde el doctor atiende en el sillón. Luego
- * corta al primer plano de las 16:05. La pausa cambia a la mitad (9.2): la actuación de P13 espera.
+ * Lo que pasa entre P12 y P13, atado al pulgar: el título se va, corte a la toma abierta de la clínica
+ * entera (la recepción y el consultorio; dia/encuadres.ts) y ahí gira el reloj de 11:20 a 16:05; luego la
+ * cámara se acerca al doctor, que atiende en el sillón, y corta al primer plano de las 16:05. La pausa
+ * cambia a la mitad (9.2): la actuación de P13 espera. Antes del 9-oct el corte caía en el plano general
+ * todavía empujado hacia el celular (un Moli gigante con el título encima) y la cámara cruzaba al
+ * consultorio en un instante: Diego lo vio como un error.
  */
 export const T3 = {
-  /** El primer plano de las 11:20 se aleja y vuelve el plano general, en el mostrador. */
-  inicio: 8.82,
-  /** La cámara llega al consultorio. */
-  consultorio: 9.12,
+  /** Corte del primer plano de las 11:20 a la toma abierta (el título ya se fue). */
+  inicio: 8.8,
+  /** La cámara empieza a acercarse al doctor. */
+  empuja: 9.0,
   /** Entra el primer plano de las 16:05. */
   llega: 9.32,
 };
 
 /**
- * Lo que pasa entre P15 y P16, atado al pulgar: el primer plano de las 16:05 se aleja, la cámara vuelve
- * del consultorio a la ventana mientras el reloj gira de 16:05 a 19:00, y se queda en la puerta, donde
- * Ana se despide. La pausa cambia a la mitad (11.375): la actuación de P16 espera a la cámara.
+ * Lo que pasa entre P15 y P16, atado al pulgar: el título se va, corte a la misma toma abierta y ahí el
+ * reloj gira de 16:05 a 19:00; luego la cámara se acerca a la recepción entera, donde Ana se despide (más
+ * abierta que antes: Diego, 9-oct). La pausa cambia a la mitad (11.375): la actuación de P16 espera.
  */
 export const T4 = {
-  /** El primer plano de las 16:05 se aleja y vuelve el plano general, en el consultorio. */
-  inicio: 11.07,
-  /** La cámara llega a la ventana. */
+  /** Corte del primer plano de las 16:05 a la toma abierta (el título ya se fue). */
+  inicio: 11.05,
+  /** La cámara empieza a acercarse a la recepción. */
+  empuja: 11.24,
+  /** La cámara llega a la recepción. */
   llega: 11.5,
 };
 
@@ -76,3 +81,10 @@ export const T5 = {
 
 /** Las pausas de las tres cifras de las 19:00: «7 días», «14 días» y «tu mismo número». */
 export const PAUSAS_CIFRAS = [18, 19, 20];
+
+/**
+ * Las pausas a las que se llega con un movimiento de cámara (T1, T3, T4 y T5; la T2 es un corte): en el
+ * celular el paso a paso las recorre despacio, y en escritorio el imán termina la transición hacia donde
+ * iba el scroll, sin ida y vuelta (Diego, 9-oct: «pasa muy rápido»).
+ */
+export const PAUSAS_CON_CAMARA = [7, 13, 16, 17];
