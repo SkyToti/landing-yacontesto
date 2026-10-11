@@ -16,21 +16,20 @@ import { PANTALLAS, PAUSAS, PAUSAS_CON_CAMARA } from "../pausas";
  *   la pausa.
  * - Red de seguridad: si un paso no mueve la página en 0.6 s, el paso a paso se apaga y vuelve el scroll
  *   de siempre. Nadie se queda atorado.
- * - Solo con puntero grueso (celular y tableta) y fuera de iPhone y iPad: el 10-oct Diego vio que en su
- *   iPhone la página no se movía (el scroll de siempre quedaba frenado y el paso no avanzaba), mientras en
- *   Android sí funcionaba; en el WebKit de Windows no se reproduce. Ahí va el scroll de siempre hasta
- *   probarlo en un iPhone: `?paso=1` lo fuerza y `?depura=1` enseña en pantalla qué pasa con cada toque.
+ * - Solo con puntero grueso (celular y tableta). En iPhone el scroll que se pide se aplica con unos cuadros
+ *   de retraso (ver viajaA): el 10-oct eso cortaba el viaje y la página no se movía; se encontró con
+ *   `?depura=1`, que enseña en pantalla qué pasa con cada toque. `?paso=0` lo apaga.
  * - Sin «cine» (movimiento reducido, sin JavaScript) el director ni arranca.
  */
 export function armarPasoAPaso(st: ScrollTrigger): () => void {
   const parametros = new URLSearchParams(location.search);
-  const forzado = parametros.get("paso") === "1";
+  const apagado = parametros.get("paso") === "0";
   const depura = parametros.get("depura") === "1";
   // iPadOS se presenta como Mac: se reconoce por la pantalla táctil.
   const ios = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
   const anota = registro(depura);
-  anota(`armado · ios ${ios} · forzado ${forzado} · grueso ${matchMedia("(pointer: coarse)").matches}`);
-  if (!matchMedia("(pointer: coarse)").matches || (ios && !forzado)) return () => {};
+  anota(`armado · ios ${ios} · apagado ${apagado} · grueso ${matchMedia("(pointer: coarse)").matches}`);
+  if (!matchMedia("(pointer: coarse)").matches || apagado) return () => {};
 
   const html = document.documentElement;
   const raiz = st.trigger as HTMLElement;
@@ -86,6 +85,7 @@ export function armarPasoAPaso(st: ScrollTrigger): () => void {
   let roto = false;
   let destino = -1;
   let viaje: gsap.core.Tween | null = null;
+  let ultimoPedido: number | null = null;
   let vigia = 0;
   function viajaA(y: number) {
     viaje?.kill();
@@ -93,12 +93,18 @@ export function armarPasoAPaso(st: ScrollTrigger): () => void {
     // el scroll se pelean y el paso nuevo se perdería.
     const iman = st.getTween(true);
     if (iman) iman.kill();
-    const desde = scrollY;
+    // Si un viaje sigue en camino, el nuevo arranca de lo último que se pidió y no de donde va la página: en
+    // iPhone la página va unos cuadros atrás y regresaría.
+    const desde = viaje && ultimoPedido !== null ? ultimoPedido : scrollY;
     const lleva = { y: desde };
-    // Lo último que se le pidió a la página. Si un cuadro después está a más de 60 px, otra cosa la movió (un
-    // enlace como «Precio») y se le cede el control. Con 3 px, un navegador que aplica el scroll con un
-    // cuadro de retraso cortaba el viaje en el primer cuadro.
-    let pedido = desde;
+    /*
+     * Lo que se le pidió a la página en los últimos cuadros. En iPhone el scroll se aplica con unos cuadros
+     * de retraso (medido el 10-oct en el iPhone de Diego con ?depura=1: a media subida la página iba en 393
+     * con 469 ya pedido): «otra cosa la movió» (un enlace como «Precio») solo si está lejos de TODO lo que se
+     * pidió hace poco. Comparando con lo último, ese retraso cortaba el viaje (con 3 px, desde el primer
+     * cuadro) y el imán regresaba la página a la pausa: «no deja hacer scroll».
+     */
+    const pedidos = [desde];
     let cuadros = 0;
     const { duracion: segundos, camara } = tiempoDe(desde, y);
     anota(`viaje ${Math.round(desde)} → ${Math.round(y)} en ${segundos.toFixed(2)} s`);
@@ -109,20 +115,25 @@ export function armarPasoAPaso(st: ScrollTrigger): () => void {
       // acercamiento caía en lo más rápido del paso (~0.3 s, grabado el 9-oct).
       ease: camara ? "none" : "power2.inOut",
       onUpdate: () => {
-        if (Math.abs(scrollY - pedido) > 60) {
-          anota(`otra cosa movió la página: ${Math.round(scrollY)} contra ${Math.round(pedido)}`);
+        const lejos = Math.min(...pedidos.map((p) => Math.abs(scrollY - p)));
+        if (lejos > 60) {
+          anota(`otra cosa movió la página: ${Math.round(scrollY)}, a ${Math.round(lejos)} px de lo pedido`);
           viaje?.kill();
           viaje = null;
+          ultimoPedido = null;
           destino = -1;
           return;
         }
-        pedido = lleva.y;
-        window.scrollTo(0, pedido);
-        if (++cuadros <= 3) anota(`cuadro ${cuadros}: pedí ${Math.round(pedido)}, quedó ${Math.round(scrollY)}`);
+        pedidos.push(lleva.y);
+        if (pedidos.length > 12) pedidos.shift();
+        ultimoPedido = lleva.y;
+        window.scrollTo(0, lleva.y);
+        if (++cuadros <= 3) anota(`cuadro ${cuadros}: pedí ${Math.round(lleva.y)}, quedó ${Math.round(scrollY)}`);
       },
       onComplete: () => {
-        anota(`llegó: ${Math.round(scrollY)}`);
+        anota(`llegó: pedí ${Math.round(y)}, va en ${Math.round(scrollY)}`);
         viaje = null;
+        ultimoPedido = null;
         destino = -1;
       },
     });
@@ -221,6 +232,7 @@ export function armarPasoAPaso(st: ScrollTrigger): () => void {
     anota(`APAGADO: ${motivo}`);
     viaje?.kill();
     viaje = null;
+    ultimoPedido = null;
     window.clearTimeout(vigia);
     removeEventListener("touchmove", alMover);
     html.classList.remove("paso");

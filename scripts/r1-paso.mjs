@@ -7,8 +7,8 @@
 // También el ritmo (Diego, 9-oct: «los movimientos de cámara pasan muy rápido»): un paso con cámara (la T3)
 // tarda de 2 a 3.6 s y uno común menos de 1.3; y en escritorio, la rueda a media T3 termina la transición
 // hacia adelante, sin regresar la cámara.
-// Desde el 10-oct: en iPhone y iPad va el scroll de siempre (salvo ?paso=1), y si un paso no mueve la página
-// el paso a paso se apaga solo (la red de seguridad).
+// Desde el 10-oct: el iPhone, con el scroll que se aplica unos cuadros tarde (como lo midió Diego), y si un
+// paso no mueve la página el paso a paso se apaga solo (la red de seguridad). ?paso=0 lo apaga.
 // Perfil: iPhone 13 con las barras de Safari (390 × 664); escritorio y movimiento reducido no deben cambiar.
 // Uso (con el servidor de out/ en marcha): node scripts/r1-paso.mjs [URL]
 import { chromium } from "playwright";
@@ -285,30 +285,61 @@ const fmt = (e) => (e.k === "después" ? "después" : `P${e.k}${e.fuera > 3 ? ` 
 }
 
 /*
- * ── iPhone y iPad: el scroll de siempre (10-oct) ──
- * En el iPhone de Diego la página no se movía con el paso a paso, y en el WebKit de Windows no se reproduce:
- * en iOS va apagado salvo con ?paso=1 (para diagnosticar con ?depura=1). Aquí, Chromium con el agente de un
- * iPhone: lo que se prueba es la decisión del código, no el Safari de verdad.
+ * ── iPhone y iPad (10-oct) ──
+ * En el iPhone de Diego el scroll que se pide se aplica con unos cuadros de retraso (medido con ?depura=1: a
+ * media subida la página iba en 393 con 469 ya pedido), y eso cortaba el viaje («otra cosa movió la
+ * página»): la página no se movía. Aquí, Chromium con el agente de un iPhone y un window.scrollTo que aplica
+ * cada petición 3 cuadros después, como el iPhone. Con la versión que comparaba contra lo último pedido,
+ * este viaje se cortaba.
  */
 {
   const UA_IPHONE = "Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1";
-  const s = await abrir({ ...IPHONE, userAgent: UA_IPHONE });
+  const URL_ORIGINAL = URL;
+  const s = await abrirEn(`${URL_ORIGINAL}?depura=1`, { ...IPHONE, userAgent: UA_IPHONE });
   let e = await estado(s);
-  revisa(!e.paso, `iPhone: sin paso a paso (paso ${e.paso})`);
-  const d = await desliza(s, { ms: 60 });
-  revisa(d.nativo && d.movioConElDedo > 200, `iPhone: el dedo mueve la página como siempre (se movió ${d.movioConElDedo}px con el dedo)`);
+  revisa(e.paso, `iPhone: con paso a paso (paso ${e.paso})`);
+  await s.p.evaluate(() => {
+    const aplica = window.scrollTo.bind(window);
+    const cola = [];
+    let cuadro = 0;
+    window.scrollTo = (x, y) => cola.push({ x, y, en: cuadro + 3 });
+    const bombea = () => {
+      cuadro++;
+      while (cola.length && cola[0].en <= cuadro) {
+        const { x, y } = cola.shift();
+        aplica(x, y);
+      }
+      requestAnimationFrame(bombea);
+    };
+    requestAnimationFrame(bombea);
+  });
+  const caja = () =>
+    s.p.evaluate(() => [...document.body.children].find((el) => el.style.position === "fixed" && el.getAttribute("aria-hidden") === "true")?.textContent ?? "");
+  await desliza(s, { ms: 50 });
+  await asentado(s, 600, 8000);
+  e = await estado(s);
+  let registro = await caja();
+  revisa(e.k === 1 && e.fuera <= 3 && !registro.includes("otra cosa movió"),
+    `iPhone con el scroll 3 cuadros tarde: un deslizón llega a P1 sin cortarse (llegó a ${fmt(e)}${registro.includes("otra cosa movió") ? "; se cortó" : ""})`);
+  // Un paso con cámara (de P6 a P7, la T1), también con el retraso.
+  await s.p.evaluate((y) => window.scrollTo(0, y), yPausa(s.geo, 6));
+  await asentado(s, 600, 8000);
+  await espera(600);
+  await desliza(s, { ms: 50 });
+  await asentado(s, 600, 8000);
+  e = await estado(s);
+  registro = await caja();
+  revisa(e.k === 7 && e.fuera <= 3 && !registro.includes("otra cosa movió"),
+    `iPhone con el scroll tarde: de P6, un deslizón cruza la T1 hasta P7 sin cortarse (llegó a ${fmt(e)})`);
   revisa(s.errores.length === 0, `iPhone: ${s.errores.length} errores de consola`);
   await s.contexto.close();
 
-  // Con ?paso=1 se fuerza, para probarlo en un iPhone de verdad.
-  const URL_ORIGINAL = URL;
-  const f = await abrirEn(`${URL_ORIGINAL}?paso=1`, { ...IPHONE, userAgent: UA_IPHONE });
+  // Con ?paso=0 se apaga: el scroll de siempre.
+  const f = await abrirEn(`${URL_ORIGINAL}?paso=0`, { ...IPHONE, userAgent: UA_IPHONE });
   e = await estado(f);
-  revisa(e.paso, `iPhone con ?paso=1: el paso a paso se prende (paso ${e.paso})`);
-  await desliza(f, { ms: 50 });
-  await asentado(f);
-  e = await estado(f);
-  revisa(e.k === 1 && e.fuera <= 3, `iPhone con ?paso=1: un deslizón llega a P1 (llegó a ${fmt(e)})`);
+  revisa(!e.paso, `?paso=0: sin paso a paso (paso ${e.paso})`);
+  const d = await desliza(f, { ms: 60 });
+  revisa(d.nativo && d.movioConElDedo > 200, `?paso=0: el dedo mueve la página como siempre (${d.movioConElDedo}px)`);
   await f.contexto.close();
 }
 
