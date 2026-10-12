@@ -5,11 +5,15 @@
 //   personas), el logo de ≥ 112 px y los precios iguales a PRECIO (components/historia/datos.ts);
 // - canonical, robots.txt, el sitemap con `lastmod` verdadero (el del aviso = su «Última actualización»),
 //   la etiqueta de Search Console, el HTML bajo los 2 MB que lee Googlebot y que no haya noindex.
+// Las guías (SEO-2, 12-oct-2026): el índice /guias/ y cada guía que enlaza (en local, también cada carpeta de
+// out/guias/), con título ≤ 60, descripción ≤ 160, un H1, canonical, la ficha Article (autor y editor = la
+// Organization, por su @id) y su fecha: la que se ve = dateModified = su lastmod en el sitemap. Y el enlace
+// «Guías» en el pie de la portada.
 // Uso: node scripts/seo.mjs                          → contra out/ (después de `npm run build`)
 //      node scripts/seo.mjs --url https://yacontesto.com
 // Con una vista previa de Vercel (*.vercel.app, o --vista-previa) el noindex es a propósito
 // (scripts/vista-previa.mjs): ahí se revisa que SÍ esté, para que no compita con yacontesto.com.
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -158,6 +162,75 @@ for (const { loc, lastmod } of urls) {
 }
 const lastmodAviso = urls.find((u) => u.loc === `${SITIO}/privacidad/`)?.lastmod;
 revisa(isoAviso && lastmodAviso?.slice(0, 10) === isoAviso, `el lastmod del aviso (${lastmodAviso}) es su «Última actualización» (${isoAviso})`);
+const lastmodDe = (ruta) => urls.find((u) => u.loc === `${SITIO}${ruta}`)?.lastmod?.slice(0, 10);
+
+// ── Las guías ──
+// Lo que cada página aparte tiene que traer: 200, título ≤ 60, descripción ≤ 160, un H1, su canonical y el
+// noindex según dónde se revisa. Devuelve lo que ya leyó para las revisiones de cada una.
+function paginaAparte(ruta, r) {
+  revisa(r.estado === 200, `${ruta} responde 200 (${r.estado})`);
+  const t = texto(r.cuerpo.match(/<title>([\s\S]*?)<\/title>/)?.[1] ?? "");
+  revisa(t && largo(t) <= 60, `${ruta}: título de ${largo(t)} letras (≤ 60): «${t}»`);
+  const d = metas(r.cuerpo).find((m) => m.name === "description")?.content ?? "";
+  revisa(d && largo(d) <= 160, `${ruta}: descripción de ${largo(d)} letras (≤ 160)`);
+  const h1 = [...r.cuerpo.matchAll(/<h1\b[^>]*>([\s\S]*?)<\/h1>/g)].map((m) => texto(m[1]));
+  revisa(h1.length === 1, `${ruta}: un solo H1 (${h1.length})`);
+  const can = atributos(r.cuerpo.match(/<link\b[^>]*rel="canonical"[^>]*>/)?.[0] ?? "").href;
+  revisa(can === `${SITIO}${ruta}`, `${ruta}: canonical ${can}`);
+  if (!VISTA_PREVIA) revisa(!metas(r.cuerpo).some((m) => m.name === "robots" && /noindex/i.test(m.content)), `${ruta}: sin noindex`);
+  return { h1: h1[0] ?? "" };
+}
+
+revisa(/<a\b[^>]*href="\/guias\/"[^>]*>Guías<\/a>/.test(html), "el pie de la portada enlaza a las guías (/guias/)");
+
+const indice = await traer("/guias/");
+paginaAparte("/guias/", indice);
+const enlazadas = [...new Set([...indice.cuerpo.matchAll(/href="(\/guias\/[\w-]+\/)"/g)].map((m) => m[1]))];
+revisa(enlazadas.length >= 1, `el índice enlaza ${enlazadas.length} guía(s): ${enlazadas.join(", ")}`);
+if (!BASE) {
+  // En local, cada carpeta de out/guias/ con su index.html es una guía publicada: tiene que estar en el índice.
+  const carpetas = (await readdir(resolve("out/guias"), { withFileTypes: true }))
+    .filter((e) => e.isDirectory() && existsSync(resolve("out/guias", e.name, "index.html")))
+    .map((e) => `/guias/${e.name}/`);
+  revisa(carpetas.every((c) => enlazadas.includes(c)) && carpetas.length === enlazadas.length, `las ${carpetas.length} guía(s) de out/guias/ son las del índice`);
+}
+
+const fechasGuias = [];
+for (const ruta of enlazadas) {
+  const r = await traer(ruta);
+  const { h1 } = paginaAparte(ruta, r);
+  const og = metas(r.cuerpo).find((m) => m.property === "og:type")?.content;
+  revisa(og === "article", `${ruta}: og:type «${og}»`);
+  const bloquesGuia = [...r.cuerpo.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
+  revisa(bloquesGuia.length === 1, `${ruta}: un solo bloque JSON-LD (${bloquesGuia.length})`);
+  let nodos = [];
+  try {
+    nodos = JSON.parse(bloquesGuia[0] ?? "")["@graph"] ?? [];
+  } catch (e) {
+    revisa(false, `${ruta}: el JSON-LD se lee: ${e.message}`);
+  }
+  const articulo = nodos.find((n) => n["@type"] === "Article");
+  const org = nodos.find((n) => n["@type"] === "Organization");
+  revisa(articulo && org, `${ruta}: el @graph trae Article y Organization (${nodos.map((n) => n["@type"]).join(", ")})`);
+  revisa(org?.name === "YaContesto" && org?.["@id"] === empresa?.["@id"], `${ruta}: la Organization es la de la portada (${org?.["@id"]})`);
+  revisa(
+    articulo?.author?.["@id"] === org?.["@id"] && articulo?.publisher?.["@id"] === org?.["@id"],
+    `${ruta}: autor y editor = la Organization (${articulo?.author?.["@id"]}, ${articulo?.publisher?.["@id"]})`,
+  );
+  revisa(!/"Person"|Diego|Ben[ií]tez/i.test(bloquesGuia[0] ?? ""), `${ruta}: la ficha no trae personas ni el nombre de Diego`);
+  revisa(articulo?.headline === h1, `${ruta}: el headline es el H1`);
+  revisa(articulo?.url === `${SITIO}${ruta}`, `${ruta}: la url del Article es la canonical`);
+  const visible = r.cuerpo.match(/<time dateTime="(\d{4}-\d{2}-\d{2})"/i)?.[1];
+  const lm = lastmodDe(ruta);
+  revisa(
+    articulo?.dateModified && articulo.dateModified === visible && visible === lm && articulo.datePublished <= articulo.dateModified,
+    `${ruta}: fecha que se ve ${visible} = dateModified ${articulo?.dateModified} = lastmod ${lm} (publicada ${articulo?.datePublished})`,
+  );
+  fechasGuias.push(articulo?.dateModified ?? "");
+}
+const lmIndice = lastmodDe("/guias/");
+const masNueva = fechasGuias.sort().at(-1);
+revisa(lmIndice && lmIndice === masNueva, `el lastmod del índice (${lmIndice}) es el de la guía más nueva (${masNueva})`);
 
 // ── Una dirección que no existe da 404 (solo en la red; en local no hay servidor) ──
 if (BASE) {
