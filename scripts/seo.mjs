@@ -162,6 +162,8 @@ revisa(isoAviso && lastmodAviso?.slice(0, 10) === isoAviso, `el lastmod del avis
 // ── Una dirección que no existe da 404 (solo en la red; en local no hay servidor) ──
 if (BASE) {
   const r = await fetch(`${BASE}/no-existe-${Date.now()}/`);
+  // Se lee el cuerpo: sin eso, la conexión con GitHub Pages se queda abierta y el script no termina.
+  await r.arrayBuffer();
   revisa(r.status === 404, `una dirección que no existe da 404 (${r.status})`);
 }
 
