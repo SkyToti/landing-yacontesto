@@ -92,6 +92,15 @@ a {
   color: var(--crema-suave);
 }
 
+/* La bajada vive dentro del h1 (SEO-1): deshace lo que hereda del titular para verse como el párrafo de antes. */
+.titular .bajada {
+  display: block;
+  font-family: var(--f-texto);
+  font-weight: 400;
+  letter-spacing: normal;
+  text-wrap: wrap;
+}
+
 .titulo-paso {
   font-size: clamp(23px, 6.3vw, 42px);
   line-height: 1.04;

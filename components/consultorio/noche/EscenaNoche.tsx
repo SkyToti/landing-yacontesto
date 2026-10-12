@@ -120,10 +120,12 @@ export function EscenaNoche() {
       <div className="escenario">
         <div className="rotulos">
           <div className="rotulo rotulo-portada" data-rotulo="0">
+            {/* La bajada va dentro del h1 (SEO-1, 12-oct-2026): así «clínica dental» está en el encabezado
+                principal. Se ve igual que cuando era un párrafo aparte (`.titular .bajada`, base.css). */}
             <h1 id="titular" className="titular">
-              Tu WhatsApp <span className="sin-corte">contesta solo,</span> <span className="sin-corte">a las 11 p. m.</span>
+              Tu WhatsApp <span className="sin-corte">contesta solo,</span> <span className="sin-corte">a las 11 p. m.</span>{" "}
+              <span className="bajada">Una recepcionista con inteligencia artificial para tu clínica dental.</span>
             </h1>
-            <p className="bajada">Una recepcionista con inteligencia artificial para tu clínica dental.</p>
           </div>
           <ol className="pasos">
             {ROTULOS_NOCHE.map((r, i) => (
