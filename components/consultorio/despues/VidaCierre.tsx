@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { conectarCalculadora } from "./calculo";
+import { conectarDetalles } from "./detalles";
 import { CIERRE } from "./textos";
 
 /**
@@ -10,7 +11,9 @@ import { CIERRE } from "./textos";
  * - si tocan a Moli en el cierre, salta y contesta con una notita (con movimiento reducido, solo la notita);
  * - la línea viva de ese Moli, solo con la clase `cine` y solo mientras se ve;
  * - la pastilla se acopla al botón grande del cierre y desaparece: nunca hay dos botones a la vez;
- * - pasada la escena, la cabecera lleva fondo para que el texto no pase por debajo de la marca.
+ * - pasada la escena, la cabecera lleva fondo para que el texto no pase por debajo de la marca;
+ * - los detalles del 11-oct-2026 (detalles.ts): la palomita del logo, la flecha que se manda, el taco que cae
+ *   y Moli que voltea a ver el botón.
  * Sin JavaScript todo se ve quieto y completo: la pastilla se queda y el botón para tocar a Moli no aparece.
  */
 export function VidaCierre() {
@@ -18,6 +21,7 @@ export function VidaCierre() {
     performance.mark("historia:despues-inicia");
     const calculadora = document.querySelector<HTMLElement>("[data-calculadora]");
     const soltarCalculadora = calculadora ? conectarCalculadora(calculadora) : undefined;
+    const soltarDetalles = conectarDetalles();
     const html = document.documentElement;
     const cierre = document.getElementById("cierre");
     const noche = document.getElementById("noche");
@@ -26,11 +30,17 @@ export function VidaCierre() {
     const moli = cierre?.querySelector<HTMLElement>(".moli-cierre");
     const toque = cierre?.querySelector<HTMLButtonElement>(".cierre-toque");
     const nota = cierre?.querySelector<HTMLElement>(".nota-cierre");
-    if (!cierre || !noche || !pastilla || !boton || !moli || !toque || !nota) return soltarCalculadora;
+    if (!cierre || !noche || !pastilla || !boton || !moli || !toque || !nota) {
+      return () => {
+        soltarCalculadora?.();
+        soltarDetalles();
+      };
+    }
 
     const quieto = matchMedia("(prefers-reduced-motion: reduce)");
     const limpiar: (() => void)[] = [];
     if (soltarCalculadora) limpiar.push(soltarCalculadora);
+    limpiar.push(soltarDetalles);
 
     /* ── Moli contesta si lo tocan ── */
     let cual = 0;

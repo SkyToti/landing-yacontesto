@@ -144,6 +144,29 @@ a {
   width: 1.77em;
   height: 1.793em;
 }
+/*
+ * Detalle 1 (11-oct-2026): la palomita del logo se dibuja una vez al abrir. Es el trazo de la máscara del
+ * hueco (Logo.tsx): con pathLength 1, «1 2» deja un solo trazo, y empezar en 1.2 evita que la punta
+ * redonda asome antes de tiempo. Sin movimiento, o si el navegador no anima, queda completa como siempre.
+ * Al pasar el cursor por la marca se vuelve a dibujar (detalles.ts).
+ */
+.marca-palomita {
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: 0;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .marca-palomita {
+    animation: palomita-dibuja 0.55s 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+}
+@keyframes palomita-dibuja {
+  from {
+    stroke-dashoffset: 1.2;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
 
 /* Las notas a mano de Moli: letra de su hoja, un poco chuecas. */
 .nota {

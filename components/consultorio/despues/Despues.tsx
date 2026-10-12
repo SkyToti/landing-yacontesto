@@ -21,11 +21,24 @@ function Instalacion() {
       </h2>
       <p className="texto-seccion">{INSTALACION.texto}</p>
       <ol className="taco">
-        {PASOS_INSTALACION.map((p) => (
+        {PASOS_INSTALACION.map((p, i) => (
           <li key={p.cuando} className="taco-paso">
-            <div className="taco-hoja" aria-hidden="true">
-              <span>{p.cuando.startsWith("Días") ? "DÍAS" : "DÍA"}</span>
-              <b>{numeroDe(p.cuando)}</b>
+            {/* La hoja va en un marco: el sello del último día se sale de la hoja, que recorta su cabeza. */}
+            <div className="taco-marco" aria-hidden="true">
+              <div className="taco-hoja">
+                <span>{p.cuando.startsWith("Días") ? "DÍAS" : "DÍA"}</span>
+                <b>{numeroDe(p.cuando)}</b>
+              </div>
+              {/* Detalle 3 (11-oct-2026): el día que empieza a contestar lleva el sello con la palomita. */}
+              {i === PASOS_INSTALACION.length - 1 && (
+                <svg className="taco-sello" viewBox="0 0 50 50" focusable="false">
+                  <defs dangerouslySetInnerHTML={{ __html: filtroTinta("tinta-sello", 5) }} />
+                  <g filter="url(#tinta-sello)">
+                    <circle cx="25" cy="25" r="20" />
+                    <path d="M15.5 25.5 22 32 34.5 18.5" pathLength={1} />
+                  </g>
+                </svg>
+              )}
             </div>
             <div>
               <p className="taco-cuando">{p.cuando}</p>
@@ -88,6 +101,9 @@ function MoliCierre() {
             <g dangerouslySetInnerHTML={{ __html: cuerpo() }} />
             <g className="cara-guardia" dangerouslySetInnerHTML={{ __html: rasgos("ci-g", "normal") }} />
             <g className="cara-feliz" dangerouslySetInnerHTML={{ __html: rasgos("ci-f", "feliz") }} />
+            {/* Detalle 5: las caras con las que voltea a ver el botón (VidaCierre las prende). */}
+            <g className="cara-mira" dangerouslySetInnerHTML={{ __html: rasgos("ci-m", "mira") }} />
+            <g className="cara-mira-abajo" dangerouslySetInnerHTML={{ __html: rasgos("ci-ma", "miraAbajo") }} />
             <g dangerouslySetInnerHTML={{ __html: diademaCompleta() }} />
           </g>
         </svg>

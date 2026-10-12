@@ -99,6 +99,10 @@ export const EXPRESIONES = {
   bosteza: { ojos: "cerrados", cejas: "arriba", boca: "o" },
   // A las 11:20, cuando le pasa el chat a tu equipo: se queda callado (guiño + boca de línea).
   calla: { ojos: "guino", cejas: "normal", boca: "linea" },
+  // Detalle 5 (11-oct-2026): en el cierre voltea a ver «¡Escríbenos!» (sin trazo nuevo: ojos, cejas y boca
+  // que ya existen). En compu el botón queda a su izquierda y abajo; en el celular, debajo.
+  mira: { ojos: "abiertos", cejas: "arriba", boca: "sonrisa", mirada: [-9, 5] },
+  miraAbajo: { ojos: "abiertos", cejas: "arriba", boca: "sonrisa", mirada: [-2, 9] },
 } satisfies Record<string, Expresion>;
 
 export type Cara = keyof typeof EXPRESIONES;

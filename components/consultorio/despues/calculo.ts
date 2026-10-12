@@ -56,10 +56,40 @@ export function conectarCalculadora(raiz: HTMLElement) {
   const linea = q(".calc-linea");
   const punto = q(".calc-punto");
   const escalones = Array.from(raiz.querySelectorAll<HTMLElement>(".calc-escalon"));
+  /*
+   * Detalle 4 (11-oct-2026, aprobado por Diego): la mensualidad cuenta hasta el valor nuevo (0.45 s) en vez de
+   * brincar, y da un saltito al cambiar de escalón (al pasar de 300 y de 800). Lectores de pantalla: igual que
+   * antes, oyen el aria-valuetext del deslizador. Con «menos movimiento», el número cambia de golpe.
+   */
+  const quieto = matchMedia("(prefers-reduced-motion: reduce)");
+  let mostrado = estadoDe(INICIAL).total;
+  let escalonAntes = estadoDe(INICIAL).escalon;
+  let cuadro = 0;
+  const contar = (destino: number) => {
+    cancelAnimationFrame(cuadro);
+    if (quieto.matches) {
+      mostrado = destino;
+      mes.textContent = precio(destino);
+      return;
+    }
+    const desde = mostrado;
+    const inicio = performance.now();
+    const paso = (ahora: number) => {
+      const k = Math.min(1, (ahora - inicio) / 450);
+      mostrado = desde + (destino - desde) * (1 - (1 - k) ** 3);
+      mes.textContent = precio(Math.round(mostrado));
+      if (k < 1) cuadro = requestAnimationFrame(paso);
+    };
+    cuadro = requestAnimationFrame(paso);
+  };
   const pintar = () => {
     const e = estadoDe(Number(input.value));
     cuantos.textContent = e.cuantos;
-    mes.textContent = e.mes;
+    contar(e.total);
+    if (e.escalon !== escalonAntes && !quieto.matches) {
+      mes.animate([{ transform: "scale(1.08)" }, { transform: "scale(1)" }], { duration: 400, easing: "cubic-bezier(0.34, 1.56, 0.64, 1)" });
+    }
+    escalonAntes = e.escalon;
     detalle.textContent = e.detalle;
     linea.style.left = e.px;
     punto.style.left = e.px;
@@ -71,5 +101,8 @@ export function conectarCalculadora(raiz: HTMLElement) {
   input.addEventListener("input", pintar);
   // Si el navegador recordó otro valor (volver atrás), la gráfica lo alcanza.
   if (Number(input.value) !== INICIAL) pintar();
-  return () => input.removeEventListener("input", pintar);
+  return () => {
+    input.removeEventListener("input", pintar);
+    cancelAnimationFrame(cuadro);
+  };
 }

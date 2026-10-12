@@ -136,6 +136,104 @@
   letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
 }
+/* Detalle 3 (11-oct-2026): el marco de la hoja (mismo tamaño que la hoja) y el sello del día que empieza a
+   contestar, con la palomita del logo. Fuera de la hoja porque la hoja recorta su cabeza (overflow). */
+.taco-marco {
+  position: relative;
+}
+.taco-sello {
+  position: absolute;
+  right: -14px;
+  bottom: -14px;
+  width: 46px;
+  height: 46px;
+  overflow: visible;
+  rotate: -8deg;
+}
+.taco-sello circle {
+  fill: var(--lima);
+  stroke: var(--tinta);
+  stroke-width: 3;
+}
+.taco-sello path {
+  fill: none;
+  stroke: var(--tinta);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1 2;
+  stroke-dashoffset: 0;
+}
+/* Las hojas caen como el taco que se arranca en la T1, una vez. Solo con JavaScript y movimiento:
+   detalles.ts pone «espera» en cada paso que todavía no se ve y lo cambia por «cae» cuando entra al 72 % de
+   arriba de la pantalla (en el celular, lejos de la pastilla, que tapaba el sello del día 7). */
+@media (prefers-reduced-motion: no-preference) {
+  .taco-paso.espera .taco-hoja {
+    opacity: 0;
+    transform: perspective(600px) rotateX(-100deg);
+  }
+  .taco-paso.espera .taco-sello {
+    opacity: 0;
+  }
+  .taco-paso.cae .taco-hoja {
+    transform-origin: 50% 0;
+    animation: hoja-cae 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .taco-paso.cae .taco-sello {
+    animation: sello-cae 0.38s 0.52s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+  .taco-paso.cae .taco-sello path {
+    animation: sello-palomita 0.35s 0.75s ease-out both;
+  }
+}
+/* En compu las tres hojas entran juntas: caen una tras otra y el sello llega al final. */
+@media (prefers-reduced-motion: no-preference) and (min-width: 900px) {
+  .taco-paso.cae:nth-child(2) .taco-hoja {
+    animation-delay: 0.15s;
+  }
+  .taco-paso.cae:nth-child(3) .taco-hoja {
+    animation-delay: 0.3s;
+  }
+  .taco-paso.cae .taco-sello {
+    animation-delay: 0.82s;
+  }
+  .taco-paso.cae .taco-sello path {
+    animation-delay: 1.05s;
+  }
+}
+@keyframes hoja-cae {
+  from {
+    opacity: 0;
+    transform: perspective(600px) rotateX(-100deg);
+  }
+  40% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: perspective(600px) rotateX(0deg);
+  }
+}
+@keyframes sello-cae {
+  from {
+    opacity: 0;
+    scale: 1.7;
+    rotate: -22deg;
+  }
+  to {
+    opacity: 1;
+    scale: 1;
+    rotate: -8deg;
+  }
+}
+@keyframes sello-palomita {
+  from {
+    stroke-dashoffset: 1.2;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
 .taco-cuando {
   font-size: 13px;
   font-weight: 700;
@@ -386,6 +484,8 @@
   font: 800 48px/1 var(--f-titular);
   letter-spacing: -0.03em;
   font-variant-numeric: tabular-nums;
+  /* Detalle 4: el saltito al cambiar de escalón crece desde la base del número, no desde su centro. */
+  transform-origin: 0 75%;
 }
 .calc-mes span {
   font-size: 15px;
@@ -543,6 +643,17 @@
   display: none;
 }
 .moli-cierre.contesta .cara-feliz {
+  display: inline;
+}
+/* Detalle 5 (11-oct-2026): Moli voltea a ver «¡Escríbenos!». VidaCierre pone «mira» (y «abajo» cuando el botón
+   queda debajo, en el celular); la cara feliz de cuando lo tocan gana. */
+.moli-cierre .cara-mira,
+.moli-cierre .cara-mira-abajo,
+.moli-cierre.mira:not(.contesta) .cara-guardia {
+  display: none;
+}
+.moli-cierre.mira:not(.contesta):not(.abajo) .cara-mira,
+.moli-cierre.mira.abajo:not(.contesta) .cara-mira-abajo {
   display: inline;
 }
 .cierre-toque {
@@ -771,6 +882,13 @@
   }
   .taco-paso {
     grid-template-columns: 1fr;
+  }
+  /* En compu la hoja ocupa toda la columna: el sello va dentro de su ancho (la sección recorta lo que se
+     sale de lado con content-visibility) y solo asoma por abajo. */
+  .taco-sello {
+    right: 14px;
+    width: 52px;
+    height: 52px;
   }
   .precio {
     grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr);

@@ -76,7 +76,9 @@ for (const quieta of [false, true]) {
         fijar.call(el, String(n));
         el.dispatchEvent(new Event("input", { bubbles: true }));
       }, n);
-      await pagina.waitForTimeout(150);
+      // Desde el detalle 4 (11-oct-2026) el número cuenta 0.45 s hasta su valor: se lee al terminar
+      // (que cuente, y no brinque, lo revisa r1-detalles.mjs).
+      await pagina.waitForTimeout(650);
       const mes = await pagina.locator(".calc-mes b").textContent();
       revisa(mes === esperado, `${nombre}: ${n} pacientes → ${mes} (se espera ${esperado})`);
     }
