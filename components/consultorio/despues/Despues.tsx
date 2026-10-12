@@ -166,7 +166,7 @@ export function Despues() {
   );
 }
 
-/** El pie: contacto, aviso de privacidad y la clínica ficticia. */
+/** El pie: contacto, las guías (SEO-2), aviso de privacidad y la clínica ficticia. */
 export function Pie() {
   return (
     <footer className="pie">
@@ -184,6 +184,11 @@ export function Pie() {
           <a href={`mailto:${PIE.correo}`}>{PIE.correo}</a>
         </li>
         <li>{PIE.ciudad}</li>
+        <li>
+          {/* Carga completa, como el aviso: con <Link> la escena dejaría sus clases (cine, pagina) en la guía. */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+          <a href="/guias/">Guías</a>
+        </li>
         <li>
           <a href="/privacidad/">Aviso de privacidad</a>
         </li>

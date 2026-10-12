@@ -1,4 +1,4 @@
-/* Las páginas aparte: la 404 y el aviso de privacidad. */
+/* Las páginas aparte: la 404, el aviso de privacidad y las guías. */
 
 .boton-obra {
   justify-self: start;
@@ -68,4 +68,60 @@
 /* El botón dentro del texto: sin esto, `.aviso a` lo pintaba crema sobre crema y no se leía (12-oct-2026). */
 .aviso .boton-obra {
   color: var(--tinta);
+}
+
+/* Las guías (SEO-2, 12-oct-2026): el texto largo del aviso, más lo que necesita una guía. */
+.guia-ruta {
+  margin-bottom: 14px;
+  font-size: 15px;
+}
+.guia-ruta a {
+  color: var(--crema-suave);
+}
+.guia h3 {
+  margin: 24px 0 6px;
+  font: 800 18px/1.2 var(--f-titular);
+  letter-spacing: -0.01em;
+}
+.guia b {
+  font-weight: 600;
+  color: var(--crema);
+}
+.guia ol {
+  display: grid;
+  gap: 12px;
+  margin-top: 8px;
+  padding-left: 1.4em;
+  list-style: decimal;
+}
+.guia ul + p,
+.guia ol + p {
+  margin-top: 14px;
+}
+/* Con dos clases, para ganarle a `.aviso p + p`. */
+.guia .guia-corto,
+.guia .guia-entrada {
+  margin-top: 20px;
+}
+.guia-corto {
+  padding: 16px 18px;
+  border: 2px dashed var(--apagado);
+  border-radius: 14px;
+}
+.guia-cierre {
+  margin-top: 44px;
+  padding-top: 8px;
+  border-top: 2px dashed var(--apagado);
+}
+.guia-fuentes li {
+  font-size: 15px;
+}
+.aviso .guias-lista {
+  gap: 28px;
+  margin-top: 32px;
+  padding-left: 0;
+  list-style: none;
+}
+.guias-lista h2 {
+  margin-top: 0;
 }

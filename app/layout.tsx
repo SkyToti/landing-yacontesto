@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import type { Metadata, Viewport } from "next";
 import { Bricolage_Grotesque, Instrument_Sans, Patrick_Hand_SC } from "next/font/google";
+import { COMPARTIR } from "@/lib/compartir";
 import "./globals.css";
 
 // Identidad nueva (rebranding del 5-oct-2026): Bricolage Grotesque en titulares, con su tamaño óptico
@@ -43,22 +44,13 @@ export const metadata: Metadata = {
   formatDetection: { telephone: false, email: false, address: false },
   openGraph: {
     type: "website",
-    locale: "es_MX",
+    locale: COMPARTIR.locale,
     url: "/",
-    siteName: "YaContesto",
+    siteName: COMPARTIR.siteName,
     title: "Tu WhatsApp contesta solo, a las 11 p. m.",
     description:
       "Una recepcionista con inteligencia artificial para tu clínica dental: contesta, revisa tu agenda y deja la cita en tu calendario.",
-    images: [
-      {
-        // La imagen al compartir del kit del logo (enlace-compartido-og-oscuro, 7-oct-2026).
-        url: "/og.png",
-        type: "image/png",
-        width: 1200,
-        height: 630,
-        alt: "YaContesto: el globo de chat con palomita y el nombre, en crema sobre fondo negro.",
-      },
-    ],
+    images: COMPARTIR.imagenes,
   },
   twitter: {
     card: "summary_large_image",
