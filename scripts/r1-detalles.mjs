@@ -56,6 +56,13 @@ async function abrir(motor, perfil, quieto) {
   await pagina.addInitScript(() =>
     document.addEventListener("click", (e) => e.target.closest?.('a[href*="wa.me"]') && e.preventDefault(), true),
   );
+  // La palomita, en cuanto se arma la página (contra el sitio en vivo, «load» llega cuando ya se está dibujando).
+  await pagina.addInitScript(() =>
+    document.addEventListener("DOMContentLoaded", () => {
+      const p = document.querySelector(".marca-palomita");
+      window.__palomitaInicio = p ? parseFloat(getComputedStyle(p).strokeDashoffset) : null;
+    }),
+  );
   return { navegador, pagina, errores };
 }
 
@@ -73,8 +80,7 @@ for (const quieto of [false, true]) {
     await pagina.goto(URL, { waitUntil: "load" });
 
     // 1 · la palomita del logo
-    await pagina.waitForTimeout(120);
-    const alAbrir = parseFloat(await valor(pagina, ".marca-palomita", "strokeDashoffset"));
+    const alAbrir = await pagina.evaluate(() => window.__palomitaInicio);
     await pagina.waitForTimeout(1100);
     const despues = parseFloat(await valor(pagina, ".marca-palomita", "strokeDashoffset"));
     if (quieto) revisa(alAbrir === 0 && despues === 0, `${n}: el logo sale completo desde el principio (${alAbrir})`);
