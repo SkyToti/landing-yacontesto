@@ -26,14 +26,19 @@ const mano = Patrick_Hand_SC({
   preload: false,
 });
 
+// Título (≤ 60) y descripción (≤ 160) para que Google no los corte; aprobados por Diego el 12-oct-2026 (SEO-1).
+// scripts/seo.mjs revisa los largos.
 const descripcion =
-  "Instalamos un asistente con inteligencia artificial en el WhatsApp de tu clínica dental: contesta al instante a cualquier hora, revisa tu agenda y deja la cita en tu Google Calendar. Listo en 7 días, con garantía de 14 días.";
+  "Instalamos una recepcionista con IA en el WhatsApp de tu clínica dental: contesta a cualquier hora, revisa tu agenda y deja la cita. Lista en 7 días.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://yacontesto.com"),
-  title: "YaContesto | Recepcionista con IA para el WhatsApp de tu clínica dental",
+  title: "YaContesto: recepcionista con IA en WhatsApp para dentistas",
   description: descripcion,
   alternates: { canonical: "/" },
+  // Search Console, propiedad «Prefijo de URL» https://yacontesto.com/ (cuenta de Diego, 12-oct-2026).
+  // La etiqueta tiene que quedarse siempre: si se quita, Google deja de dar la propiedad por verificada.
+  verification: { google: "N9BAlc6sneZmJIcs8uKmM3NoGAJZmZOTkguZW7Uh1xY" },
   applicationName: "YaContesto",
   formatDetection: { telephone: false, email: false, address: false },
   openGraph: {
