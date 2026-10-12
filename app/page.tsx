@@ -3,22 +3,8 @@ import { EscenaNoche } from "@/components/consultorio/noche/EscenaNoche";
 import { Pastilla } from "@/components/consultorio/Pastilla";
 import { Logo } from "@/components/consultorio/Logo";
 import { Despues, Pie } from "@/components/consultorio/despues/Despues";
-import { PIE } from "@/components/consultorio/despues/textos";
 import { VidaCierre } from "@/components/consultorio/despues/VidaCierre";
-
-const datosEstructurados = {
-  "@context": "https://schema.org",
-  "@type": "Service",
-  name: "YaContesto",
-  serviceType: "Recepcionista con inteligencia artificial para WhatsApp",
-  areaServed: { "@type": "Country", name: "México" },
-  url: "https://yacontesto.com/",
-  provider: { "@type": "Person", name: "Diego Benítez", email: PIE.correo },
-  // Los perfiles de YaContesto: así los buscadores los ligan con el sitio.
-  sameAs: PIE.redes.map((red) => red.url),
-  description:
-    "Asistente con inteligencia artificial para el WhatsApp de clínicas dentales: contesta al instante, revisa la agenda y deja la cita en el calendario de la clínica.",
-};
+import { DATOS_ESTRUCTURADOS_JSON } from "@/lib/datos-estructurados";
 
 /**
  * «Un día en tu consultorio», rediseño con Moli (R-1, rama r1-moli). Paso 6: el día completo, de las 23:47 a
@@ -28,7 +14,7 @@ const datosEstructurados = {
 export default function Inicio() {
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(datosEstructurados) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: DATOS_ESTRUCTURADOS_JSON }} />
       <header className="cabecera">
         <a className="marca" href="#noche" aria-label="YaContesto, inicio">
           <Logo />
