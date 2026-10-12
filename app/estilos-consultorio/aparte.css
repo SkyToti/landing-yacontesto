@@ -65,3 +65,7 @@
   color: var(--crema);
   text-underline-offset: 3px;
 }
+/* El botón dentro del texto: sin esto, `.aviso a` lo pintaba crema sobre crema y no se leía (12-oct-2026). */
+.aviso .boton-obra {
+  color: var(--tinta);
+}
